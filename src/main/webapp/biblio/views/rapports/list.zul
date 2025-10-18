@@ -1,0 +1,86 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        Rapports List - Manage rapport de stage entries
+        Provides CRUD operations for RapportStageBiblio entities
+    -->
+    <div sclass="content-area">
+        <label value="📋 Gestion des rapports de stage" sclass="biblio-section-title" style="font-size: 24px; font-weight: bold; display: block; margin-bottom: 16px;" />
+        
+        <!-- Toolbar -->
+        <include src="/biblio/components/toolbar.zul" />
+        
+        <!-- Search and Filter -->
+        <div sclass="biblio-card" style="margin-bottom: 16px;">
+            <hlayout>
+                <textbox placeholder="Rechercher par titre, nom, cote..." value="@bind(vm.searchQuery)" 
+                         onChanging="@command('searchRapports')" hflex="1" />
+                <button label="🔍 Rechercher" onClick="@command('searchRapports')" />
+                <button label="🔄 Réinitialiser" onClick="@command('resetSearch')" />
+            </hlayout>
+            
+            <separator />
+            
+            <hlayout>
+                <label value="Filière:" />
+                <listbox model="@load(vm.filieres)" value="@bind(vm.selectedFiliere)" 
+                        onSelect="@command('filterByFiliere')" />
+                <label value="Promotion:" />
+                <listbox model="@load(vm.promotions)" value="@bind(vm.selectedPromotion)" 
+                        onSelect="@command('filterByPromotion')" />
+            </hlayout>
+        </div>
+        
+        <!-- Rapports List -->
+        <div sclass="biblio-list">
+            <div sclass="list-header">
+                <hlayout>
+                    <label value="Titre" hflex="3" />
+                    <label value="Nom" hflex="2" />
+                    <label value="Filière" hflex="2" />
+                    <label value="Promotion" hflex="1" />
+                    <label value="Actions" hflex="2" />
+                </hlayout>
+            </div>
+            
+            <apply forEach="@load(vm.rapports)">
+                <div sclass="list-item">
+                    <div sclass="item-info" hflex="3">
+                        <div sclass="item-title">@load(each.titre)</div>
+                        <div sclass="item-subtitle">Cote: @load(each.cote)</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="2">
+                        <div sclass="item-title">@load(each.nom)</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="2">
+                        <div sclass="item-title">@load(each.filiereBiblio?.libelle ?: 'Non spécifié')</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="1">
+                        <div sclass="item-title">@load(each.promotionBiblio?.libelle ?: 'Non spécifié')</div>
+                    </div>
+                    
+                    <div sclass="item-actions" hflex="2">
+                        <button label="👁️" onClick="@command('viewRapport', rapport=each)" />
+                        <button label="✏️" onClick="@command('editRapport', rapport=each)" />
+                        <button label="📋" onClick="@command('showRapportDetails', rapport=each)" />
+                        <button label="🗑️" onClick="@command('deleteRapport', rapport=each)" />
+                    </div>
+                </div>
+            </apply>
+        </div>
+        
+        <!-- Pagination -->
+        <div sclass="biblio-card" style="text-align: center; margin-top: 16px;">
+            <hlayout>
+                <button label="Précédent" onClick="@command('previousPage')" 
+                        disabled="@load(vm.currentPageNumber le 1)" />
+                <label value="Page @load(vm.currentPageNumber) sur @load(vm.totalPages)" />
+                <button label="Suivant" onClick="@command('nextPage')" 
+                        disabled="@load(vm.currentPageNumber ge vm.totalPages)" />
+            </hlayout>
+        </div>
+    </div>
+</zk>
+</zk>

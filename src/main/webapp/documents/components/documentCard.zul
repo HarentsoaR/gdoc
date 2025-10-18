@@ -1,0 +1,12 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <div sclass="doc-card" onClick="@command('selectDocument', doc=arg.doc)">
+        <hlayout valign="middle" spacing="12px">
+            <n:i sclass="z-icon-folder doc-card-icon" />
+            <label value="@load(arg.doc.titre)" sclass="doc-title" tooltiptext="@load(arg.doc.titre)" />
+        </hlayout>
+        <div sclass="doc-card-footer">
+            <label value="@load(arg.doc.emplacement)" sclass="doc-subtitle" />
+            <button iconSclass="z-icon-ellipsis-v" sclass="btn-icon" />
+        </div>
+    </div>
+</zk>

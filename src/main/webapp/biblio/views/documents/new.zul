@@ -1,0 +1,133 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        New Document Form - Create a new document in the bibliothèque
+        Form for DocumentBiblio entity creation
+    -->
+    <div sclass="content-area">
+        <label value="➕ Nouveau document" sclass="biblio-section-title" style="font-size: 24px; font-weight: bold; display: block; margin-bottom: 16px;" />
+        
+        <div sclass="biblio-card">
+            <form id="documentForm">
+                <!-- Basic Information -->
+                <div sclass="form-group">
+                    <label sclass="form-label">Titre *</label>
+                    <textbox sclass="form-input" value="@bind(vm.newDocument.titre)" />
+                </div>
+                
+                <hlayout>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">ISBN *</label>
+                        <textbox sclass="form-input" value="@bind(vm.newDocument.numeroIsbn)" />
+                    </div>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Prix *</label>
+                        <textbox sclass="form-input" value="@bind(vm.newDocument.prix)" />
+                    </div>
+                </hlayout>
+                
+                <hlayout>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Nombre de pages *</label>
+                        <intbox sclass="form-input" value="@bind(vm.newDocument.nombrePage)" />
+                    </div>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Nombre d'exemplaires *</label>
+                        <intbox sclass="form-input" value="@bind(vm.newDocument.nombreExemplaire)" />
+                    </div>
+                </hlayout>
+                
+                <!-- Document Type and Categories -->
+                <hlayout>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Type de document *</label>
+                        <listbox model="@load(vm.documentTypes)" value="@bind(vm.newDocument.detailTypeDocumentBiblioId)" 
+                                sclass="form-select" />
+                    </div>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Domaine *</label>
+                        <listbox model="@load(vm.domains)" value="@bind(vm.newDocument.domaineOuvrageId)" 
+                                sclass="form-select" />
+                    </div>
+                </hlayout>
+                
+                <hlayout>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Catégorie *</label>
+                        <listbox model="@load(vm.categories)" value="@bind(vm.newDocument.categorieOuvrageId)" 
+                                sclass="form-select" />
+                    </div>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Collection *</label>
+                        <listbox model="@load(vm.collections)" value="@bind(vm.newDocument.collectionOuvrageId)" 
+                                sclass="form-select" />
+                    </div>
+                </hlayout>
+                
+                <!-- Publisher and Origin -->
+                <hlayout>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Éditeur *</label>
+                        <listbox model="@load(vm.editeurs)" value="@bind(vm.newDocument.editeurId)" 
+                                sclass="form-select" />
+                    </div>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Origine *</label>
+                        <listbox model="@load(vm.origines)" value="@bind(vm.newDocument.origineId)" 
+                                sclass="form-select" />
+                    </div>
+                </hlayout>
+                
+                <!-- Dates -->
+                <hlayout>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Date d'entrée *</label>
+                        <datebox sclass="form-input" value="@bind(vm.newDocument.dateEntree)" />
+                    </div>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Date d'acquisition *</label>
+                        <datebox sclass="form-input" value="@bind(vm.newDocument.dateAcquisition)" />
+                    </div>
+                </hlayout>
+                
+                <!-- Additional Information -->
+                <div sclass="form-group">
+                    <label sclass="form-label">Résumé *</label>
+                    <textbox sclass="form-input" rows="3" value="@bind(vm.newDocument.resume)" />
+                </div>
+                
+                <div sclass="form-group">
+                    <label sclass="form-label">Mots-clés *</label>
+                    <textbox sclass="form-input" value="@bind(vm.newDocument.motCle)" />
+                </div>
+                
+                <div sclass="form-group">
+                    <label sclass="form-label">Cote ouvrage *</label>
+                    <textbox sclass="form-input" value="@bind(vm.newDocument.coteOuvrage)" />
+                </div>
+                
+                <div sclass="form-group">
+                    <label sclass="form-label">Remarques</label>
+                    <textbox sclass="form-input" rows="2" value="@bind(vm.newDocument.remarque)" />
+                </div>
+                
+                <!-- Status -->
+                <hlayout>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Disponibilité</label>
+                        <checkbox label="Disponible" checked="@bind(vm.newDocument.disponibilite eq 1)" />
+                    </div>
+                    <div sclass="form-group" hflex="1">
+                        <label sclass="form-label">Empruntable</label>
+                        <checkbox label="Empruntable" checked="@bind(vm.newDocument.pretable eq 1)" />
+                    </div>
+                </hlayout>
+                
+                <!-- Form Actions -->
+                <div style="text-align: right; margin-top: 24px;">
+                    <button label="💾 Enregistrer" onClick="@command('saveDocument')" sclass="toolbar-button primary" />
+                    <button label="❌ Annuler" onClick="@command('cancelDocument')" sclass="toolbar-button" />
+                </div>
+            </form>
+        </div>
+    </div>
+</zk>

@@ -1,0 +1,116 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        Inventory List - Complete inventory of all bibliothèque items
+        Shows all documents with their status and location
+    -->
+    <div sclass="content-area">
+        <label value="📦 Inventaire complet" sclass="biblio-section-title" style="font-size: 24px; font-weight: bold; display: block; margin-bottom: 16px;" />
+        
+        <!-- Toolbar -->
+        <include src="/biblio/components/toolbar.zul" />
+        
+        <!-- Search and Filter -->
+        <div sclass="biblio-card" style="margin-bottom: 16px;">
+            <hlayout>
+                <textbox placeholder="Rechercher dans l'inventaire..." value="@bind(vm.searchQuery)" 
+                         onChanging="@command('searchInventory')" hflex="1" />
+                <button label="🔍 Rechercher" onClick="@command('searchInventory')" />
+                <button label="🔄 Réinitialiser" onClick="@command('resetSearch')" />
+            </hlayout>
+            
+            <separator />
+            
+            <hlayout>
+                <label value="Type:" />
+                <listbox model="@load(vm.documentTypes)" value="@bind(vm.selectedDocumentType)" 
+                        onSelect="@command('filterByType')" />
+                <label value="Statut:" />
+                <listbox model="@load(vm.statusOptions)" value="@bind(vm.selectedStatus)" 
+                        onSelect="@command('filterByStatus')" />
+                <label value="Domaine:" />
+                <listbox model="@load(vm.domains)" value="@bind(vm.selectedDomain)" 
+                        onSelect="@command('filterByDomain')" />
+            </hlayout>
+        </div>
+        
+        <!-- Statistics Summary -->
+        <div sclass="biblio-grid" style="margin-bottom: 16px;">
+            <div sclass="biblio-card">
+                <h4 sclass="card-title">📚 Total</h4>
+                <div sclass="stat-number">@load(vm.totalItems)</div>
+            </div>
+            <div sclass="biblio-card">
+                <h4 sclass="card-title">✅ Disponibles</h4>
+                <div sclass="stat-number">@load(vm.availableItems)</div>
+            </div>
+            <div sclass="biblio-card">
+                <h4 sclass="card-title">📤 Empruntés</h4>
+                <div sclass="stat-number">@load(vm.loanedItems)</div>
+            </div>
+            <div sclass="biblio-card">
+                <h4 sclass="card-title">❌ Indisponibles</h4>
+                <div sclass="stat-number">@load(vm.unavailableItems)</div>
+            </div>
+        </div>
+        
+        <!-- Inventory List -->
+        <div sclass="biblio-list">
+            <div sclass="list-header">
+                <hlayout>
+                    <label value="Titre" hflex="3" />
+                    <label value="Type" hflex="1" />
+                    <label value="Auteur" hflex="2" />
+                    <label value="Statut" hflex="1" />
+                    <label value="Date entrée" hflex="1" />
+                    <label value="Actions" hflex="2" />
+                </hlayout>
+            </div>
+            
+            <apply forEach="@load(vm.inventoryItems)">
+                <div sclass="list-item">
+                    <div sclass="item-info" hflex="3">
+                        <div sclass="item-title">@load(each.titre)</div>
+                        <div sclass="item-subtitle">@load(each.numeroIsbn)</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="1">
+                        <div sclass="item-title">@load(each.detailTypeDocumentBiblio?.typeDocumentBiblio?.libelle ?: 'Document')</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="2">
+                        <div sclass="item-title">@load(each.documentAuteur?.auteur?.nom ?: 'Non spécifié')</div>
+                        <div sclass="item-subtitle">@load(each.editeur?.nom ?: 'Non spécifié')</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="1">
+                        <label sclass="@load(each.disponibilite eq 1 ? 'status-available' : 'status-unavailable')">
+                            @load(each.disponibilite eq 1 ? 'Disponible' : 'Indisponible')
+                        </label>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="1">
+                        <div sclass="item-title">@load(each.dateEntree)</div>
+                    </div>
+                    
+                    <div sclass="item-actions" hflex="2">
+                        <button label="👁️" onClick="@command('viewItem', item=each)" />
+                        <button label="✏️" onClick="@command('editItem', item=each)" />
+                        <button label="📋" onClick="@command('showItemDetails', item=each)" />
+                        <button label="📊" onClick="@command('showItemStats', item=each)" />
+                    </div>
+                </div>
+            </apply>
+        </div>
+        
+        <!-- Pagination -->
+        <div sclass="biblio-card" style="text-align: center; margin-top: 16px;">
+            <hlayout>
+                <button label="Précédent" onClick="@command('previousPage')" 
+                        disabled="@load(vm.currentPageNumber le 1)" />
+                <label value="Page @load(vm.currentPageNumber) sur @load(vm.totalPages)" />
+                <button label="Suivant" onClick="@command('nextPage')" 
+                        disabled="@load(vm.currentPageNumber ge vm.totalPages)" />
+            </hlayout>
+        </div>
+    </div>
+</zk>

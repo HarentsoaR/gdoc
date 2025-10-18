@@ -1,0 +1,36 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        Biblio Document Card - Reusable card component for displaying document information
+        Similar to documents/documentCard.zul but adapted for biblio entities
+    -->
+    <div sclass="biblio-card" style="cursor: pointer;" onClick="@command('selectDocument', document=document)">
+        <div sclass="card-header">
+            <h4 sclass="card-title">@load(document.titre)</h4>
+            <label sclass="card-subtitle">@load(document.detailTypeDocumentBiblio?.typeDocumentBiblio?.libelle ?: 'Document')</label>
+        </div>
+        
+        <div sclass="card-content">
+            <div sclass="document-info">
+                <label value="Auteur: @load(document.documentAuteur?.auteur?.nom ?: 'Non spécifié')" />
+                <label value="Éditeur: @load(document.editeur?.nom ?: 'Non spécifié')" />
+                <label value="ISBN: @load(document.numeroIsbn)" />
+                <label value="Pages: @load(document.nombrePage)" />
+                <label value="Exemplaires: @load(document.nombreExemplaire)" />
+            </div>
+            
+            <div sclass="document-status">
+                <label sclass="@load(document.disponibilite eq 1 ? 'status-available' : 'status-unavailable')">
+                    @load(document.disponibilite eq 1 ? 'Disponible' : 'Indisponible')
+                </label>
+                <label value="@load(document.pretable eq 1 ? 'Empruntable' : 'Non empruntable')" />
+            </div>
+        </div>
+        
+        <div sclass="card-actions">
+            <button label="👁️ Voir" sclass="card-action" onClick="@command('viewDocument', document=document)" />
+            <button label="✏️ Modifier" sclass="card-action" onClick="@command('editDocument', document=document)" />
+            <button label="📋 Détails" sclass="card-action" onClick="@command('showDocumentDetails', document=document)" />
+            <button label="🗑️ Supprimer" sclass="card-action" onClick="@command('deleteDocument', document=document)" />
+        </div>
+    </div>
+</zk>

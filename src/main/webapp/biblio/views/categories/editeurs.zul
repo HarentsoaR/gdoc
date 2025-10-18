@@ -1,0 +1,62 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        Editeurs Management - Manage publishers
+        CRUD operations for Editeur entities
+    -->
+    <div sclass="content-area">
+        <label value="🏢 Gestion des éditeurs" sclass="biblio-section-title" style="font-size: 24px; font-weight: bold; display: block; margin-bottom: 16px;" />
+        
+        <!-- Toolbar -->
+        <include src="/biblio/components/toolbar.zul" />
+        
+        <!-- Search and Filter -->
+        <div sclass="biblio-card" style="margin-bottom: 16px;">
+            <hlayout>
+                <textbox placeholder="Rechercher un éditeur..." value="@bind(vm.searchQuery)" 
+                         onChanging="@command('searchEditeurs')" hflex="1" />
+                <button label="🔍 Rechercher" onClick="@command('searchEditeurs')" />
+                <button label="🔄 Réinitialiser" onClick="@command('resetSearch')" />
+            </hlayout>
+        </div>
+        
+        <!-- Editeurs List -->
+        <div sclass="biblio-list">
+            <div sclass="list-header">
+                <hlayout>
+                    <label value="Nom" hflex="3" />
+                    <label value="Adresse" hflex="2" />
+                    <label value="Documents" hflex="1" />
+                    <label value="Actions" hflex="2" />
+                </hlayout>
+            </div>
+            
+            <apply forEach="@load(vm.editeurs)">
+                <div sclass="list-item">
+                    <div sclass="item-info" hflex="3">
+                        <div sclass="item-title">@load(each.nom)</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="2">
+                        <div sclass="item-subtitle">@load(each.adresse ?: 'Aucune adresse')</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="1">
+                        <div sclass="item-title">@load(each.documents?.size() ?: 0)</div>
+                    </div>
+                    
+                    <div sclass="item-actions" hflex="2">
+                        <button label="👁️" onClick="@command('viewEditeur', editeur=each)" />
+                        <button label="✏️" onClick="@command('editEditeur', editeur=each)" />
+                        <button label="🗑️" onClick="@command('deleteEditeur', editeur=each)" />
+                    </div>
+                </div>
+            </apply>
+        </div>
+        
+        <!-- Add New Editeur Button -->
+        <div sclass="biblio-card" style="text-align: center; margin-top: 16px;">
+            <button label="➕ Ajouter un nouvel éditeur" onClick="@command('openNewEditeurModal')" 
+                    sclass="toolbar-button primary" />
+        </div>
+    </div>
+</zk>

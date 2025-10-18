@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 4.0//EN" "http://www.tuckey.org/res/dtds/urlrewrite4.0.dtd">
+<urlrewrite>
+    <!-- Login pretty URL: / -> /login.zul -->
+    <rule>
+        <name>root</name>
+        <from>^/$</from>
+        <to last="true">/login.zul</to>
+    </rule>
+
+    <!-- Home pretty URL: /home -> /index.zul -->
+    <rule>
+        <name>home</name>
+        <from>^/home$</from>
+        <to last="true">/index.zul</to>
+    </rule>
+
+    <!-- Admin pretty URL: /admin -> /admin/main.zul -->
+    <rule>
+        <name>admin-main</name>
+        <from>^/admin$</from>
+        <to last="true">/admin/main.zul</to>
+    </rule>
+
+    <!-- Documents module: /documents -> /documents/documents.zul (landing) -->
+    <rule>
+        <name>documents-root</name>
+        <from>^/documents$</from>
+        <to last="true">/documents/documents.zul</to>
+    </rule>
+
+    <!-- Map deeper pretty paths if needed e.g. /documents/candidats/dossiers -->
+    <rule>
+        <name>documents-candidats-dossiers</name>
+        <from>^/documents/candidats/dossiers$</from>
+        <to last="true">/documents/views/candidats/dossiers.zul</to>
+    </rule>
+
+    <!-- Biblio module: /biblio -> /biblio/biblio.zul (landing) -->
+    <rule>
+        <name>biblio-root</name>
+        <from>^/biblio$</from>
+        <to last="true">/biblio/biblio.zul</to>
+    </rule>
+
+    <!-- Biblio documents management -->
+    <rule>
+        <name>biblio-documents</name>
+        <from>^/biblio/documents$</from>
+        <to last="true">/biblio/biblio.zul?view=/biblio/views/documents/list.zul</to>
+    </rule>
+
+    <!-- Biblio journals management -->
+    <rule>
+        <name>biblio-journals</name>
+        <from>^/biblio/journals$</from>
+        <to last="true">/biblio/biblio.zul?view=/biblio/views/journals/list.zul</to>
+    </rule>
+
+    <!-- Biblio rapports management -->
+    <rule>
+        <name>biblio-rapports</name>
+        <from>^/biblio/rapports$</from>
+        <to last="true">/biblio/biblio.zul?view=/biblio/views/rapports/list.zul</to>
+    </rule>
+
+    <!-- Biblio inventory management -->
+    <rule>
+        <name>biblio-inventory</name>
+        <from>^/biblio/inventory$</from>
+        <to last="true">/biblio/biblio.zul?view=/biblio/views/inventaire/list.zul</to>
+    </rule>
+
+    <!-- Biblio categories management -->
+    <rule>
+        <name>biblio-categories</name>
+        <from>^/biblio/categories$</from>
+        <to last="true">/biblio/biblio.zul?view=/biblio/views/categories/domaines.zul</to>
+    </rule>
+
+</urlrewrite>

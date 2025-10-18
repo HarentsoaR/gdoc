@@ -1,0 +1,99 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <!-- 
+        Biblio Sidebar - Navigation for bibliothèque management
+        Organized by document types and management functions
+    -->
+    <vlayout sclass="sidebar" width="260px">
+        
+        <!-- Section 1: Main Action Button -->
+        <div sclass="sidebar-section">
+             <button label="Nouveau Document" sclass="btn-new" iconSclass="z-icon-plus"
+                    onClick="@command('openNewDocumentModal')" />
+        </div>
+
+        <!-- Section 2: Navigation Links -->
+        <div sclass="sidebar-section sidebar-nav">
+            <!-- Retour à l'accueil -->
+            <button label="Retour à l'accueil" sclass="sidebar-button" iconSclass="z-icon-home"
+                    onClick="@command('goHome')" />
+
+            <button label="Tableau de bord" sclass="sidebar-button active" iconSclass="z-icon-dashboard"
+                    onClick="@command('navigateTo', view='/biblio/views/dashboard.zul', label='Tableau de bord')" />
+            
+            <button label="Tous les documents" sclass="sidebar-button" iconSclass="z-icon-book"
+                    onClick="@command('navigateTo', view='/biblio/views/explorer.zul', label='Explorateur')" />
+        </div>
+
+        <separator/>
+        
+        <!-- Section 3: Documents Management (collapsible) -->
+        <div sclass="sidebar-section sidebar-nav">
+            <hlayout sclass="@load(vm.documentsExpanded ? 'sidebar-toggle open' : 'sidebar-toggle')"
+                     onClick="@command('toggleDocumentsSection')">
+                <n:i class="z-icon-caret-right sidebar-caret" />
+                <label value="Documents" sclass="sidebar-title no-padding" />
+            </hlayout>
+            <vlayout sclass="concours-subnav" visible="@load(vm.documentsExpanded)">
+                <button label="Ouvrages" sclass="sidebar-button" iconSclass="z-icon-book"
+                        onClick="@command('navigateTo', view='/biblio/views/documents/list.zul', section='Documents', page='Ouvrages')" />
+                <button label="Journaux" sclass="sidebar-button" iconSclass="z-icon-newspaper-o"
+                        onClick="@command('navigateTo', view='/biblio/views/journals/list.zul', section='Documents', page='Journaux')" />
+                <button label="Rapports de stage" sclass="sidebar-button" iconSclass="z-icon-file-text"
+                        onClick="@command('navigateTo', view='/biblio/views/rapports/list.zul', section='Documents', page='Rapports')" />
+                <button label="Mémoires" sclass="sidebar-button" iconSclass="z-icon-graduation-cap"
+                        onClick="@command('navigateTo', view='/biblio/views/documents/memoires.zul', section='Documents', page='Mémoires')" />
+                <button label="Dictionnaires" sclass="sidebar-button" iconSclass="z-icon-bookmark"
+                        onClick="@command('navigateTo', view='/biblio/views/documents/dictionnaires.zul', section='Documents', page='Dictionnaires')" />
+            </vlayout>
+        </div>
+
+        <!-- Section 4: Inventory Management (collapsible) -->
+        <div sclass="sidebar-section sidebar-nav">
+            <hlayout sclass="@load(vm.inventoryExpanded ? 'sidebar-toggle open' : 'sidebar-toggle')"
+                     onClick="@command('toggleInventorySection')">
+                <n:i class="z-icon-caret-right sidebar-caret" />
+                <label value="Inventaire" sclass="sidebar-title no-padding" />
+            </hlayout>
+            <vlayout sclass="concours-subnav" visible="@load(vm.inventoryExpanded)">
+                <button label="Inventaire général" sclass="sidebar-button" iconSclass="z-icon-list"
+                        onClick="@command('navigateTo', view='/biblio/views/inventaire/list.zul', section='Inventaire', page='Inventaire général')" />
+                <button label="Statistiques" sclass="sidebar-button" iconSclass="z-icon-bar-chart"
+                        onClick="@command('navigateTo', view='/biblio/views/inventaire/statistiques.zul', section='Inventaire', page='Statistiques')" />
+                <button label="Recherche avancée" sclass="sidebar-button" iconSclass="z-icon-search"
+                        onClick="@command('navigateTo', view='/biblio/views/inventaire/recherche.zul', section='Inventaire', page='Recherche')" />
+            </vlayout>
+        </div>
+
+        <!-- Section 5: Categories Management (collapsible) -->
+        <div sclass="sidebar-section sidebar-nav">
+            <hlayout sclass="@load(vm.categoriesExpanded ? 'sidebar-toggle open' : 'sidebar-toggle')"
+                     onClick="@command('toggleCategoriesSection')">
+                <n:i class="z-icon-caret-right sidebar-caret" />
+                <label value="Catégories" sclass="sidebar-title no-padding" />
+            </hlayout>
+            <vlayout sclass="concours-subnav" visible="@load(vm.categoriesExpanded)">
+                <button label="Domaines" sclass="sidebar-button" iconSclass="z-icon-tags"
+                        onClick="@command('navigateTo', view='/biblio/views/categories/domaines.zul', section='Catégories', page='Domaines')" />
+                <button label="Catégories d'ouvrages" sclass="sidebar-button" iconSclass="z-icon-folder"
+                        onClick="@command('navigateTo', view='/biblio/views/categories/categories.zul', section='Catégories', page='Catégories')" />
+                <button label="Collections" sclass="sidebar-button" iconSclass="z-icon-bookmark"
+                        onClick="@command('navigateTo', view='/biblio/views/categories/collections.zul', section='Catégories', page='Collections')" />
+                <button label="Éditeurs" sclass="sidebar-button" iconSclass="z-icon-building"
+                        onClick="@command('navigateTo', view='/biblio/views/categories/editeurs.zul', section='Catégories', page='Éditeurs')" />
+            </vlayout>
+        </div>
+
+        <space vflex="1" /> <!-- Pushes the storage section to the bottom -->
+        
+        <!-- Section 6: Storage Information -->
+        <div sclass="sidebar-section">
+            <div sclass="sidebar-storage">
+                <n:i class="z-icon-database" />
+                <label value="Base de données bibliothèque" sclass="storage-title"/>
+                <progressmeter value="75" sclass="storage-progress"/>
+                <label value="1,250 documents sur 2,000" sclass="storage-text"/>
+                <button label="Gérer la base" sclass="btn-storage" />
+            </div>
+        </div>
+    </vlayout>
+</zk>

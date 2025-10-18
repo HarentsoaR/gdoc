@@ -1,0 +1,63 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        Categories Management - Manage document categories
+        CRUD operations for CategorieOuvrage entities
+    -->
+    <div sclass="content-area">
+        <label value="📖 Gestion des catégories d'ouvrages" sclass="biblio-section-title" style="font-size: 24px; font-weight: bold; display: block; margin-bottom: 16px;" />
+        
+        <!-- Toolbar -->
+        <include src="/biblio/components/toolbar.zul" />
+        
+        <!-- Search and Filter -->
+        <div sclass="biblio-card" style="margin-bottom: 16px;">
+            <hlayout>
+                <textbox placeholder="Rechercher une catégorie..." value="@bind(vm.searchQuery)" 
+                         onChanging="@command('searchCategories')" hflex="1" />
+                <button label="🔍 Rechercher" onClick="@command('searchCategories')" />
+                <button label="🔄 Réinitialiser" onClick="@command('resetSearch')" />
+            </hlayout>
+        </div>
+        
+        <!-- Categories List -->
+        <div sclass="biblio-list">
+            <div sclass="list-header">
+                <hlayout>
+                    <label value="Libellé" hflex="3" />
+                    <label value="Description" hflex="2" />
+                    <label value="Documents" hflex="1" />
+                    <label value="Actions" hflex="2" />
+                </hlayout>
+            </div>
+            
+            <apply forEach="@load(vm.categories)">
+                <div sclass="list-item">
+                    <div sclass="item-info" hflex="3">
+                        <div sclass="item-title">@load(each.libelle)</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="2">
+                        <div sclass="item-subtitle">@load(each.description ?: 'Aucune description')</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="1">
+                        <div sclass="item-title">@load(each.documents?.size() ?: 0)</div>
+                    </div>
+                    
+                    <div sclass="item-actions" hflex="2">
+                        <button label="👁️" onClick="@command('viewCategorie', categorie=each)" />
+                        <button label="✏️" onClick="@command('editCategorie', categorie=each)" />
+                        <button label="🗑️" onClick="@command('deleteCategorie', categorie=each)" />
+                    </div>
+                </div>
+            </apply>
+        </div>
+        
+        <!-- Add New Category Button -->
+        <div sclass="biblio-card" style="text-align: center; margin-top: 16px;">
+            <button label="➕ Ajouter une nouvelle catégorie" onClick="@command('openNewCategorieModal')" 
+                    sclass="toolbar-button primary" />
+        </div>
+    </div>
+</zk>
+</zk>

@@ -1,0 +1,30 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <vlayout hflex="1" vflex="1" viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.DocumentConcoursViewModel')" sclass="content-area">
+        <hlayout spacing="8px" sclass="content-header">
+            <textbox placeholder="🔍 Rechercher un document concours..." width="40%" value="@bind(vm.searchQuery)" onChange="@command('search')"/>
+            <button label="Rafraîchir" sclass="btn-secondary" iconSclass="z-icon-refresh" onClick="@command('refresh')"/>
+        </hlayout>
+        <div sclass="data-table-container" vflex="1">
+            <listbox model="@load(vm.docs)" vflex="1" hflex="1" sclass="data-table">
+                <listhead>
+                    <listheader label="Libellé"/>
+                    <listheader label="Remarque"/>
+                    <listheader label="Actions" width="120px" align="center"/>
+                </listhead>
+                <template name="model" var="d">
+                    <listitem>
+                        <listcell label="@load(d.libelle)"/>
+                        <listcell label="@load(d.remarque)"/>
+                        <listcell sclass="actions-cell">
+                            <hlayout spacing="6px">
+                                <button sclass="btn-icon btn-icon-danger" iconSclass="z-icon-trash-o" tooltiptext="Supprimer"
+                                        onClick="@command('delete', id=d.documentConcoursId)"/>
+                            </hlayout>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+    </vlayout>
+</zk>
+

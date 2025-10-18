@@ -1,0 +1,28 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="xhtml">
+    <!-- 
+        Biblio Topbar - Header with navigation and search
+        Following the same pattern as documents topbar
+    -->
+    <div sclass="topbar">
+        <div sclass="topbar-left">
+            <label sclass="topbar-title" value="Gestion Bibliothèque" />
+            <div sclass="breadcrumb">
+                <label value="@load(vm.currentSection)" />
+                <label value=" > " />
+                <label value="@load(vm.currentPage)" />
+            </div>
+        </div>
+        
+        <div sclass="topbar-right">
+            <textbox sclass="search-box" placeholder="Rechercher dans la bibliothèque..."
+                     value="@bind(vm.searchQuery)" 
+                     onChanging="@command('search')" />
+            
+            <button label="Recherche avancée" sclass="toolbar-button"
+                    onClick="@command('openAdvancedSearch')" />
+            
+            <button label="Paramètres" sclass="toolbar-button"
+                    onClick="@command('openSettings')" />
+        </div>
+    </div>
+</zk>

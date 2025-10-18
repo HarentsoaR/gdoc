@@ -1,0 +1,25 @@
+<vlayout sclass="p-3">
+    <textbox placeholder="🔍 Rechercher un document..." width="40%"
+             value="@bind(vm.searchQuery)" onChange="@command('searchDocuments')" />
+    
+    <listbox model="@bind(vm.documents)" width="100%" height="100%">
+        <listhead>
+            <listheader label="Titre" />
+            <listheader label="Type" />
+            <listheader label="Taille" />
+            <listheader label="Date" />
+            <listheader label="Actions" />
+        </listhead>
+        <template name="model">
+            <listitem>
+                <listcell label="@load(each.titre)" />
+                <listcell label="@load(each.type)" />
+                <listcell label="@load(each.taille)" />
+                <listcell label="@load(each.dateUpload)" />
+                <listcell>
+                    <button label="🗑️" onClick="@command('deleteDocument', docId=each.documentId)" />
+                </listcell>
+            </listitem>
+        </template>
+    </listbox>
+</vlayout>

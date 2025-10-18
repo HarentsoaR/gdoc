@@ -1,0 +1,28 @@
+<zk>
+    <div style="height: 70px; background: white; border-bottom: 1px solid #e2e8f0; padding: 0 32px; display: flex; align-items: center; justify-content: space-between;">
+        
+        <!-- Breadcrumb Dynamique -->
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
+            <forEach items="@load(vm.breadcrumbs)" var="crumb" varStatus="status">
+                <!-- Si l'item a une page, c'est un lien cliquable -->
+                <a if="@load(not empty crumb.page)"
+                   label="@load(crumb.label)"
+                   onClick="@command('navigateTo', page=crumb.page)"
+                   style="color: #64748b; cursor: pointer; text-decoration: none;"/>
+
+                <!-- Si l'item n'a pas de page, c'est le dernier, non cliquable -->
+                <label if="@load(empty crumb.page)"
+                       value="@load(crumb.label)"
+                       style="color: #1e293b; font-weight: 600;"/>
+
+                <!-- Affiche le séparateur, sauf pour le dernier élément -->
+                <label if="@load(!status.last)" value="›" style="color: #cbd5e1;"/>
+            </forEach>
+        </div>
+        
+        <!-- User Profile (inchangé) -->
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <!-- ... ton code pour le profil utilisateur ... -->
+        </div>
+    </div>
+</zk>

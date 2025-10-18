@@ -1,0 +1,62 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window id="uploadConcoursWin" title="Uploader un document de concours" border="normal" width="560px"
+            viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.ConcoursUploadViewModel')"
+            closable="true" sizable="false" mode="modal">
+
+        <vlayout sclass="p-3" spacing="10px">
+            <hlayout>
+                <label value="Candidat" width="140px"/>
+                <combobox id="candidat" width="100%" model="@load(vm.candidats)" autodrop="true" readonly="true"
+                          selectedItem="@bind(vm.selectedCandidat)">
+                    <template name="model" var="c">
+                        <comboitem label="@load(c.nom.concat(' ').concat(c.prenom))"/>
+                    </template>
+                </combobox>
+            </hlayout>
+
+            <hlayout>
+                <label value="Document Concours" width="140px"/>
+                <combobox id="docConcours" width="100%" model="@load(vm.documentsConcours)" autodrop="true" readonly="true"
+                          selectedItem="@bind(vm.selectedDocumentConcours)">
+                    <template name="model" var="dc">
+                        <comboitem label="@load(dc.libelle)" />
+                    </template>
+                </combobox>
+            </hlayout>
+
+            <hlayout>
+                <label value="Liste Dossier" width="140px"/>
+                <combobox id="ldc" width="100%" model="@load(vm.dossiersConcours)" autodrop="true" readonly="true"
+                          selectedItem="@bind(vm.selectedListeDossierConcours)">
+                    <template name="model" var="ld">
+                        <comboitem label="@load(ld.nomDossier)" />
+                    </template>
+                </combobox>
+            </hlayout>
+
+            <label value="📤 Upload" style="font-size:18px;font-weight:700;color:#005A9E"/>
+            <vlayout id="dropZone" hflex="1" droppable="true"
+                     style="border:2px dashed #005A9E;border-radius:6px;padding:24px;text-align:center">
+                <attribute name="onDrop"><![CDATA[
+                    import org.zkoss.util.media.Media;
+                    Media[] medias = event.getMedias();
+                    if (medias != null && medias.length > 0) {
+                        org.zkoss.bind.BindUtils.postCommand(null, null, "prepareUpload",
+                            java.util.Collections.singletonMap("file", medias[0]));
+                    }
+                ]]></attribute>
+                <label value="Glisser-déposer ou" style="color:#666"/>
+                <fileupload id="uploadBtn" label="Choisir fichier" upload="true,maxsize=10485760"
+                            onUpload="@command('prepareUpload', file=event.media)" style="margin-top:8px"/>
+                <label value="@load(vm.pendingFileName)" sclass="text-muted"/>
+            </vlayout>
+
+            <hlayout spacing="8px">
+                <button label="Annuler" onClick="uploadConcoursWin.detach()" />
+                <button label="Importer" sclass="btn-primary" disabled="@load(empty vm.pendingFileName)"
+                        onClick="@command('upload'); uploadConcoursWin.detach()" />
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+

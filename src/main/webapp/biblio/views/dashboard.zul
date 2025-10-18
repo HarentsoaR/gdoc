@@ -1,0 +1,82 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        Biblio Dashboard - Main overview of the bibliothèque system
+        Shows statistics, recent documents, and quick actions
+    -->
+    <div sclass="content-area">
+        <label value="Tableau de bord - Bibliothèque" sclass="biblio-section-title" style="font-size: 24px; font-weight: bold; display: block; margin-bottom: 16px;" />
+        
+        <!-- Statistics Cards -->
+        <div sclass="biblio-grid">
+            <div sclass="biblio-card">
+                <label value="Total Documents" sclass="card-title" style="font-size: 16px; font-weight: bold; display: block; margin-bottom: 8px;" />
+                <label value="@load(vm.totalDocuments)" sclass="stat-number" style="font-size: 24px; font-weight: bold; color: #1a73e8; display: block; margin: 8px 0;" />
+                <label value="Documents enregistrés" />
+            </div>
+            
+            <div sclass="biblio-card">
+                <label value="Ouvrages" sclass="card-title" style="font-size: 16px; font-weight: bold; display: block; margin-bottom: 8px;" />
+                <label value="@load(vm.totalOuvrages)" sclass="stat-number" style="font-size: 24px; font-weight: bold; color: #1a73e8; display: block; margin: 8px 0;" />
+                <label value="Livres et ouvrages" />
+            </div>
+            
+            <div sclass="biblio-card">
+                <label value="Journaux" sclass="card-title" style="font-size: 16px; font-weight: bold; display: block; margin-bottom: 8px;" />
+                <label value="@load(vm.totalJournaux)" sclass="stat-number" style="font-size: 24px; font-weight: bold; color: #1a73e8; display: block; margin: 8px 0;" />
+                <label value="Périodiques et journaux" />
+            </div>
+            
+            <div sclass="biblio-card">
+                <label value="Rapports" sclass="card-title" style="font-size: 16px; font-weight: bold; display: block; margin-bottom: 8px;" />
+                <label value="@load(vm.totalRapports)" sclass="stat-number" style="font-size: 24px; font-weight: bold; color: #1a73e8; display: block; margin: 8px 0;" />
+                <label value="Rapports de stage" />
+            </div>
+            
+            <div sclass="biblio-card">
+                <label value="Disponibles" sclass="card-title" style="font-size: 16px; font-weight: bold; display: block; margin-bottom: 8px;" />
+                <label value="@load(vm.documentsDisponibles)" sclass="stat-number" style="font-size: 24px; font-weight: bold; color: #1a73e8; display: block; margin: 8px 0;" />
+                <label value="Documents disponibles" />
+            </div>
+            
+            <div sclass="biblio-card">
+                <label value="Empruntés" sclass="card-title" style="font-size: 16px; font-weight: bold; display: block; margin-bottom: 8px;" />
+                <label value="@load(vm.documentsEmpruntes)" sclass="stat-number" style="font-size: 24px; font-weight: bold; color: #1a73e8; display: block; margin: 8px 0;" />
+                <label value="Documents empruntés" />
+            </div>
+        </div>
+        
+        <!-- Recent Documents -->
+        <div sclass="biblio-section">
+            <label value="Documents récents" sclass="biblio-section-title" style="font-size: 18px; font-weight: bold; display: block; margin: 24px 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid #1a73e8;" />
+            <div sclass="biblio-grid">
+                <apply template="documentCard" forEach="@load(vm.recentDocuments)" />
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div sclass="biblio-section">
+            <label value="Actions rapides" sclass="biblio-section-title" style="font-size: 18px; font-weight: bold; display: block; margin: 24px 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid #1a73e8;" />
+            <div sclass="biblio-grid">
+                <div sclass="biblio-card" style="text-align: center; cursor: pointer;" onClick="@command('navigateTo', view='/biblio/views/documents/list.zul')">
+                    <label value="Gérer les documents" sclass="card-title" style="font-size: 16px; font-weight: bold; display: block; margin-bottom: 8px;" />
+                    <label value="Ajouter, modifier, supprimer des documents" />
+                </div>
+                
+                <div sclass="biblio-card" style="text-align: center; cursor: pointer;" onClick="@command('navigateTo', view='/biblio/views/inventaire/list.zul')">
+                    <label value="Inventaire" sclass="card-title" style="font-size: 16px; font-weight: bold; display: block; margin-bottom: 8px;" />
+                    <label value="Consulter l'inventaire complet" />
+                </div>
+                
+                <div sclass="biblio-card" style="text-align: center; cursor: pointer;" onClick="@command('navigateTo', view='/biblio/views/categories/domaines.zul')">
+                    <label value="Catégories" sclass="card-title" style="font-size: 16px; font-weight: bold; display: block; margin-bottom: 8px;" />
+                    <label value="Gérer les domaines et catégories" />
+                </div>
+                
+                <div sclass="biblio-card" style="text-align: center; cursor: pointer;" onClick="@command('openReportsModal')">
+                    <label value="Rapports" sclass="card-title" style="font-size: 16px; font-weight: bold; display: block; margin-bottom: 8px;" />
+                    <label value="Générer des rapports statistiques" />
+                </div>
+            </div>
+        </div>
+    </div>
+</zk>

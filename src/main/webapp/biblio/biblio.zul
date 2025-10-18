@@ -1,0 +1,29 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="xhtml">
+    <!-- 
+        Biblio Management System - Main Entry Point
+        Following the same pattern as documents.zul
+    -->
+    <style src="/biblio/style.css" />
+
+    <window viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.BiblioViewModel')"
+            width="100%" height="100%" border="none" sclass="gedi-main-window"
+            style="padding:0;border:none;background:transparent" contentStyle="padding:0">
+
+        <!-- 1. Barre du haut (Topbar) -->
+        <include src="/biblio/components/topbar.zul"/>
+
+        <hlayout vflex="1" hflex="1" spacing="0">
+            <!-- 2. Barre latérale gauche (Sidebar) -->
+            <include src="/biblio/components/sidebar.zul" hflex="min" />
+
+            <!-- 3. Contenu Principal (Dashboard) -->
+            <vlayout vflex="1" hflex="1">
+                <include src="@load(vm.currentView)" hflex="1" vflex="1" />
+            </vlayout>
+
+            <!-- 4. Panneau de droite (Prévisualisation) -->
+            <!-- <include src="/biblio/components/previewPanel.zul" hflex="min" /> -->
+        </hlayout>
+
+    </window>
+</zk>

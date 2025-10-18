@@ -1,0 +1,46 @@
+<?component name="navbar" src="/includes/navbar.zul"?>
+<?component name="sidebar" src="/includes/sidebar.zul"?>
+<?component name="breadcrumb" src="/includes/breadcrumb.zul"?>
+
+<zk>
+    <style src="/css/admin.css"/>
+    
+    <window title="Gestion des Accès" border="none" width="100%" height="100%">
+        
+        <div sclass="layout">
+            <sidebar currentPage="access"/>
+            
+            <vlayout sclass="content" spacing="16px">
+                <navbar/>
+                <breadcrumb currentPage="access"/>
+                
+                <vlayout>
+                    <label value="Gestion des Accès" style="font-size:22px;font-weight:700;color:#111827"/>
+                    <label value="Configurer les permissions et droits d'accès." sclass="muted"/>
+                </vlayout>
+                
+                <vlayout sclass="section" spacing="16px">
+                    <label value="Politiques de sécurité" style="font-weight:700; font-size:16px;"/>
+                    <div class="divider"/>
+                    
+                    <vlayout spacing="12px">
+                        <hlayout style="justify-content:space-between; align-items:center;">
+                            <label value="Chiffrement de bout en bout"/>
+                            <div sclass="toggle toggle--on"/>
+                        </hlayout>
+                        
+                        <hlayout style="justify-content:space-between; align-items:center;">
+                            <label value="Authentification multifacteur (MFA)"/>
+                            <div sclass="toggle"/>
+                        </hlayout>
+                        
+                        <hlayout style="justify-content:space-between; align-items:center;">
+                            <label value="Expiration des sessions (30 min)"/>
+                            <div sclass="toggle toggle--on"/>
+                        </hlayout>
+                    </vlayout>
+                </vlayout>
+            </vlayout>
+        </div>
+    </window>
+</zk>

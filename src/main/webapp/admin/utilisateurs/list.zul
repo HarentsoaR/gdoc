@@ -1,0 +1,126 @@
+<?page title="Gestion des Utilisateurs" contentType="text/html;charset=UTF-8"?>
+<zk>
+    <!-- Le Window a déjà height="100%", c'est notre base. -->
+    <window border="none" width="100%" height="100%"
+            viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.AdminUserViewModel')">
+
+        <style>
+            /* Ton CSS est très bien, pas besoin de le changer */
+            .page-header { margin-bottom: 24px; }
+            .page-title { font-size: 28px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+            .page-subtitle { font-size: 16px; color: #64748b; }
+            .stats-container { display: flex; gap: 16px; margin-bottom: 24px; }
+            .stat-card { flex: 1; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; text-align: center; }
+            .stat-number { font-size: 32px; font-weight: 800; display: block; margin-bottom: 4px; }
+            .stat-label { font-size: 14px; color: #64748b; }
+            .search-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+            .users-section { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; overflow: hidden; }
+            .section-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; }
+            .section-title { font-size: 18px; font-weight: 600; color: #1e293b; }
+            .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; }
+            .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+            .status-active { background: #dcfce7; color: #166534; }
+            .status-inactive { background: #fef2f2; color: #dc2626; }
+            .role-badge { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+            .role-admin { background: #fef3c7; color: #92400e; }
+            .role-agent { background: #dbeafe; color: #1e40af; }
+            .role-lecteur { background: #f3e8ff; color: #7c3aed; }
+            .btn-primary { background: #3b82f6; border: none; color: white; font-weight: 600; border-radius: 8px; padding: 8px 16px; transition: all 0.2s ease; cursor: pointer; height: 40px; }
+            .btn-primary:hover { background: #2563eb; }
+            .btn-success { background: #22c55e; border: none; color: white; font-weight: 600; border-radius: 8px; padding: 8px 16px; transition: all 0.2s ease; cursor: pointer; height: 40px; }
+            .btn-success:hover { background: #16a34a; } /* Petite correction de couleur */
+            .action-btn { background: transparent; border: 1px solid #e2e8f0; color: #64748b; border-radius: 6px; cursor: pointer; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+            .action-btn:hover { background: #f1f5f9; color: #1e293b; }
+            .z-listheader-content { font-weight: 600; color: #64748b; }
+        </style>
+
+        <!-- ✅ LA CORRECTION EST ICI : vflex="1" a été ajouté à ce Vlayout principal. -->
+        <!-- Il va maintenant remplir tout le `window` et pourra distribuer la hauteur à ses enfants. -->
+        <vlayout sclass="content-wrapper" vflex="1">
+
+            <!-- Le header, les stats et la recherche prennent leur hauteur naturelle. -->
+            <vlayout sclass="page-header">
+                <label sclass="page-title" value="👥 Gestion des Utilisateurs"/>
+                <label sclass="page-subtitle" value="Administrez les comptes utilisateurs, rôles et permissions d'accès"/>
+            </vlayout>
+            
+            <div sclass="stats-container">
+                <div sclass="stat-card">
+                    <label sclass="stat-number" value="@load(vm.usersCount)"/>
+                    <label sclass="stat-label" value="Utilisateurs totaux"/>
+                </div>
+                <div sclass="stat-card">
+                    <label sclass="stat-number" value="@load(vm.activeUsersCount)"/>
+                    <label sclass="stat-label" value="Utilisateurs actifs"/>
+                </div>
+                <div class="stat-card">
+                    <label class="stat-number" value="3"/>
+                    <label class="stat-label" value="Rôles disponibles"/>
+                </div>
+            </div>
+
+            <div sclass="search-section">
+                <textbox value="@bind(vm.searchQuery)" placeholder="🔍 Rechercher par nom, prénom ou email..." hflex="1" height="40px" onOK="@command('searchUsers')"/>
+                <button label="Filtrer" sclass="btn-primary" onClick="@command('searchUsers')"/>
+                <button iconSclass="z-icon-refresh" sclass="action-btn" onClick="@command('loadUsers')" tooltiptext="Rafraîchir" style="width: 40px;"/>
+                <button label="➕ Nouvel utilisateur" sclass="btn-success" onClick="@command('navigateTo', page='/admin/utilisateurs/new.zul')"/>
+            </div>
+
+            <!-- Ce Vlayout prendra maintenant tout l'espace vertical restant grâce à vflex="1" -->
+            <vlayout sclass="users-section" vflex="1">
+                <div sclass="section-header">
+                    <label sclass="section-title" value="Liste des utilisateurs"/>
+                    <label value="@load(vm.usersCount)" style="color: #64748b; font-size: 14px;"/>
+                </div>
+
+                <!-- La listbox remplira son parent (users-section), et la pagination s'affichera en bas de la liste. -->
+                <listbox model="@load(vm.users)" emptyMessage="Aucun utilisateur trouvé."
+                         vflex="1" mold="paging" pageSize="10" style="border: none;">
+                    <listhead sizable="true">
+                        <listheader label="Utilisateur" width="30%" sort="auto(nom)"/>
+                        <listheader label="Email" sort="auto(mail)"/>
+                        <listheader label="Rôle" width="15%" sort="auto(profilId)"/>
+                        <listheader label="Statut" width="15%" align="center" sort="auto(actif)"/>
+                        <listheader label="Actions" width="10%" align="center"/>
+                    </listhead>
+                    <template name="model" var="user">
+                        <listitem>
+                            <listcell>
+                                <hlayout spacing="12px" valign="center">
+                                    <div sclass="user-avatar">
+                                        <label value="@load(vm.getInitials(user))"/>
+                                    </div>
+                                    <vlayout>
+                                        <label value="@load(vm.getNomComplet(user))" style="font-weight: 600; color: #1e293b;"/>
+                                        <label value="@load(user.service)" style="font-size: 12px; color: #64748b;"/>
+                                    </vlayout>
+                                </hlayout>
+                            </listcell>
+                            <listcell label="@load(user.mail)"/>
+                            <listcell>
+                                <div sclass="role-badge @load(vm.getRoleClass(user.profilId))">
+                                    <label value="@load(vm.getRoleLabel(user.profilId))"/>
+                                </div>
+                            </listcell>
+                            <listcell>
+                                <div sclass="status-badge @load(vm.isActif(user) ? 'status-active' : 'status-inactive')">
+                                    <label value="@load(vm.isActif(user) ? 'Actif' : 'Inactif')"/>
+                                </div>
+                            </listcell>
+                            <listcell>
+                                <hlayout spacing="8px" style="justify-content: center;">
+                                    <button sclass="action-btn" iconSclass="z-icon-pencil"
+                                            onClick="@command('openEditModal', user=user)"
+                                            tooltiptext="Modifier"/>
+                                    <button sclass="action-btn" iconSclass="z-icon-trash-o"
+                                            onClick="@command('deleteUser', userId=user.utilisateurId)"
+                                            tooltiptext="Supprimer"/>
+                                </hlayout>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </vlayout>
+        </vlayout>
+    </window>
+</zk>

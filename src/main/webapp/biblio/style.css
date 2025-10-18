@@ -1,0 +1,485 @@
+/* Biblio Management System Styles */
+/* Based on documents/style.css with biblio-specific adaptations */
+
+.gedi-main-window {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f9fa;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background: #ffffff;
+    border-right: 1px solid #e1e5e9;
+    height: 100vh;
+    overflow-y: auto;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+}
+
+.sidebar-section {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.sidebar-nav {
+    padding: 8px 0;
+}
+
+.sidebar-button {
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+    margin: 2px 0;
+    border: none;
+    background: transparent;
+    color: #5f6368;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.sidebar-button:hover {
+    background: #f1f3f4;
+    color: #1a73e8;
+}
+
+.sidebar-button.active {
+    background: #e8f0fe;
+    color: #1a73e8;
+    font-weight: 500;
+}
+
+.btn-new {
+    width: 100%;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-new:hover {
+    background: #1557b0;
+}
+
+.sidebar-toggle {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    cursor: pointer;
+    color: #5f6368;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background: #f1f3f4;
+}
+
+.sidebar-caret {
+    margin-right: 8px;
+    transition: transform 0.2s ease;
+}
+
+.sidebar-toggle.open .sidebar-caret {
+    transform: rotate(90deg);
+}
+
+.sidebar-title {
+    font-weight: 500;
+    color: #3c4043;
+}
+
+.concours-subnav {
+    margin-left: 24px;
+    margin-top: 8px;
+}
+
+/* Storage Section */
+.sidebar-storage {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.storage-title {
+    font-weight: 500;
+    color: #3c4043;
+    margin: 8px 0;
+}
+
+.storage-progress {
+    width: 100%;
+    margin: 8px 0;
+}
+
+.storage-text {
+    font-size: 12px;
+    color: #5f6368;
+    margin: 4px 0;
+}
+
+.btn-storage {
+    background: transparent;
+    border: 1px solid #dadce0;
+    color: #5f6368;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.btn-storage:hover {
+    background: #f1f3f4;
+}
+
+/* Topbar Styles */
+.topbar {
+    background: #ffffff;
+    border-bottom: 1px solid #e1e5e9;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.topbar-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: #3c4043;
+    margin: 0;
+}
+
+.breadcrumb {
+    margin-left: 16px;
+    color: #5f6368;
+    font-size: 14px;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-box {
+    width: 300px;
+    padding: 8px 12px;
+    border: 1px solid #dadce0;
+    border-radius: 24px;
+    font-size: 14px;
+    background: #f8f9fa;
+}
+
+.search-box:focus {
+    outline: none;
+    border-color: #1a73e8;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+/* Toolbar Styles */
+.toolbar {
+    background: #ffffff;
+    border-bottom: 1px solid #e1e5e9;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toolbar-button {
+    padding: 8px 16px;
+    border: 1px solid #dadce0;
+    background: white;
+    color: #5f6368;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.toolbar-button:hover {
+    background: #f8f9fa;
+    border-color: #1a73e8;
+    color: #1a73e8;
+}
+
+.toolbar-button.primary {
+    background: #1a73e8;
+    color: white;
+    border-color: #1a73e8;
+}
+
+.toolbar-button.primary:hover {
+    background: #1557b0;
+}
+
+/* Content Area */
+.content-area {
+    padding: 24px;
+    background: #f8f9fa;
+    min-height: calc(100vh - 120px);
+}
+
+/* Card Styles */
+.biblio-card {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #e1e5e9;
+    transition: box-shadow 0.2s ease;
+}
+
+.biblio-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #3c4043;
+    margin: 0 0 8px 0;
+}
+
+.card-subtitle {
+    font-size: 14px;
+    color: #5f6368;
+    margin: 0 0 12px 0;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.card-action {
+    padding: 6px 12px;
+    border: 1px solid #dadce0;
+    background: white;
+    color: #5f6368;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.card-action:hover {
+    background: #f8f9fa;
+    border-color: #1a73e8;
+    color: #1a73e8;
+}
+
+/* Grid Layout */
+.biblio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
+/* List Layout */
+.biblio-list {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.list-header {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e1e5e9;
+    font-weight: 500;
+    color: #3c4043;
+}
+
+.list-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.2s ease;
+}
+
+.list-item:hover {
+    background: #f8f9fa;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-title {
+    font-weight: 500;
+    color: #3c4043;
+    margin: 0 0 4px 0;
+}
+
+.item-subtitle {
+    font-size: 14px;
+    color: #5f6368;
+    margin: 0;
+}
+
+.item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Status Indicators */
+.status-available {
+    color: #34a853;
+    font-weight: 500;
+}
+
+.status-unavailable {
+    color: #ea4335;
+    font-weight: 500;
+}
+
+.status-loaned {
+    color: #fbbc04;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+    
+    .biblio-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .search-box {
+        width: 200px;
+    }
+}
+
+/* Biblio-specific styles */
+.biblio-icon {
+    color: #1a73e8;
+    margin-right: 8px;
+}
+
+.biblio-section {
+    margin-bottom: 24px;
+}
+
+.biblio-section-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #3c4043;
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #1a73e8;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 500;
+    color: #3c4043;
+    margin-bottom: 4px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.form-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    background: white;
+    font-size: 14px;
+}
+
+/* Modal Styles */
+.modal-header {
+    background: #f8f9fa;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e1e5e9;
+    font-weight: 500;
+    color: #3c4043;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    background: #f8f9fa;
+    padding: 16px 24px;
+    border-top: 1px solid #e1e5e9;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Document Details Styles */
+.document-details {
+    margin-top: 16px;
+}
+
+.detail-group {
+    margin-bottom: 12px;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #3c4043;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    color: #5f6368;
+    display: block;
+}
+
+/* Statistics Styles */
+.stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a73e8;
+    margin: 8px 0;
+}

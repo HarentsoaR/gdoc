@@ -1,0 +1,64 @@
+<?page title="Paramètres | GEDI" contentType="text/html;charset=UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <style>
+        .settings-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .settings-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            padding: 24px;
+        }
+        .settings-section h3 {
+            margin: 0 0 16px 0;
+            font-size: 18px;
+        }
+    </style>
+
+    <div sclass="settings-container">
+        <div sclass="settings-section">
+            <label>⚙️ Paramètres Généraux</label>
+            <grid width="100%">
+                <rows>
+                    <row>
+                        <label value="Nom de l'application" />
+                        <textbox value="GEDI" width="200px" />
+                    </row>
+                    <row>
+                        <label value="Thème" />
+                        <combobox>
+                            <comboitem label="Clair" />
+                            <comboitem label="Sombre" />
+                        </combobox>
+                    </row>
+                    <row>
+                        <button label="Sauvegarder" />
+                    </row>
+                </rows>
+            </grid>
+        </div>
+
+        <div sclass="settings-section">
+            <label>🔒 Sécurité</label>
+            <label value="Changer le mot de passe administrateur" />
+            <grid>
+                <rows>
+                    <row>
+                        <label value="Ancien mot de passe" />
+                        <textbox type="password" />
+                    </row>
+                    <row>
+                        <label value="Nouveau mot de passe" />
+                        <textbox type="password" />
+                    </row>
+                    <row>
+                        <button label="Mettre à jour" />
+                    </row>
+                </rows>
+            </grid>
+        </div>
+    </div>
+</zk>

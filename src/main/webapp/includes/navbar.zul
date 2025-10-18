@@ -1,0 +1,32 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+<div style="height: 70px; background: white; border-bottom: 1px solid #e2e8f0; padding: 0 24px; display: flex; align-items: center; justify-content: space-between;">
+
+    <!-- Left section -->
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <!-- Breadcrumb -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <label value="Admin" style="color: #64748b; cursor: pointer;"
+                   onClick="@command('navigateTo', page='/admin/dashboard.zul')"/>
+            <label value="›" style="color: #cbd5e1;"/>
+
+            <forEach items="@load(vm.breadcrumbs)" var="crumb" varStatus="status">
+                <label value="@load(crumb)" style="color: #1e293b; font-weight: 600; text-transform: capitalize;"/>
+                <label value="›" style="color: #cbd5e1;" visible="@load(not status.last)"/>
+            </forEach>
+        </div>
+    </div>
+
+    <!-- Right section (user profile) -->
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; text-align: center; line-height: 36px;">
+                <label value="A"/>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+                <label value="Administrateur" style="font-weight: 600; color: #1e293b; font-size: 14px;"/>
+                <label value="Super Admin" style="color: #64748b; font-size: 12px;"/>
+            </div>
+        </div>
+    </div>
+</div>
+</zk>

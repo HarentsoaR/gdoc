@@ -1,0 +1,382 @@
+/* ===================================================================
+   GEDI - Modern UI Stylesheet v2.1
+   -------------------------------------------------------------------
+   Fichier de style complet et unifié.
+   Structure :
+   1. Variables Globales (Design Tokens) -> Le centre de contrôle du design
+   2. Reset et Styles de Base -> Pour une base saine et cohérente
+   3. Structure Principale (Layout) -> Topbar, Sidebar, Content Area
+   4. Composants UI -> Boutons, Tableaux, Formulaires...
+   5. Classes Utilitaires -> Aides rapides
+   6. Media Queries (Responsive) -> Pour l'adaptation aux écrans
+   =================================================================== */
+
+/* --- 1. Variables Globales (Design Tokens) --- */
+:root {
+    /* Palette de couleurs principale */
+    --primary-color: #2563eb;       /* Bleu vif et professionnel */
+    --primary-color-dark: #1d4ed8;    /* Pour les :hover */
+    --primary-color-light: #dbeafe;  /* Pour les fonds subtils, :hover sur les lignes */
+
+    /* Palette de couleurs secondaire et neutre */
+    --secondary-color: #e5e7eb;
+    --secondary-color-dark: #d1d5db;
+    --bg-color: #f9fafb;             /* Fond général de l'application */
+    --surface-color: #ffffff;        /* Fond des cartes, tableaux, popups */
+    --border-color: #e5e7eb;
+
+    /* Palette sémantique */
+    --danger-color: #dc2626;
+    --danger-color-light: #fee2e2;
+
+    /* Typographie */
+    --text-color: #111827;           /* Couleur principale du texte */
+    --text-color-muted: #6b7280;     /* Pour les labels, textes secondaires */
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-size-sm: 12px;
+    --font-size-base: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 20px;
+    --font-size-xxl: 24px;
+
+    /* Autres variables de design */
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-full: 9999px;
+    --shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --topbar-height: 60px;
+}
+
+/* --- 2. Reset et Styles de Base --- */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: var(--font-family);
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    font-size: var(--font-size-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+* { box-sizing: border-box; }
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #aaa; }
+
+
+/* --- 3. Structure Principale (Layout) --- */
+
+/* Overrides ZK pour un layout pleine page */
+.gedi-main-window.z-window { padding: 0 !important; border: none !important; background: transparent; }
+.gedi-main-window > .z-window-content { padding: 0 !important; }
+
+/* Topbar */
+.topbar { display: flex; justify-content: space-between; align-items: center; background-color: var(--surface-color); border-bottom: 1px solid var(--border-color); padding: 8px 24px; height: var(--topbar-height); box-shadow: var(--shadow); }
+.topbar-left, .topbar-right { display: flex; align-items: center; gap: 16px; }
+.app-title { font-size: 18px; font-weight: 600; }
+.user-avatar { border-radius: 50%; }
+
+/* Sidebar */
+.sidebar { background-color: var(--bg-color); border-right: 1px solid var(--border-color); padding: 8px; display: flex; flex-direction: column; position: sticky; top: var(--topbar-height); height: calc(100vh - var(--topbar-height)); overflow-y: auto; }
+.sidebar-section { padding: 8px 4px; }
+.sidebar-nav { display: flex; flex-direction: column; gap: 4px; }
+.sidebar-title { font-size: var(--font-size-sm); font-weight: 600; color: var(--text-color-muted); text-transform: uppercase; padding: 12px 16px; }
+.sidebar-title.no-padding { padding: 12px 0; }
+
+/* Compact collapse button in sidebar header */
+/* Drive-like row toggle */
+.sidebar-toggle { display: flex; align-items: center; gap: 8px; padding: 6px 12px; cursor: pointer; border-radius: var(--border-radius-full); width: 100%; }
+.sidebar-toggle:hover { background-color: #f1f3f4; }
+.sidebar-caret { transition: transform 0.15s ease; color: var(--text-color-muted); }
+.sidebar-toggle.open .sidebar-caret { transform: rotate(90deg); }
+.concours-subnav { padding-left: 20px; }
+
+/* Zone de contenu principale */
+.content-area { padding: 24px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+.content-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+.page-title { font-size: var(--font-size-xxl); font-weight: 700; color: var(--text-color); }
+.header-actions { display: flex; align-items: center; gap: 12px; }
+
+
+/* --- 4. Composants UI --- */
+
+/* -- Boutons -- */
+.z-button { transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s; }
+.btn-primary { background-color: var(--primary-color) !important; color: white !important; border-radius: var(--border-radius) !important; border: none !important; padding: 10px 16px !important; cursor: pointer; font-weight: 500; }
+.btn-primary:hover { background-color: var(--primary-color-dark) !important; }
+.btn-secondary { background-color: var(--surface-color) !important; border: 1px solid var(--border-color) !important; color: var(--text-color) !important; padding: 10px 16px !important; border-radius: var(--border-radius) !important; cursor: pointer; font-weight: 500; }
+.btn-secondary:hover { background-color: var(--bg-color) !important; }
+
+/* Bouton Spécial "Nouveau" (style Drive) */
+.sidebar .btn-new { background-color: var(--surface-color) !important; color: #1f2937 !important; font-weight: 500; border: 1px solid var(--border-color) !important; border-radius: 16px !important; padding: 16px 24px !important; margin: 8px; box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15); }
+.sidebar .btn-new:hover { background-color: #f7f9fa !important; box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15); }
+
+/* Boutons de navigation de la Sidebar */
+.sidebar .z-button.sidebar-button { background: none !important; border: none !important; box-shadow: none !important; width: 100%; text-align: left; border-radius: var(--border-radius-full) !important; padding: 12px 16px !important; color: var(--text-color); font-weight: 400; display: flex; align-items: center; gap: 16px; }
+.sidebar .z-button.sidebar-button:hover { background-color: #f1f3f4 !important; }
+.sidebar .z-button.sidebar-button.active { background-color: var(--primary-color-light) !important; color: var(--primary-color) !important; font-weight: 600; }
+
+/* Boutons d'icônes (dans les tableaux) */
+.btn-icon { background: none !important; border: none !important; cursor: pointer; padding: 8px !important; border-radius: 50% !important; line-height: 1; }
+.btn-icon .z-button-image { font-size: 16px; color: var(--text-color-muted) !important; transition: color 0.2s; } /* La correction clé pour la visibilité */
+.btn-icon .z-icon, .btn-icon .z-button-icon { color: var(--text-color-muted) !important; font-size: 16px; }
+.btn-icon:hover { background-color: var(--secondary-color) !important; }
+.btn-icon:hover .z-button-image { color: var(--text-color) !important; } /* Devient plus sombre au survol */
+.btn-icon:hover .z-icon, .btn-icon:hover .z-button-icon { color: var(--text-color) !important; }
+.btn-icon-danger:hover { background-color: var(--danger-color-light) !important; }
+.btn-icon-danger:hover .z-button-image { color: var(--danger-color) !important; } /* Devient rouge au survol */
+.btn-icon-danger:hover .z-icon, .btn-icon-danger:hover .z-button-icon { color: var(--danger-color) !important; }
+
+/* Actions column alignment */
+.actions-cell .z-listcell-content { display: flex; justify-content: center; }
+
+/* Ensure action icons are ALWAYS visible (not only on selection) */
+.data-table .actions-cell .btn-icon,
+.data-table .actions-cell .btn-icon * {
+    opacity: 1 !important;
+}
+.data-table .actions-cell .btn-icon .z-button-image,
+.data-table .actions-cell .btn-icon .z-icon,
+.data-table .actions-cell .btn-icon .z-button-icon {
+    color: #6b7280 !important; /* neutral gray for default state */
+}
+.data-table .z-listitem:hover .actions-cell .btn-icon .z-button-image,
+.data-table .z-listitem:hover .actions-cell .btn-icon .z-icon,
+.data-table .z-listitem:hover .actions-cell .btn-icon .z-button-icon {
+    color: #111827 !important; /* darker on row hover */
+}
+
+
+/* -- Formulaires (Inputs) -- */
+.search-box { position: relative; }
+.search-input { border-radius: var(--border-radius); border: 1px solid var(--border-color); padding: 8px 12px 8px 36px; width: 250px; transition: border-color 0.2s, box-shadow 0.2s; }
+.search-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-color-light); }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-color-muted); }
+
+
+/* -- Tableaux de Données (Listbox) -- */
+.data-table-container { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); box-shadow: var(--shadow); overflow: hidden; display: flex; }
+.data-table { border: none !important; }
+
+/* En-tête du tableau */
+.data-table .z-listhead { background-color: var(--surface-color) !important; border-bottom: 2px solid var(--border-color) !important; } /* Correction clé: fond blanc, bordure plus épaisse */
+.data-table .z-listheader { background: transparent !important; } /* Assure qu'aucun style enfant ne met du bleu */
+.data-table .z-listheader-content { font-size: var(--font-size-sm); font-weight: 600; color: var(--text-color-muted); text-transform: uppercase; padding: 12px 24px !important; }
+
+/* Lignes du tableau */
+.data-table .z-listitem { background: transparent !important; transition: background-color 0.15s ease-in-out; }
+.data-table .z-listitem:hover > .z-listcell { background-color: var(--primary-color-light) !important; }
+.data-table .z-listcell { border-top: 1px solid var(--border-color) !important; padding: 14px 24px !important; background: transparent !important; vertical-align: middle; }
+.data-table .z-listitem:first-child .z-listcell { border-top: none !important; }
+.data-table .z-listcell-content { color: var(--text-color); }
+
+/* Message quand le tableau est vide */
+.data-table .z-listbox-emptybody td { padding: 48px !important; color: var(--text-color-muted); font-style: italic; }
+
+
+/* -- Panneau de Stockage (Sidebar) -- */
+.sidebar-storage { padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: #374151; }
+.storage-title { font-weight: 500; }
+.storage-text { font-size: 12px; color: #6b7280; }
+.storage-progress { height: 6px; border-radius: 3px; background: #e5e7eb; }
+.storage-progress > .z-progressmeter-bar { background-color: var(--primary-color); border-radius: 3px; }
+.btn-storage { background: none !important; border: 1px solid #d1d5db !important; color: var(--primary-color) !important; font-weight: 500; padding: 8px 12px !important; border-radius: var(--border-radius-full) !important; margin-top: 8px; }
+.btn-storage:hover { background-color: var(--primary-color-light) !important; }
+
+
+/* --- 5. Classes Utilitaires --- */
+.fw-bold { font-weight: 600 !important; }
+.text-danger { color: var(--danger-color) !important; }
+.text-muted { color: var(--text-color-muted) !important; }
+
+
+/* --- 6. Media Queries (Responsive) --- */
+@media (max-width: 1024px) {
+    .content-area {
+        padding: 16px;
+}
+.page-title {
+        font-size: var(--font-size-xl);
+    }
+    .sidebar {
+        /* Sur les écrans plus petits, la sidebar pourrait être cachée par défaut */
+        /* display: none; */
+    }
+}
+@media (max-width: 768px) {
+    .content-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .header-actions {
+    flex-direction: column;
+        align-items: stretch;
+    }
+    .search-input {
+        width: 100%;
+    }
+.topbar {
+    padding: 8px 16px;
+    }
+}
+
+
+/* ===================================================================
+   SECTION 7: DASHBOARD & CARTES DE DOCUMENT (STYLE DRIVE)
+   =================================================================== */
+
+.dashboard.content-area {
+    gap: 32px; /* Plus d'espace entre les sections */
+    padding: 16px 32px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-title {
+    font-size: var(--font-size-lg);
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.section-toggle .z-button-image {
+    color: var(--text-color-muted);
+    font-size: 20px;
+}
+
+
+/* -- Grille des dossiers suggérés -- */
+.suggested-folders-grid {
+    display: grid;
+    /* Crée des colonnes flexibles, chacune d'au moins 250px */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+}
+
+
+/* -- Carte de Document (Nouveau Style) -- */
+.doc-card {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.doc-card:hover {
+    background-color: #f0f2f5; /* Un gris légèrement plus foncé au survol */
+    border-color: #d1d5db;
+    box-shadow: var(--shadow-md);
+}
+
+.doc-card-icon {
+    font-size: 20px;
+    color: var(--text-color-muted);
+    margin-right: 12px;
+}
+
+.doc-card .doc-title {
+    font-weight: 500;
+    color: var(--text-color);
+    /* Pour gérer les noms de fichiers longs */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.doc-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.doc-card .doc-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--text-color-muted);
+}
+
+
+/* -- Liste de Fichiers (Style Spécifique) -- */
+.data-table-container.file-list-table {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    border-radius: 0;
+}
+
+.file-list-table .z-listhead {
+    background: transparent !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+/* Finalise the file list specific styles (the previous file ended abruptly) */
+.file-list-table .z-listheader-content {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-color-muted);
+    text-transform: uppercase;
+    padding: 12px 24px !important;
+}
+
+.file-list-table .z-listitem {
+    background: transparent !important;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.file-list-table .z-listcell {
+    border-top: 1px solid var(--border-color) !important;
+    padding: 14px 24px !important;
+    background: transparent !important;
+    vertical-align: middle;
+}
+
+.file-list-table .z-listitem:first-child .z-listcell {
+    border-top: none !important;
+}
+
+.file-list-table .z-listitem:hover > .z-listcell {
+    background-color: var(--primary-color-light) !important;
+}
+
+/* File type icon helpers */
+.file-icon-pdf { color: #ef4444; }
+.file-icon-default { color: #6b7280; }
+
+/* Ensure header action button in page header matches style */
+.page-header .btn-icon .z-button-image,
+.page-header .btn-icon .z-icon,
+.page-header .btn-icon .z-button-icon {
+    color: var(--text-color-muted) !important;
+}
+.page-header .btn-icon:hover .z-button-image,
+.page-header .btn-icon:hover .z-icon,
+.page-header .btn-icon:hover .z-button-icon {
+    color: var(--text-color) !important;
+}

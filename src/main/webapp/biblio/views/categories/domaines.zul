@@ -1,0 +1,62 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        Domaines Management - Manage document domains
+        CRUD operations for DomaineOuvrage entities
+    -->
+    <div sclass="content-area">
+        <label value="🏷️ Gestion des domaines" sclass="biblio-section-title" style="font-size: 24px; font-weight: bold; display: block; margin-bottom: 16px;" />
+        
+        <!-- Toolbar -->
+        <include src="/biblio/components/toolbar.zul" />
+        
+        <!-- Search and Filter -->
+        <div sclass="biblio-card" style="margin-bottom: 16px;">
+            <hlayout>
+                <textbox placeholder="Rechercher un domaine..." value="@bind(vm.searchQuery)" 
+                         onChanging="@command('searchDomaines')" hflex="1" />
+                <button label="🔍 Rechercher" onClick="@command('searchDomaines')" />
+                <button label="🔄 Réinitialiser" onClick="@command('resetSearch')" />
+            </hlayout>
+        </div>
+        
+        <!-- Domaines List -->
+        <div sclass="biblio-list">
+            <div sclass="list-header">
+                <hlayout>
+                    <label value="Libellé" hflex="3" />
+                    <label value="Description" hflex="2" />
+                    <label value="Documents" hflex="1" />
+                    <label value="Actions" hflex="2" />
+                </hlayout>
+            </div>
+            
+            <apply forEach="@load(vm.domaines)">
+                <div sclass="list-item">
+                    <div sclass="item-info" hflex="3">
+                        <div sclass="item-title">@load(each.libelle)</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="2">
+                        <div sclass="item-subtitle">@load(each.description ?: 'Aucune description')</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="1">
+                        <div sclass="item-title">@load(each.documents?.size() ?: 0)</div>
+                    </div>
+                    
+                    <div sclass="item-actions" hflex="2">
+                        <button label="👁️" onClick="@command('viewDomaine', domaine=each)" />
+                        <button label="✏️" onClick="@command('editDomaine', domaine=each)" />
+                        <button label="🗑️" onClick="@command('deleteDomaine', domaine=each)" />
+                    </div>
+                </div>
+            </apply>
+        </div>
+        
+        <!-- Add New Domaine Button -->
+        <div sclass="biblio-card" style="text-align: center; margin-top: 16px;">
+            <button label="➕ Ajouter un nouveau domaine" onClick="@command('openNewDomaineModal')" 
+                    sclass="toolbar-button primary" />
+        </div>
+    </div>
+</zk>

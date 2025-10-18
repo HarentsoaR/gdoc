@@ -1,0 +1,194 @@
+<!-- File Path: src/main/webapp/documents/views/candidats/dossiers.zul -->
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <style>
+        .breadcrumb-bar > .z-hlayout-inner {
+            align-items: center;
+        }
+        .breadcrumb-link {
+            cursor: pointer;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .breadcrumb-link:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb-separator {
+            margin: 0 8px;
+            color: var(--text-color-secondary);
+        }
+        .list-item-folder {
+            cursor: pointer;
+        }
+        .list-item-folder:hover {
+            background-color: var(--hover-color);
+        }
+        .item-icon {
+            font-size: 20px;
+            color: #5f6368;
+            width: 24px;
+            text-align: center;
+        }
+        .item-title {
+            font-weight: 500;
+        }
+        .item-subtitle {
+            font-size: 12px;
+            color: var(--text-color-secondary);
+        }
+        .filter-bar {
+            padding: 12px 16px;
+            background-color: #eef6ff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        .filters-row > .z-vlayout {
+            gap: 6px;
+        }
+        .filter-actions .z-button {
+            height: 34px;
+        }
+        .pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #e9ecef; color: #333; border-radius: 999px;
+            padding: 4px 10px; margin-right: 8px; font-size: 12px;
+        }
+        .pill .clear-x { cursor: pointer; color: #6c757d; }
+        .results-meta { color: var(--text-color-secondary); font-size: 12px; }
+    </style>
+
+    <vlayout hflex="1" vflex="1" viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.ListeDossierConcoursCandidatViewModel')" sclass="content-area">
+        <!-- Header with Breadcrumbs and Actions -->
+        <hlayout hflex="1" sclass="content-header" style="justify-content: space-between;">
+            <!-- Breadcrumbs -->
+            <hlayout sclass="breadcrumb-bar">
+                <forEach items="@load(vm.breadcrumbs)" var="crumb" varStatus="status">
+                    <a label="@load(crumb.label)" sclass="breadcrumb-link"
+                       onClick="@command('navigateViaBreadcrumb', crumb=crumb)"
+                       if="${!status.last}"/>
+                    <label value="@load(crumb.label)" if="${status.last}"/>
+                    <label value=">" sclass="breadcrumb-separator" if="${!status.last}"/>
+                </forEach>
+            </hlayout>
+
+            <!-- Actions -->
+            <hlayout spacing="8px">
+                <button label="Rafraîchir" sclass="btn-secondary" iconSclass="z-icon-refresh" onClick="@command('applyFilters')"/>
+            </hlayout>
+        </hlayout>
+
+        <!-- NOUVELLE BARRE DE FILTRES : Visible seulement quand un type de document est sélectionné -->
+        <div sclass="filter-bar" visible="@load(vm.selectedDocumentType ne null)">
+            <grid>
+                <columns>
+                    <column hflex="1"/><column hflex="1"/><column hflex="1"/><column width="240px"/>
+                </columns>
+                <rows>
+                    <row sclass="filters-row">
+                        <vlayout>
+                            <label value="Concours"/>
+                            <combobox model="@load(vm.allConcours)" selectedItem="@bind(vm.selectedConcoursFilter)"
+                                      hflex="1" placeholder="Tous les concours" autodrop="true" readonly="true"
+                                      onChange="@command('applyFilters')">
+                                <template name="model">
+                                    <comboitem label="@load(each.toString())"/>
+                                </template>
+                            </combobox>
+                        </vlayout>
+                        <vlayout>
+                            <label value="Centre d'examen"/>
+                            <combobox model="@load(vm.allCentresExamen)" selectedItem="@bind(vm.selectedCentreExamenFilter)"
+                                      hflex="1" placeholder="Tous les centres" autodrop="true" readonly="true"
+                                      onChange="@command('applyFilters')">
+                                <template name="model">
+                                    <comboitem label="@load(each.libelle)"/>
+                                </template>
+                            </combobox>
+                        </vlayout>
+                        <vlayout>
+                            <label value="Nom du candidat"/>
+                            <textbox value="@bind(vm.filterNomCandidat)" hflex="1" placeholder="Rechercher par nom ou prénom..."
+                                     instant="true" onChange="@command('applyFilters')" onOK="@command('applyFilters')"/>
+                        </vlayout>
+                        <vlayout sclass="filter-actions" style="justify-content: flex-end; align-items: flex-end;">
+                            <hlayout spacing="8px">
+                                <button label="Rechercher" sclass="btn-primary" iconSclass="z-icon-search" onClick="@command('applyFilters')"/>
+                                <button label="Effacer les filtres" sclass="btn-secondary" iconSclass="z-icon-eraser" onClick="@command('clearFilters')"/>
+                            </hlayout>
+                        </vlayout>
+                    </row>
+                </rows>
+            </grid>
+
+            <!-- Active filters pills -->
+            <hlayout visible="@load(vm.selectedConcoursFilter ne null or vm.selectedCentreExamenFilter ne null or not empty vm.filterNomCandidat)"
+                     style="margin-top:8px; align-items:center;">
+                <label value="Filtres actifs:" sclass="results-meta"/>
+                <hlayout sclass="pill" visible="@load(vm.selectedConcoursFilter ne null)">
+                    <label value="@load(vm.selectedConcoursFilter.toString())"/>
+                </hlayout>
+                <hlayout sclass="pill" visible="@load(vm.selectedCentreExamenFilter ne null)">
+                    <label value="@load(vm.selectedCentreExamenFilter.libelle)"/>
+                </hlayout>
+                <hlayout sclass="pill" visible="@load(not empty vm.filterNomCandidat)">
+                    <label value="@load(vm.filterNomCandidat)"/>
+                </hlayout>
+            </hlayout>
+        </div>
+
+        <!-- Main Content List -->
+        <div class="data-table-container" style="border:1px solid var(--border-color); border-radius:12px; box-shadow:var(--shadow);" vflex="1">
+            <hlayout style="padding:10px 12px; align-items:center; justify-content:space-between;">
+                <label value="@load(vm.selectedDocumentType ne null ? vm.selectedDocumentType.libelle : 'Types de documents')" sclass="item-title"/>
+                <hlayout>
+                    <label value="Total:" sclass="results-meta"/>
+                    <label value="@load(vm.displayItems.size())" sclass="results-meta"/>
+                </hlayout>
+            </hlayout>
+            <listbox model="@load(vm.displayItems)" vflex="1" hflex="1" sclass="data-table" emptyMessage="Aucun élément à afficher. Essayez de modifier vos filtres.">
+                <listhead>
+                    <listheader label="Nom" />
+                    <listheader label="Propriétaire" visible="@load(vm.selectedDocumentType ne null)" />
+                    <listheader label="État" visible="@load(vm.selectedDocumentType ne null)" width="150px"/>
+                    <listheader label="Actions" width="120px" align="right"/>
+                </listhead>
+                <template name="model" var="d">
+                    <listitem onDoubleClick="@command(d.folder ? 'navigate' : 'download', item=d)"
+                              sclass="${d.folder ? 'list-item-folder' : ''}">
+                        <!-- Cellule Nom (commune aux dossiers et fichiers) -->
+                        <listcell>
+                            <hlayout spacing="12px">
+                                <n:i class="${d.iconSclass} item-icon"/>
+                                <vlayout>
+                                    <label value="@load(d.name)" sclass="item-title"/>
+                                    <label value="@load(d.subtitle)" sclass="item-subtitle" visible="@load(not empty d.subtitle)"/>
+                                </vlayout>
+                            </hlayout>
+                        </listcell>
+
+                        <!-- MODIFICATION : Affichage direct des infos du fichier -->
+                        <zk if="${!d.folder}">
+                            <listcell label="@load(d.data.candidat.nom) @load(d.data.candidat.prenom)"/>
+                            <listcell label="@load(d.data.etatDoc)"/>
+                        </zk>
+                        
+                        <!-- Cellules vides pour les dossiers pour l'alignement -->
+                        <zk if="${d.folder}">
+                            <listcell/><listcell/>
+                        </zk>
+
+                        <!-- Cellule Actions -->
+                        <listcell>
+                            <hlayout if="${!d.folder}" style="justify-content: flex-end;">
+                                <button sclass="btn-icon" iconSclass="z-icon-download" tooltiptext="Télécharger"
+                                        onClick="@command('download', item=d)"/>
+                                <button sclass="btn-icon btn-icon-danger" iconSclass="z-icon-trash-o" tooltiptext="Supprimer"
+                                        onClick="@command('delete', item=d)"/>
+                            </hlayout>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+    </vlayout>
+</zk>

@@ -1,0 +1,85 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        Journals List - Manage journal entries in the bibliothèque
+        Provides CRUD operations for JournalBiblio entities
+    -->
+    <div sclass="content-area">
+        <label value="📰 Gestion des journaux" sclass="biblio-section-title" style="font-size: 24px; font-weight: bold; display: block; margin-bottom: 16px;" />
+        
+        <!-- Toolbar -->
+        <include src="/biblio/components/toolbar.zul" />
+        
+        <!-- Search and Filter -->
+        <div sclass="biblio-card" style="margin-bottom: 16px;">
+            <hlayout>
+                <textbox placeholder="Rechercher par titre, auteur..." value="@bind(vm.searchQuery)" 
+                         onChanging="@command('searchJournals')" hflex="1" />
+                <button label="🔍 Rechercher" onClick="@command('searchJournals')" />
+                <button label="🔄 Réinitialiser" onClick="@command('resetSearch')" />
+            </hlayout>
+            
+            <separator />
+            
+            <hlayout>
+                <label value="Type de journal:" />
+                <listbox model="@load(vm.journalTypes)" value="@bind(vm.selectedJournalType)" 
+                        onSelect="@command('filterByJournalType')" />
+                <label value="Date:" />
+                <datebox value="@bind(vm.selectedDate)" onSelect="@command('filterByDate')" />
+            </hlayout>
+        </div>
+        
+        <!-- Journals List -->
+        <div sclass="biblio-list">
+            <div sclass="list-header">
+                <hlayout>
+                    <label value="Titre" hflex="3" />
+                    <label value="Auteur" hflex="2" />
+                    <label value="Type" hflex="1" />
+                    <label value="Date" hflex="1" />
+                    <label value="Actions" hflex="2" />
+                </hlayout>
+            </div>
+            
+            <apply forEach="@load(vm.journals)">
+                <div sclass="list-item">
+                    <div sclass="item-info" hflex="3">
+                        <div sclass="item-title">@load(each.titre)</div>
+                        <div sclass="item-subtitle">Numéro: @load(each.jrNumero)</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="2">
+                        <div sclass="item-title">@load(each.auteur)</div>
+                        <div sclass="item-subtitle">@load(each.origine?.libelle ?: 'Non spécifié')</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="1">
+                        <div sclass="item-title">@load(each.typeJournal?.libelle ?: 'Journal')</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="1">
+                        <div sclass="item-title">@load(each.date)</div>
+                    </div>
+                    
+                    <div sclass="item-actions" hflex="2">
+                        <button label="👁️" onClick="@command('viewJournal', journal=each)" />
+                        <button label="✏️" onClick="@command('editJournal', journal=each)" />
+                        <button label="📋" onClick="@command('showJournalDetails', journal=each)" />
+                        <button label="🗑️" onClick="@command('deleteJournal', journal=each)" />
+                    </div>
+                </div>
+            </apply>
+        </div>
+        
+        <!-- Pagination -->
+        <div sclass="biblio-card" style="text-align: center; margin-top: 16px;">
+            <hlayout>
+                <button label="Précédent" onClick="@command('previousPage')" 
+                        disabled="@load(vm.currentPageNumber le 1)" />
+                <label value="Page @load(vm.currentPageNumber) sur @load(vm.totalPages)" />
+                <button label="Suivant" onClick="@command('nextPage')" 
+                        disabled="@load(vm.currentPageNumber ge vm.totalPages)" />
+            </hlayout>
+        </div>
+    </div>
+</zk>

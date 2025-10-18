@@ -1,0 +1,32 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <vlayout hflex="1" vflex="1" viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.ConcoursPhaseViewModel')" sclass="content-area">
+        <hlayout spacing="8px" sclass="content-header">
+            <textbox placeholder="🔍 Rechercher une phase..." width="40%" value="@bind(vm.searchQuery)" onChange="@command('search')"/>
+            <button label="Rafraîchir" sclass="btn-secondary" iconSclass="z-icon-refresh" onClick="@command('refresh')"/>
+        </hlayout>
+        <div sclass="data-table-container" vflex="1">
+            <listbox model="@load(vm.phases)" vflex="1" hflex="1" sclass="data-table">
+                <listhead>
+                    <listheader label="#" width="80px" align="center"/>
+                    <listheader label="Libellé"/>
+                    <listheader label="Concours"/>
+                    <listheader label="Actions" width="120px" align="center"/>
+                </listhead>
+                <template name="model" var="p">
+                    <listitem>
+                        <listcell label="@load(p.numero)"/>
+                        <listcell label="@load(p.libelle)"/>
+                        <listcell label="@load(p.concoursId)"/>
+                        <listcell sclass="actions-cell">
+                            <hlayout spacing="6px">
+                                <button sclass="btn-icon btn-icon-danger" iconSclass="z-icon-trash-o" tooltiptext="Supprimer"
+                                        onClick="@command('delete', id=p.concoursPhaseId)"/>
+                            </hlayout>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+    </vlayout>
+</zk>
+

@@ -1,0 +1,49 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        Biblio Explorer - Browse all documents with filtering and search
+        Similar to documents/explorer.zul but for biblio documents
+    -->
+    <div sclass="content-area">
+        <label value="📚 Explorateur de documents" sclass="biblio-section-title" style="font-size: 24px; font-weight: bold; display: block; margin-bottom: 16px;" />
+        
+        <!-- Search and Filter Bar -->
+        <div sclass="biblio-card" style="margin-bottom: 16px;">
+            <hlayout>
+                <textbox placeholder="Rechercher un document..." value="@bind(vm.searchQuery)" 
+                         onChanging="@command('searchDocuments')" hflex="1" />
+                <button label="🔍 Rechercher" onClick="@command('searchDocuments')" />
+                <button label="🔄 Réinitialiser" onClick="@command('resetSearch')" />
+            </hlayout>
+            
+            <separator />
+            
+            <hlayout>
+                <label value="Filtrer par type:" />
+                <listbox model="@load(vm.documentTypes)" value="@bind(vm.selectedDocumentType)" 
+                        onSelect="@command('filterByType')" />
+                <label value="Domaine:" />
+                <listbox model="@load(vm.domains)" value="@bind(vm.selectedDomain)" 
+                        onSelect="@command('filterByDomain')" />
+                <label value="Statut:" />
+                <listbox model="@load(vm.statusOptions)" value="@bind(vm.selectedStatus)" 
+                        onSelect="@command('filterByStatus')" />
+            </hlayout>
+        </div>
+        
+        <!-- Documents Grid -->
+        <div sclass="biblio-grid">
+            <apply template="documentCard" forEach="@load(vm.filteredDocuments)" />
+        </div>
+        
+        <!-- Pagination -->
+        <div sclass="biblio-card" style="text-align: center; margin-top: 16px;">
+            <hlayout>
+                <button label="Précédent" onClick="@command('previousPage')" 
+                        disabled="@load(vm.currentPageNumber le 1)" />
+                <label value="Page @load(vm.currentPageNumber) sur @load(vm.totalPages)" />
+                <button label="Suivant" onClick="@command('nextPage')" 
+                        disabled="@load(vm.currentPageNumber ge vm.totalPages)" />
+            </hlayout>
+        </div>
+    </div>
+</zk>

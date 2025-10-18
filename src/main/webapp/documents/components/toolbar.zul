@@ -1,0 +1,4 @@
+<hlayout sclass="toolbar p-2 bg-light">
+    <button label="⬆️ Importer" onClick="@command('openUploadModal')" />
+    <button label="🔁 Rafraîchir" onClick="@command('loadDocuments')" />
+</hlayout>

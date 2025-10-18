@@ -1,0 +1,91 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        Documents List - Manage all documents in the bibliothèque
+        Provides CRUD operations for DocumentBiblio entities
+    -->
+    <div sclass="content-area">
+        <label value="📚 Gestion des documents" sclass="biblio-section-title" style="font-size: 24px; font-weight: bold; display: block; margin-bottom: 16px;" />
+        
+        <!-- Toolbar -->
+        <include src="/biblio/components/toolbar.zul" />
+        
+        <!-- Search and Filter -->
+        <div sclass="biblio-card" style="margin-bottom: 16px;">
+            <hlayout>
+                <textbox placeholder="Rechercher par titre, auteur, ISBN..." value="@bind(vm.searchQuery)" 
+                         onChanging="@command('searchDocuments')" hflex="1" />
+                <button label="🔍 Rechercher" onClick="@command('searchDocuments')" />
+                <button label="🔄 Réinitialiser" onClick="@command('resetSearch')" />
+            </hlayout>
+            
+            <separator />
+            
+            <hlayout>
+                <label value="Type:" />
+                <listbox model="@load(vm.documentTypes)" value="@bind(vm.selectedDocumentType)" 
+                        onSelect="@command('filterByType')" />
+                <label value="Domaine:" />
+                <listbox model="@load(vm.domains)" value="@bind(vm.selectedDomain)" 
+                        onSelect="@command('filterByDomain')" />
+                <label value="Disponibilité:" />
+                <listbox model="@load(vm.availabilityOptions)" value="@bind(vm.selectedAvailability)" 
+                        onSelect="@command('filterByAvailability')" />
+            </hlayout>
+        </div>
+        
+        <!-- Documents List -->
+        <div sclass="biblio-list">
+            <div sclass="list-header">
+                <hlayout>
+                    <label value="Titre" hflex="3" />
+                    <label value="Auteur" hflex="2" />
+                    <label value="Type" hflex="1" />
+                    <label value="Disponibilité" hflex="1" />
+                    <label value="Actions" hflex="2" />
+                </hlayout>
+            </div>
+            
+            <apply forEach="@load(vm.documents)">
+                <div sclass="list-item">
+                    <div sclass="item-info" hflex="3">
+                        <div sclass="item-title">@load(each.titre)</div>
+                        <div sclass="item-subtitle">ISBN: @load(each.numeroIsbn)</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="2">
+                        <div sclass="item-title">@load(each.documentAuteur?.auteur?.nom ?: 'Non spécifié')</div>
+                        <div sclass="item-subtitle">@load(each.editeur?.nom ?: 'Non spécifié')</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="1">
+                        <div sclass="item-title">@load(each.detailTypeDocumentBiblio?.typeDocumentBiblio?.libelle ?: 'Document')</div>
+                    </div>
+                    
+                    <div sclass="item-info" hflex="1">
+                        <label sclass="@load(each.disponibilite eq 1 ? 'status-available' : 'status-unavailable')">
+                            @load(each.disponibilite eq 1 ? 'Disponible' : 'Indisponible')
+                        </label>
+                    </div>
+                    
+                    <div sclass="item-actions" hflex="2">
+                        <button label="👁️" onClick="@command('viewDocument', document=each)" />
+                        <button label="✏️" onClick="@command('editDocument', document=each)" />
+                        <button label="📋" onClick="@command('showDocumentDetails', document=each)" />
+                        <button label="🗑️" onClick="@command('deleteDocument', document=each)" />
+                    </div>
+                </div>
+            </apply>
+        </div>
+        
+        <!-- Pagination -->
+        <div sclass="biblio-card" style="text-align: center; margin-top: 16px;">
+            <hlayout>
+                <button label="Précédent" onClick="@command('previousPage')" 
+                        disabled="@load(vm.currentPageNumber le 1)" />
+                <label value="Page @load(vm.currentPageNumber) sur @load(vm.totalPages)" />
+                <button label="Suivant" onClick="@command('nextPage')" 
+                        disabled="@load(vm.currentPageNumber ge vm.totalPages)" />
+            </hlayout>
+        </div>
+    </div>
+</zk>

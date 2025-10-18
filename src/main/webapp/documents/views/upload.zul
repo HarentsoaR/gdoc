@@ -1,0 +1,30 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window id="uploadWin" title="Importer un document" border="normal" width="480px"
+            viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.DocumentViewModel')"
+            closable="true" sizable="false" mode="modal">
+
+        <vlayout sclass="p-3" spacing="8px">
+            <hlayout>
+                <label value="Fichier" width="120px" />
+                <fileupload id="file" upload="true" label="Choisir un fichier" />
+            </hlayout>
+
+            <hlayout>
+                <label value="Titre" width="120px" />
+                <textbox id="titre" width="100%" placeholder="Titre du document" />
+            </hlayout>
+
+            <hlayout>
+                <label value="Remarque" width="120px" />
+                <textbox id="remarque" width="100%" multiline="true" rows="3" />
+            </hlayout>
+
+            <hlayout spacing="8px">
+                <button label="Annuler" onClick="uploadWin.detach()" />
+                <button label="Importer" sclass="btn-primary"
+                        onClick="@command('handleUpload', titre=titre.value, remarque=remarque.value, file= file.media); uploadWin.detach()" />
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+

@@ -1,0 +1,9 @@
+<hlayout sclass="toolbar p-2 bg-light">
+    <button label="Ajouter" onClick="@command('openNewDocumentModal')" />
+    <button label="Importer" onClick="@command('openImportModal')" />
+    <button label="Exporter" onClick="@command('exportData')" />
+    <button label="Rafraîchir" onClick="@command('loadDocuments')" />
+    <separator orient="vertical" />
+    <button label="Recherche" onClick="@command('openSearchModal')" />
+    <button label="Rapports" onClick="@command('openReportsModal')" />
+</hlayout>

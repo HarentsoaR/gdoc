@@ -1,0 +1,47 @@
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:n="native"
+    viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.ProfilViewModel')">
+    
+    <style>
+        .page-container {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .toolbar { margin-bottom: 16px; display: flex; justify-content: space-between; }
+    </style>
+
+    <div sclass="page-container">
+        <div sclass="toolbar">
+            <label value="Gestion des Profils" style="font-weight:bold;font-size:18px"/>
+            <button label="➕ Nouveau Profil" onClick="@command('newProfil')"/>
+        </div>
+
+        <listbox model="@load(vm.profils)" selectedItem="@bind(vm.selectedProfil)"
+                 mold="paging" pageSize="10" width="100%">
+            <listhead>
+                <listheader label="ID" width="80px"/>
+                <listheader label="Libellé"/>
+                <listheader label="Remarque"/>
+                <listheader label="Actif" width="100px"/>
+                <listheader label="Actions" width="150px"/>
+            </listhead>
+
+            <template name="model">
+                <listitem>
+                    <listcell label="@load(each.profilId)"/>
+                    <listcell label="@load(each.libelle)"/>
+                    <listcell label="@load(each.remarque)"/>
+                    <!-- <listcell label="@load(each.actif == 1 ? 'Oui' : 'Non')"/> -->
+                    <listcell>
+                        <hlayout>
+                            <button label="✏️" onClick="@command('editProfil', profil=each)"/>
+                            <button label="🗑️" onClick="@command('deleteProfil', profil=each)"/>
+                        </hlayout>
+                    </listcell>
+                </listitem>
+            </template>
+        </listbox>
+    </div>
+</zk>

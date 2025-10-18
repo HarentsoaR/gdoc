@@ -1,0 +1,73 @@
+<?page title="Connexion – GEDI"?>
+<zk xmlns:n="native">
+
+    <style>
+        /* Le CSS reste identique, il est correct */
+        .z-page{background-color:#f0f2f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;margin:0}.login-container{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}.login-card{display:flex;max-width:900px;width:100%;background-color:#fff;border-radius:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,.15);overflow:hidden;transition:all .3s ease-in-out}.login-branding{flex:1;background:linear-gradient(135deg,#005a9e,#1976d2);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;text-align:center}.login-branding-logo{width:80px;height:80px;margin-bottom:20px}.login-branding-title{font-size:36px;font-weight:700}.login-branding-subtitle{font-size:16px;opacity:.9;margin-top:8px;max-width:300px}.login-form-panel{flex:1.2;display:flex;flex-direction:column;justify-content:center;padding:56px}.login-title{font-size:32px;font-weight:700;color:#1f2937}.login-subtitle{font-size:16px;color:#6b7280;margin-top:8px;margin-bottom:32px}.login-label{font-size:14px;font-weight:600;color:#374151;margin-bottom:8px}.input-wrapper{position:relative;width:100%}.login-input.z-textbox{height:48px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;padding:0 12px 0 44px;width:100%;transition:all .2s ease-in-out}.login-input.z-textbox:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.2);outline:none}.login-input-error.z-textbox,.login-input-error.z-textbox:focus{border-color:#ef4444!important;background-color:#fee2e2}.error-message{font-size:13px;color:#dc2626;margin-top:6px;height:16px}.input-icon{position:absolute;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:18px;z-index:2;pointer-events:none}.input-icon.left{left:14px}.input-icon.right{right:14px;pointer-events:all;cursor:pointer;transition:color .2s}.input-icon.right:hover{color:#374151}.login-button.z-button{height:48px;background:#2563eb;border:none;border-radius:8px;font-size:16px;font-weight:600;transition:all .2s ease-in-out}.login-button.z-button:hover{background:#1d4ed8}.login-button.z-button[disabled]{background-color:#9ca3af;cursor:not-allowed;opacity:.7}.spinner{animation:spin 1s linear infinite;margin-right:8px}@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}.login-link.z-a{font-size:14px;color:#2563eb;text-decoration:none}.login-link.z-a:hover{text-decoration:underline}.banner{position:fixed;top:24px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.08);z-index:1000;font-weight:600}.banner-success{background:#e6ffed;color:#1e7e34;border:1px solid #c3e6cb}.banner-error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}@media (max-width:800px){.login-card{flex-direction:column;width:95%;max-width:450px;height:auto}.login-branding{display:none}.login-form-panel{padding:40px}}
+    </style>
+
+    <div sclass="login-container" viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.LoginViewModel')">
+        
+        <!-- ✅ CORRECTION : Ajout de id="flashBanner" et de l'icône -->
+        <div id="flashBanner" sclass="@load(vm.bannerClass)" visible="@load(not empty vm.flashMessage)">
+            <label value="@load(vm.flashMessage)" />
+            <n:i sclass="@load(vm.bannerIconClass)" />
+        </div>
+        
+        <div sclass="login-card">
+            <div sclass="login-branding">
+                <image src="/img/logo-gedi-white.png" sclass="login-branding-logo"/>
+                <label value="GEDI" sclass="login-branding-title"/>
+                <label value="Votre solution de Gestion Électronique de Documents, simplifiée et sécurisée." sclass="login-branding-subtitle"/>
+            </div>
+
+            <div sclass="login-form-panel">
+                <label value="Bienvenue !" sclass="login-title"/>
+                <label value="Veuillez entrer vos identifiants pour continuer." sclass="login-subtitle"/>
+
+                <vbox width="100%" spacing="15px">
+                    <vbox width="100%" spacing="0">
+                        <label value="Nom d'utilisateur" sclass="login-label"/>
+                        <div sclass="input-wrapper">
+                            <n:i sclass="z-icon-user input-icon left"/>
+                            <textbox id="usernameBox" hflex="1" 
+                                     sclass="login-input @load(vm.loginError ? 'login-input-error' : '')"
+                                     placeholder="ex: jdupont"
+                                     value="@save(vm.username) @load(vm.username)"
+                                     onOK="@command('login')" />
+                        </div>
+                    </vbox>
+
+                    <vbox width="100%" spacing="0">
+                        <label value="Mot de passe" sclass="login-label"/>
+                        <div sclass="input-wrapper">
+                            <n:i sclass="z-icon-lock input-icon left"/>
+                            <textbox id="passwordBox" hflex="1"
+                                     sclass="login-input @load(vm.loginError ? 'login-input-error' : '')"
+                                     placeholder="••••••••"
+                                     type="@load(vm.passwordInputType)"
+                                     value="@save(vm.password) @load(vm.password)"
+                                     onOK="@command('login')" />
+                            <a sclass="input-icon right"
+                               iconSclass="@load(vm.passwordVisibilityIcon)"
+                               onClick="@command('togglePasswordVisibility')"/>
+                        </div>
+                    </vbox>
+                    
+                    <label sclass="error-message" value="@load(vm.errorMessage)" />
+                </vbox>
+
+                <vbox width="100%" spacing="16px" style="margin-top: 24px;">
+                    <!-- ✅ CORRECTION : La condition "loginDisabled" est enlevée. Le bouton est maintenant toujours activé. -->
+                    <button id="loginButton" width="100%" sclass="login-button"
+                            label="@load(vm.isLoggingIn ? 'Connexion...' : 'Se connecter')"
+                            iconSclass="@load(vm.isLoggingIn ? 'spinner z-icon-spinner' : '')"
+                            disabled="@load(vm.isLoggingIn)"
+                            onClick="@command('login')"/>
+                            
+                    <a label="Mot de passe oublié ?" sclass="login-link" style="text-align: center;"/>
+                </vbox>
+            </div>
+        </div>
+    </div>
+</zk>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk>
+	<!-- Set default theme -->
+	<system-config>
+		<theme-provider-class>org.zkoss.theme.LeanThemeProvider</theme-provider-class>
+		<theme-name>iceblue_c</theme-name>
+	</system-config>
+	
+	<!-- This listener ensures Spring beans can be accessed from ZK -->
+    <listener>
+        <listener-class>org.zkoss.zkplus.spring.DelegatingVariableResolver</listener-class>
+    </listener>
+	
+</zk>

@@ -1,0 +1,42 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <vlayout sclass="preview-panel" width="280px" height="350px">
+        <!-- Section Stockage -->
+       <!-- <groupbox sclass="info-box">
+            <caption label="Aperçu du Stockage" />
+            <vlayout>
+                <progressmeter value="50" width="100%" />
+                <label value="50 Go utilisés sur 100 Go" sclass="text-sm text-muted" />
+                <button label="Gérer le stockage" sclass="btn-secondary" />
+            </vlayout>
+        </groupbox>
+        -->
+
+        <!-- Section Activité Récente -->
+        <groupbox sclass="info-box" vflex="1">
+            <caption label="Activité Récente" />
+            <!-- Le mold="select" rend la listbox non sélectionnable visuellement -->
+            <listbox model="@load(vm.recentActivities)" mold="select" vflex="1" sclass="activity-list">
+                <template name="model" var="activity">
+                    <listitem>
+                        <listcell>
+                             <label value="@load(activity)" />
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </groupbox>
+
+        <!-- Section Prévisualisation (visible seulement si un doc est sélectionné) -->
+        <groupbox sclass="info-box" vflex="min"
+                  visible="@load(vm.selectedDocument ne null)">
+            <caption label="Prévisualisation" />
+            <vlayout>
+                <image src="@load(vm.selectedDocument.previewUrl or '/img/preview-placeholder.png')" width="100%" />
+                <label value="@load(vm.selectedDocument.titre)" sclass="fw-bold" />
+                <label value="@load('Taille: ' .concat(vm.selectedDocument.taille))" sclass="text-sm text-muted" />
+                <button label="Télécharger" sclass="btn-primary" width="100%" 
+                        onClick="@command('downloadDocument', doc=vm.selectedDocument)" />
+            </vlayout>
+        </groupbox>
+    </vlayout>
+</zk>

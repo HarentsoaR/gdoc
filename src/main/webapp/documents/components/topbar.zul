@@ -1,0 +1,21 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <div sclass="topbar">
+        <!-- Section gauche : Logo et chemin actuel -->
+        <div sclass="topbar-left">
+            <image src="/img/logo-gedi.png" width="30px" />
+            <label value="GEDI Drive" sclass="app-title" />
+            <separator orient="vertical" bar="true" />
+            <label value="@load(vm.currentPath)" sclass="breadcrumb" />
+        </div>
+
+        <!-- Section droite : Recherche, Import et Utilisateur -->
+        <div sclass="topbar-right">
+            <textbox sclass="search-input" placeholder="Rechercher un document..." 
+                     value="@bind(vm.searchQuery)" instant="true"
+                     onChanging="@command('searchDocuments')" />
+            <button label="Importer" sclass="btn-primary" iconSclass="z-icon-upload"
+                    onClick="@command('openUploadModal')" />
+            <image src="/img/user-avatar.png" width="36px" sclass="user-avatar" />
+        </div>
+    </div>
+</zk>

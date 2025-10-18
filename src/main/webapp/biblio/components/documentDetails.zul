@@ -1,0 +1,117 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- 
+        Document Details Modal - Show detailed information about a document
+        Displays all document information in a modal window
+    -->
+    <window title="Détails du document" width="600px" height="500px" 
+            closable="true" sizable="true" mode="modal" position="center">
+        
+        <div sclass="modal-body">
+        <div sclass="biblio-card">
+            <label value="@load(document.titre)" sclass="card-title" style="font-size: 18px; font-weight: bold; display: block; margin-bottom: 16px;" />
+                
+                <div sclass="document-details">
+                    <hlayout>
+                        <div sclass="detail-group" hflex="1">
+                            <label sclass="detail-label">ISBN:</label>
+                            <label sclass="detail-value">@load(document.numeroIsbn)</label>
+                        </div>
+                        <div sclass="detail-group" hflex="1">
+                            <label sclass="detail-label">Prix:</label>
+                            <label sclass="detail-value">@load(document.prix)</label>
+                        </div>
+                    </hlayout>
+                    
+                    <hlayout>
+                        <div sclass="detail-group" hflex="1">
+                            <label sclass="detail-label">Pages:</label>
+                            <label sclass="detail-value">@load(document.nombrePage)</label>
+                        </div>
+                        <div sclass="detail-group" hflex="1">
+                            <label sclass="detail-label">Exemplaires:</label>
+                            <label sclass="detail-value">@load(document.nombreExemplaire)</label>
+                        </div>
+                    </hlayout>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Auteur:</label>
+                        <label sclass="detail-value">@load(document.documentAuteur?.auteur?.nom ?: 'Non spécifié')</label>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Éditeur:</label>
+                        <label sclass="detail-value">@load(document.editeur?.nom ?: 'Non spécifié')</label>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Type:</label>
+                        <label sclass="detail-value">@load(document.detailTypeDocumentBiblio?.typeDocumentBiblio?.libelle ?: 'Document')</label>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Domaine:</label>
+                        <label sclass="detail-value">@load(document.domaineOuvrage?.libelle ?: 'Non spécifié')</label>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Catégorie:</label>
+                        <label sclass="detail-value">@load(document.categorieOuvrage?.libelle ?: 'Non spécifié')</label>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Collection:</label>
+                        <label sclass="detail-value">@load(document.collectionOuvrage?.libelle ?: 'Non spécifié')</label>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Date d'entrée:</label>
+                        <label sclass="detail-value">@load(document.dateEntree)</label>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Date d'acquisition:</label>
+                        <label sclass="detail-value">@load(document.dateAcquisition)</label>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Statut:</label>
+                        <label sclass="@load(document.disponibilite eq 1 ? 'status-available' : 'status-unavailable')">
+                            @load(document.disponibilite eq 1 ? 'Disponible' : 'Indisponible')
+                        </label>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Empruntable:</label>
+                        <label sclass="detail-value">@load(document.pretable eq 1 ? 'Oui' : 'Non')</label>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Résumé:</label>
+                        <div sclass="detail-value" style="margin-top: 8px;">@load(document.resume)</div>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Mots-clés:</label>
+                        <label sclass="detail-value">@load(document.motCle)</label>
+                    </div>
+                    
+                    <div sclass="detail-group">
+                        <label sclass="detail-label">Cote:</label>
+                        <label sclass="detail-value">@load(document.coteOuvrage)</label>
+                    </div>
+                    
+                    <div sclass="detail-group" visible="@load(not empty document.remarque)">
+                        <label sclass="detail-label">Remarques:</label>
+                        <div sclass="detail-value" style="margin-top: 8px;">@load(document.remarque)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div sclass="modal-footer">
+            <button label="✏️ Modifier" onClick="@command('editDocument', document=document)" />
+            <button label="📋 Imprimer" onClick="@command('printDocument', document=document)" />
+            <button label="❌ Fermer" onClick="@command('closeModal')" />
+        </div>
+    </window>
+</zk>
