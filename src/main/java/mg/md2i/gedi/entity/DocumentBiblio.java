@@ -9,6 +9,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.zkoss.bind.annotation.Transient;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -406,5 +408,20 @@ public class DocumentBiblio implements Serializable {
 	public CollectionOuvrage getCollectionOuvrage() {
 		return collectionOuvrage;
 	}
+	
+	/* Méthode de convenance (helper) pour accéder directement au TypeDocumentBiblio 
+     * à travers l'entité DetailTypeDocumentBiblio.
+     * L'annotation @Transient indique à JPA de ne pas essayer de mapper cette méthode
+     * à une colonne de la base de données.
+     * @return Le TypeDocumentBiblio associé, ou null s'il n'y en a pas.
+     */
+    @Transient
+    public TypeDocumentBiblio getTypeDocumentBiblio() {
+        if (this.detailTypeDocumentBiblio != null) {
+            // Note: Je suppose que la classe DetailTypeDocumentBiblio a une méthode getTypeDocumentBiblio()
+            return this.detailTypeDocumentBiblio.getTypeDocumentBiblio();
+        }
+        return null;
+    }
 
 }

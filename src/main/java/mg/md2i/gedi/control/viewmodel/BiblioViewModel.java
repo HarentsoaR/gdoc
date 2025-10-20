@@ -31,8 +31,8 @@ public class BiblioViewModel {
     
     // Search and filtering
     private String searchQuery = "";
-    private String selectedDocumentType = "";
-    private String selectedDomain = "";
+    private TypeDocumentBiblio selectedDocumentType = null;
+    private DomaineOuvrage selectedDomain = null;
     private String selectedStatus = "";
     private String selectedAvailability = "";
     private String selectedJournalType = "";
@@ -46,6 +46,8 @@ public class BiblioViewModel {
     private List<RapportStageBiblio> rapports = new ArrayList<>();
     private List<DocumentBiblio> recentDocuments = new ArrayList<>();
     private List<DocumentBiblio> filteredDocuments = new ArrayList<>();
+    // Current page slice for UI rendering
+    private List<DocumentBiblio> pagedDocuments = new ArrayList<>();
     private List<DocumentBiblio> inventoryItems = new ArrayList<>();
     
     // Lookup data
@@ -173,12 +175,9 @@ public class BiblioViewModel {
     }
     
     @Command
+    @NotifyChange({"filteredDocuments", "resultsCountText"})
     public void searchDocuments() {
-        filteredDocuments = documents.stream()
-            .filter(doc -> searchQuery.isEmpty() || 
-                doc.getTitre().toLowerCase().contains(searchQuery.toLowerCase()) ||
-                doc.getNumeroIsbn().toLowerCase().contains(searchQuery.toLowerCase()))
-            .collect(Collectors.toList());
+        applyFilters();
     }
     
     @Command
@@ -197,25 +196,85 @@ public class BiblioViewModel {
     }
     
     @Command
+    @NotifyChange({"searchQuery", "selectedDocumentType", "selectedDomain", "selectedStatus", "filteredDocuments", "resultsCountText"})
     public void resetSearch() {
         searchQuery = "";
-        filteredDocuments = new ArrayList<>(documents);
+        selectedDocumentType = null;
+        selectedDomain = null;
+        selectedStatus = "";
+        if (documents != null) {
+            filteredDocuments = new ArrayList<>(documents);
+        } else {
+            filteredDocuments = new ArrayList<>();
+        }
+    }
+    
+    private void applyFilters() {
+        if (documents == null || documents.isEmpty()) {
+            filteredDocuments = new ArrayList<>();
+            updatePagination();
+            return;
+        }
+        
+        filteredDocuments = documents.stream()
+            .filter(doc -> {
+                // Search query filter
+                if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+                    String query = searchQuery.toLowerCase().trim();
+                    String titre = doc.getTitre() != null ? doc.getTitre().toLowerCase() : "";
+                    String isbn = doc.getNumeroIsbn() != null ? doc.getNumeroIsbn().toLowerCase() : "";
+                    if (!titre.contains(query) && !isbn.contains(query)) {
+                        return false;
+                    }
+                }
+                
+                // Document type filter
+                if (selectedDocumentType != null && doc.getDetailTypeDocumentBiblio() != null && 
+                    doc.getDetailTypeDocumentBiblio().getTypeDocumentBiblio() != null) {
+                    String typeLabel = doc.getDetailTypeDocumentBiblio().getTypeDocumentBiblio().getLibelle();
+                    if (!Objects.equals(typeLabel, selectedDocumentType.getLibelle())) {
+                        return false;
+                    }
+                }
+                
+                // Domain filter
+                if (selectedDomain != null && doc.getDomaineOuvrage() != null) {
+                    if (!Objects.equals(doc.getDomaineOuvrage().getLibelle(), selectedDomain.getLibelle())) {
+                        return false;
+                    }
+                }
+                
+                // Status filter
+                if (selectedStatus != null && !selectedStatus.isEmpty() && !"Tous".equals(selectedStatus)) {
+                    String docStatus = doc.getDisponibilite() == 1 ? "Disponible" : "Emprunté";
+                    if (!docStatus.equals(selectedStatus)) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            })
+            .collect(Collectors.toList());
+        updatePagination();
     }
     
     // Filter commands
     @Command
+    @NotifyChange({"filteredDocuments", "resultsCountText"})
     public void filterByType() {
-        // Implement type filtering
+        applyFilters();
     }
     
     @Command
+    @NotifyChange({"filteredDocuments", "resultsCountText"})
     public void filterByDomain() {
-        // Implement domain filtering
+        applyFilters();
     }
     
     @Command
+    @NotifyChange({"filteredDocuments", "resultsCountText"})
     public void filterByStatus() {
-        // Implement status filtering
+        applyFilters();
     }
     
     @Command
@@ -300,6 +359,12 @@ public class BiblioViewModel {
         // Show detailed document information
     }
     
+    @Command
+    public void selectDocument(@BindingParam("document") DocumentBiblio document) {
+        // Select document for preview or detailed view
+        editingDocument = document;
+    }
+    
     // Data loading methods
     private void loadLookupData() {
         try {
@@ -349,13 +414,27 @@ public class BiblioViewModel {
         }
     }
     
-    @NotifyChange({"documents", "filteredDocuments"})
+    @NotifyChange({"documents", "filteredDocuments", "resultsCountText", "pagedDocuments", "currentPageNumber", "totalPages"})
     private void loadDocuments() {
         try {
             documents = DocumentBiblioGestion.findAll();
             filteredDocuments = new ArrayList<>(documents);
+            updatePagination();
+            
+            // Debug: Log the number of documents loaded
+            System.out.println("Documents chargés: " + documents.size());
+            if (!documents.isEmpty()) {
+                DocumentBiblio firstDoc = documents.get(0);
+                System.out.println("Premier document - Titre: " + firstDoc.getTitre());
+                System.out.println("Premier document - Domaine: " + (firstDoc.getDomaineOuvrage() != null ? firstDoc.getDomaineOuvrage().getLibelle() : "NULL"));
+                System.out.println("Premier document - DetailType: " + (firstDoc.getDetailTypeDocumentBiblio() != null ? "EXISTS" : "NULL"));
+                if (firstDoc.getDetailTypeDocumentBiblio() != null && firstDoc.getDetailTypeDocumentBiblio().getTypeDocumentBiblio() != null) {
+                    System.out.println("Premier document - Type: " + firstDoc.getDetailTypeDocumentBiblio().getTypeDocumentBiblio().getLibelle());
+                }
+            }
         } catch (Exception e) {
             Clients.showNotification("Erreur lors du chargement des documents: " + e.getMessage(), "error", null, "top_right", 3000);
+            e.printStackTrace();
         }
     }
     
@@ -391,7 +470,7 @@ public class BiblioViewModel {
     public void nextPage() {
         if (currentPageNumber < totalPages) {
             currentPageNumber++;
-            loadDocuments();
+            updatePagination();
         }
     }
     
@@ -399,8 +478,33 @@ public class BiblioViewModel {
     public void previousPage() {
         if (currentPageNumber > 1) {
             currentPageNumber--;
-            loadDocuments();
+            updatePagination();
         }
+    }
+
+    // Helper to compute paging slice from filteredDocuments
+    @NotifyChange({"pagedDocuments", "currentPageNumber", "totalPages"})
+    private void updatePagination() {
+        int total = filteredDocuments != null ? filteredDocuments.size() : 0;
+        if (pageSize <= 0) {
+            pageSize = 20;
+        }
+        totalPages = Math.max(1, (int) Math.ceil(total / (double) pageSize));
+        if (currentPageNumber > totalPages) currentPageNumber = totalPages;
+        if (currentPageNumber < 1) currentPageNumber = 1;
+
+        if (total == 0) {
+            pagedDocuments = new ArrayList<>();
+            return;
+        }
+        int startIndex = (currentPageNumber - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, total);
+        if (startIndex >= endIndex) {
+            startIndex = 0;
+            endIndex = Math.min(pageSize, total);
+            currentPageNumber = 1;
+        }
+        pagedDocuments = filteredDocuments.subList(startIndex, endIndex);
     }
     
     // Modal commands
@@ -493,4 +597,91 @@ public class BiblioViewModel {
     
     public int getCurrentPageNumber() { return currentPageNumber; }
     public int getTotalPages() { return totalPages; }
+    
+    // Filter properties getters and setters
+    public TypeDocumentBiblio getSelectedDocumentType() { return selectedDocumentType; }
+    public void setSelectedDocumentType(TypeDocumentBiblio selectedDocumentType) { this.selectedDocumentType = selectedDocumentType; }
+    
+    public DomaineOuvrage getSelectedDomain() { return selectedDomain; }
+    public void setSelectedDomain(DomaineOuvrage selectedDomain) { this.selectedDomain = selectedDomain; }
+    
+    public String getSelectedStatus() { return selectedStatus; }
+    public void setSelectedStatus(String selectedStatus) { this.selectedStatus = selectedStatus; }
+    
+    public String getSelectedAvailability() { return selectedAvailability; }
+    public void setSelectedAvailability(String selectedAvailability) { this.selectedAvailability = selectedAvailability; }
+    
+    public String getSelectedJournalType() { return selectedJournalType; }
+    public void setSelectedJournalType(String selectedJournalType) { this.selectedJournalType = selectedJournalType; }
+    
+    public String getSelectedFiliere() { return selectedFiliere; }
+    public void setSelectedFiliere(String selectedFiliere) { this.selectedFiliere = selectedFiliere; }
+    
+    public String getSelectedPromotion() { return selectedPromotion; }
+    public void setSelectedPromotion(String selectedPromotion) { this.selectedPromotion = selectedPromotion; }
+    
+    public Date getSelectedDate() { return selectedDate; }
+    public void setSelectedDate(Date selectedDate) { this.selectedDate = selectedDate; }
+    
+    public List<JournalBiblio> getJournals() { return journals; }
+    public void setJournals(List<JournalBiblio> journals) { this.journals = journals; }
+    
+    public List<RapportStageBiblio> getRapports() { return rapports; }
+    public void setRapports(List<RapportStageBiblio> rapports) { this.rapports = rapports; }
+    
+    public List<DocumentBiblio> getInventoryItems() { return inventoryItems; }
+    public void setInventoryItems(List<DocumentBiblio> inventoryItems) { this.inventoryItems = inventoryItems; }
+    
+    public List<TypeJournal> getJournalTypes() { return journalTypes; }
+    public List<FiliereBiblio> getFilieres() { return filieres; }
+    public List<PromotionBiblio> getPromotions() { return promotions; }
+    
+    public int getPageSize() { return pageSize; }
+    public void setPageSize(int pageSize) { this.pageSize = pageSize; }
+    
+    // Computed property for results count display
+    public String getResultsCountText() {
+        return "Résultats (" + filteredDocuments.size() + ")";
+    }
+    
+    // Helper methods for ZUL template
+    public String getDocumentTypeLabel(DocumentBiblio doc) {
+        if (doc != null && doc.getDetailTypeDocumentBiblio() != null && 
+            doc.getDetailTypeDocumentBiblio().getTypeDocumentBiblio() != null) {
+            return doc.getDetailTypeDocumentBiblio().getTypeDocumentBiblio().getLibelle();
+        }
+        return "Non défini";
+    }
+    
+    public String getDomainLabel(DocumentBiblio doc) {
+        if (doc != null && doc.getDomaineOuvrage() != null) {
+            return doc.getDomaineOuvrage().getLibelle();
+        }
+        return "Non défini";
+    }
+    
+    public String getAuthorLabel(DocumentBiblio doc) {
+        // DocumentBiblio doesn't have a direct author field
+        // You might need to add this relationship or use a different approach
+        return "Non spécifié";
+    }
+    
+    public String getPublisherLabel(DocumentBiblio doc) {
+        if (doc != null && doc.getEditeur() != null) {
+            return doc.getEditeur().getEditeur(); // The field is called 'editeur', not 'nom'
+        }
+        return "Non spécifié";
+    }
+    
+    public String getStatusLabel(DocumentBiblio doc) {
+        return doc.getDisponibilite() == 1 ? "Disponible" : "Emprunté";
+    }
+    
+    public String getStatusClass(DocumentBiblio doc) {
+        if (doc == null) return "badge";
+        return doc.getDisponibilite() == 1 ? "badge badge-success" : "badge badge-warning";
+    }
+
+    // Paging data getter for ZUL
+    public List<DocumentBiblio> getPagedDocuments() { return pagedDocuments; }
 }

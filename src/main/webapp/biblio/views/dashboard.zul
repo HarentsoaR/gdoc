@@ -49,7 +49,9 @@
         <div sclass="biblio-section">
             <label value="Documents récents" sclass="biblio-section-title" style="font-size: 18px; font-weight: bold; display: block; margin: 24px 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid #1a73e8;" />
             <div sclass="biblio-grid">
-                <apply template="documentCard" forEach="@load(vm.recentDocuments)" />
+                <apply forEach="@load(vm.recentDocuments)">
+                    <include src="/biblio/components/documentCard.zul" document="@load(each)" />
+                </apply>
             </div>
         </div>
         

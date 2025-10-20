@@ -5,22 +5,22 @@
     -->
     <div sclass="biblio-card" style="cursor: pointer;" onClick="@command('selectDocument', document=document)">
         <div sclass="card-header">
-            <h4 sclass="card-title">@load(document.titre)</h4>
-            <label sclass="card-subtitle">@load(document.detailTypeDocumentBiblio?.typeDocumentBiblio?.libelle ?: 'Document')</label>
+            <label sclass="card-title" value="@load(document.titre)" />
+            <label sclass="card-subtitle" value="@load(vm.getDocumentTypeLabel(document))" />
         </div>
         
         <div sclass="card-content">
             <div sclass="document-info">
-                <label value="Auteur: @load(document.documentAuteur?.auteur?.nom ?: 'Non spécifié')" />
-                <label value="Éditeur: @load(document.editeur?.nom ?: 'Non spécifié')" />
+                <label value="Auteur: @load(vm.getAuthorLabel(document))" />
+                <label value="Éditeur: @load(vm.getPublisherLabel(document))" />
                 <label value="ISBN: @load(document.numeroIsbn)" />
                 <label value="Pages: @load(document.nombrePage)" />
                 <label value="Exemplaires: @load(document.nombreExemplaire)" />
             </div>
             
             <div sclass="document-status">
-                <label sclass="@load(document.disponibilite eq 1 ? 'status-available' : 'status-unavailable')">
-                    @load(document.disponibilite eq 1 ? 'Disponible' : 'Indisponible')
+                <label sclass="@load(vm.getStatusClass(document))">
+                    @load(vm.getStatusLabel(document))
                 </label>
                 <label value="@load(document.pretable eq 1 ? 'Empruntable' : 'Non empruntable')" />
             </div>

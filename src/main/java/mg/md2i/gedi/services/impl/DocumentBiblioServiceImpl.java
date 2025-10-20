@@ -18,7 +18,7 @@ public class DocumentBiblioServiceImpl implements DocumentBiblioService {
 
     @Override
     public List<DocumentBiblio> getAllActive() {
-        return repository.findByActif(1);
+        return repository.findAllActiveWithRelations();
     }
 
     @Override

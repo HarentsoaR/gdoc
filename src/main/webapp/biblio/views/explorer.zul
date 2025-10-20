@@ -1,49 +1,138 @@
-<zk xmlns="http://www.zkoss.org/2005/zul">
-    <!-- 
-        Biblio Explorer - Browse all documents with filtering and search
-        Similar to documents/explorer.zul but for biblio documents
-    -->
-    <div sclass="content-area">
-        <label value="📚 Explorateur de documents" sclass="biblio-section-title" style="font-size: 24px; font-weight: bold; display: block; margin-bottom: 16px;" />
-        
-        <!-- Search and Filter Bar -->
-        <div sclass="biblio-card" style="margin-bottom: 16px;">
-            <hlayout>
-                <textbox placeholder="Rechercher un document..." value="@bind(vm.searchQuery)" 
-                         onChanging="@command('searchDocuments')" hflex="1" />
-                <button label="🔍 Rechercher" onClick="@command('searchDocuments')" />
-                <button label="🔄 Réinitialiser" onClick="@command('resetSearch')" />
-            </hlayout>
-            
-            <separator />
-            
-            <hlayout>
-                <label value="Filtrer par type:" />
-                <listbox model="@load(vm.documentTypes)" value="@bind(vm.selectedDocumentType)" 
-                        onSelect="@command('filterByType')" />
-                <label value="Domaine:" />
-                <listbox model="@load(vm.domains)" value="@bind(vm.selectedDomain)" 
-                        onSelect="@command('filterByDomain')" />
-                <label value="Statut:" />
-                <listbox model="@load(vm.statusOptions)" value="@bind(vm.selectedStatus)" 
-                        onSelect="@command('filterByStatus')" />
-            </hlayout>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:n="native">
+    
+    <style>
+        .document-explorer .z-grid-body .z-label {
+            font-weight: 600;
+        }
+        .document-explorer .z-listheader-content {
+            font-weight: bold;
+        }
+        .badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        .badge-success {
+            background-color: #18a689; /* Vert */
+        }
+        .badge-warning {
+            background-color: #f8ac59; /* Orange */
+        }
+        .badge-danger {
+            background-color: #ed5565; /* Rouge */
+        }
+    </style>
+
+    <div sclass="content-area document-explorer" vflex="1">
+        <div sclass="page-header">
+            <label value="Explorateur de documents" sclass="page-title" />
+            <label value="Recherchez, filtrez et parcourez l'ensemble des documents de la bibliothèque." sclass="page-subtitle"/>
         </div>
         
-        <!-- Documents Grid -->
-        <div sclass="biblio-grid">
-            <apply template="documentCard" forEach="@load(vm.filteredDocuments)" />
+        <div sclass="z-panel">
+            <div sclass="z-panel-header">
+                <label sclass="z-panel-title" value="🔍 Outils de recherche et de filtrage" />
+            </div>
+            <div sclass="z-panel-body">
+                <vlayout>
+                    <!-- Search Bar -->
+                    <hlayout valign="middle" style="margin-bottom: 16px;">
+                        <textbox placeholder="Rechercher par titre, ISBN, auteur..." 
+                                 value="@bind(vm.searchQuery)"
+                                 onChanging="@command('searchDocuments')"
+                                 onOK="@command('searchDocuments')" 
+                                 hflex="1" 
+                                 style="padding: 10px 16px; border-radius: 8px; border: 1px solid #dadce0; font-size: 14px;" />
+                        <button label="Rechercher" iconSclass="z-icon-search"
+                                onClick="@command('searchDocuments')" 
+                                style="margin-left: 8px; padding: 10px 20px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-weight: 500;"/>
+                        <button label="Réinitialiser" iconSclass="z-icon-refresh"
+                                onClick="@command('resetSearch')" 
+                                style="margin-left: 8px; padding: 10px 20px; background: #f8f9fa; color: #5f6368; border: 1px solid #dadce0; border-radius: 8px;"/>
+                    </hlayout>
+                    
+                    <!-- Filter Row 1 -->
+                    <hlayout valign="middle" style="margin-bottom: 12px;">
+                        <label value="Type de document :" style="width: 150px; font-weight: 500; color: #3c4043;" />
+                        <listbox mold="select" model="@load(vm.documentTypes)" 
+                                 selectedItem="@bind(vm.selectedDocumentType)"
+                                 onSelect="@command('filterByType')"
+                                 style="width: 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid #dadce0;">
+                            <template name="model" var="type">
+                                <listitem label="@load(type.libelle)" />
+                            </template>
+                        </listbox>
+                        
+                        <label value="Domaine :" style="width: 100px; font-weight: 500; color: #3c4043; margin-left: 20px;" />
+                        <listbox mold="select" model="@load(vm.domains)" 
+                                 selectedItem="@bind(vm.selectedDomain)"
+                                 onSelect="@command('filterByDomain')"
+                                 style="width: 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid #dadce0;">
+                            <template name="model" var="domain">
+                                <listitem label="@load(domain.libelle)" />
+                            </template>
+                        </listbox>
+                    </hlayout>
+                    
+                    <!-- Filter Row 2 -->
+                    <hlayout valign="middle">
+                        <label value="Statut :" style="width: 150px; font-weight: 500; color: #3c4043;" />
+                        <listbox mold="select" model="@load(vm.statusOptions)"
+                                 selectedItem="@bind(vm.selectedStatus)"
+                                 onSelect="@command('filterByStatus')"
+                                 style="width: 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid #dadce0;">
+                            <template name="model" var="status">
+                                <listitem label="@load(status)" value="@load(status)" />
+                            </template>
+                        </listbox>
+                    </hlayout>
+                </vlayout>
+            </div>
         </div>
         
-        <!-- Pagination -->
-        <div sclass="biblio-card" style="text-align: center; margin-top: 16px;">
-            <hlayout>
-                <button label="Précédent" onClick="@command('previousPage')" 
-                        disabled="@load(vm.currentPageNumber le 1)" />
-                <label value="Page @load(vm.currentPageNumber) sur @load(vm.totalPages)" />
-                <button label="Suivant" onClick="@command('nextPage')" 
-                        disabled="@load(vm.currentPageNumber ge vm.totalPages)" />
-            </hlayout>
+        <div sclass="z-panel" vflex="1" style="margin-top: 20px;">
+            <div sclass="z-panel-header">
+                <label sclass="z-panel-title" value="📋 @load(vm.resultsCountText)" />
+            </div>
+            <div sclass="z-panel-body" vflex="1" style="padding: 0;">
+                <listbox model="@load(vm.filteredDocuments)" mold="paging" pageSize="15" vflex="1" 
+                         emptyMessage="Aucun document ne correspond à vos critères de recherche."
+                         style="border: none;">
+                    <listhead sizable="true">
+                        <listheader label="Titre du document" sort="auto(titre)" />
+                        <listheader label="Type" width="180px" sort="auto(detailTypeDocumentBiblio.typeDocumentBiblio.libelle)" />
+                        <listheader label="Domaine" width="180px" sort="auto(domaineOuvrage.libelle)" />
+                        <listheader label="Date d'entrée" width="150px" sort="auto(dateEntree)" align="center"/>
+                        <listheader label="Statut" width="120px" sort="auto(disponibilite)" align="center"/>
+                        <listheader label="Actions" width="120px" align="center"/>
+                    </listhead>
+                    <template name="model" var="doc">
+                        <listitem>
+                            <listcell label="@load(doc.titre)" />
+                            <listcell label="@load(vm.getDocumentTypeLabel(doc))" />
+                            <listcell label="@load(vm.getDomainLabel(doc))" />
+                            <listcell>
+                                <label value="@load(doc.dateEntree)" />
+                            </listcell>
+                            <listcell>
+                                <label value="@load(vm.getStatusLabel(doc))" 
+                                       sclass="@load(vm.getStatusClass(doc))" />
+                            </listcell>
+                            <listcell>
+                                <button tooltiptext="Voir les détails" iconSclass="z-icon-eye" 
+                                        sclass="btn-icon" onClick="@command('viewDocument', document=doc)" />
+                                <button tooltiptext="Modifier" iconSclass="z-icon-pencil" 
+                                        sclass="btn-icon" onClick="@command('editDocument', document=doc)" />
+                                <button tooltiptext="Supprimer" iconSclass="z-icon-trash-o" 
+                                        sclass="btn-icon btn-danger" onClick="@command('deleteDocument', document=doc)" />
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
         </div>
     </div>
 </zk>
