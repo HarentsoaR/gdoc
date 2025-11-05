@@ -39,18 +39,31 @@
             <vlayout sclass="concours-subnav" visible="@load(vm.concoursExpanded)">
                 <button label="Liste Concours" sclass="sidebar-button" iconSclass="z-icon-list"
                         onClick="@command('navigateTo', view='/documents/views/concours/list.zul', section='Concours', page='Liste Concours')" />
-                <button label="Phases" sclass="sidebar-button" iconSclass="z-icon-tasks"
+               <!-- <button label="Phases" sclass="sidebar-button" iconSclass="z-icon-tasks"
                         onClick="@command('navigateTo', view='/documents/views/concours/phases.zul', section='Concours', page='Phases')" />
                 <button label="Centres" sclass="sidebar-button" iconSclass="z-icon-building"
                         onClick="@command('navigateTo', view='/documents/views/concours/centres.zul', section='Concours', page='Centres')" />
                 <button label="Lieux" sclass="sidebar-button" iconSclass="z-icon-map-marker"
-                        onClick="@command('navigateTo', view='/documents/views/concours/lieux.zul', section='Concours', page='Lieux')" />
+                        onClick="@command('navigateTo', view='/documents/views/concours/lieux.zul', section='Concours', page='Lieux')" /> -->
                 <button label="Doc. Concours" sclass="sidebar-button" iconSclass="z-icon-file-text"
-                        onClick="@command('navigateTo', view='/documents/views/concours/document-concours.zul', section='Concours', page='Documents')" />
+                        onClick="@command('navigateTo', view='/documents/views/concours/documents-concours/list.zul', section='Concours', page='Documents')" />
                 <button label="Candidats" sclass="sidebar-button" iconSclass="z-icon-user-plus"
                         onClick="@command('navigateTo', view='/documents/views/candidats/list.zul', section='Concours', page='Candidats')" />
                 <button label="Dossiers Candidats" sclass="sidebar-button" iconSclass="z-icon-folder-open"
                         onClick="@command('navigateTo', view='/documents/views/candidats/dossiers.zul', section='Concours', page='Dossiers Candidats')" />
+            </vlayout>
+        </div>
+
+        <separator/>
+
+        <!-- Section 4: Administration -->
+        <div sclass="sidebar-section sidebar-nav">
+            <label value="Administration" sclass="sidebar-title" />
+            <vlayout>
+                 <button label="Filières" sclass="sidebar-button" iconSclass="z-icon-graduation-cap"
+                        onClick="@command('navigateTo', view='/documents/views/filiere/list.zul', section='Administration', page='Filières')" />
+                 <button label="Promotions" sclass="sidebar-button" iconSclass="z-icon-bookmark"
+                        onClick="@command('navigateTo', view='/documents/views/promotion/list.zul', section='Administration', page='Promotions')" />
             </vlayout>
         </div>
 

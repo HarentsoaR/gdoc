@@ -1,7 +1,7 @@
 <!-- candidat/list.zul -->
 <zk xmlns="http://www.zkoss.org/2005/zul">
     <div hflex="1" vflex="1" sclass="content-area" 
-         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.CandidatGlobalViewModel')">
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.CandidatViewModel')">
 
         <!-- En-tête de page -->
         <div sclass="content-header">

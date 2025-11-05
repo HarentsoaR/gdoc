@@ -42,6 +42,16 @@ public class ConcoursServiceImpl implements ConcoursService {
     public List<Concours> search(String query) {
         return repository.findByAvisConcoursContainingIgnoreCase(query);
     }
+
+    @Override
+    public List<String> getDistinctAvis() {
+        return repository.findDistinctAvisConcours();
+    }
+
+    @Override
+    public List<String> getDistinctNumeros() {
+        return repository.findDistinctNumeroArrete();
+    }
 }
 
 

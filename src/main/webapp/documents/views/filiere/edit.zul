@@ -1,0 +1,47 @@
+<zk>
+    <window title="Modifier Filière" border="normal" width="600px" closable="true"
+            viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.FiliereViewModel', filiereToManage=arg.filiereToManage)">
+
+        <div class="panel-body" style="padding:16px;">
+             <grid>
+                <columns><column width="150px"/><column/></columns>
+                <rows>
+                    <row>
+                        <cell><label value="ID" sclass="fw-bold"/></cell>
+                        <cell><textbox value="@bind(vm.currentFiliere.filiereId)" width="100%" readonly="true" style="color:#999;background:#f5f5f5;"/></cell>
+                    </row>
+                    <row>
+                        <cell><label value="Code *" sclass="fw-bold"/></cell>
+                        <cell><textbox value="@bind(vm.currentFiliere.code)" width="100%" constraint="no empty: Le code est obligatoire"/></cell>
+                    </row>
+                    <row>
+                        <cell><label value="Libellé *" sclass="fw-bold"/></cell>
+                        <cell><textbox value="@bind(vm.currentFiliere.libelle)" width="100%" constraint="no empty: Le libellé est obligatoire"/></cell>
+                    </row>
+                    <row>
+                        <cell><label value="Type (sysId) *" sclass="fw-bold"/></cell>
+                        <cell>
+                            <combobox model="@load(vm.sysIdOptions)"
+                                      value="@bind(vm.currentFiliere.sysId)"
+                                      readonly="true" autodrop="true" width="100%"
+                                      constraint="no empty: Le type est obligatoire">
+                                <template name="model">
+                                    <comboitem label="@load(each)"/>
+                                </template>
+                            </combobox>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell><label value="Remarque" sclass="fw-bold"/></cell>
+                        <cell><textbox value="@bind(vm.currentFiliere.remarque)" width="100%" rows="3"/></cell>
+                    </row>
+                </rows>
+            </grid>
+        </div>
+        
+        <div style="text-align: right; padding: 16px; border-top: 1px solid #ddd;">
+            <button label="Annuler" sclass="btn-secondary" iconSclass="z-icon-times" onClick="@command('cancel')"/>
+            <button label="Sauvegarder" sclass="btn-primary" iconSclass="z-icon-save" onClick="@command('saveFiliere')"/>
+        </div>
+    </window>
+</zk>

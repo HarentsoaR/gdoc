@@ -1,0 +1,54 @@
+<zk>
+    <div hflex="1" vflex="1" sclass="content-area"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.DocumentConcoursViewModel')">
+
+        <!-- Header de la page -->
+        <div sclass="content-header">
+            <div>
+                <label value="Documents Concours" sclass="page-title"/>
+                <label value="Gérer les types de documents requis pour les concours" sclass="text-muted"
+                       style="display: block; margin-top: 4px;"/>
+            </div>
+            <div sclass="header-actions">
+                <button label="Nouveau Document" sclass="btn-primary" iconSclass="z-icon-plus"
+                        onClick="@command('addDocument')"/>
+            </div>
+        </div>
+
+        <!-- Panneau de recherche et actions -->
+        <div class="panel" style="margin-top: 16px;">
+            <div class="panel-body" style="display: flex; gap: 8px;">
+                <textbox hflex="1" placeholder="Rechercher par libellé..."
+                         value="@bind(vm.searchQuery)"
+                         onOK="@command('search')"/>
+                <button label="Rechercher" sclass="btn" onClick="@command('search')"/>
+                <button label="Rafraîchir" sclass="btn-secondary" iconSclass="z-icon-refresh" onClick="@command('refreshDocumentList')"/>
+            </div>
+        </div>
+
+        <!-- Liste des données -->
+        <div class="panel" style="margin-top: 16px;">
+            <!-- THE FIX IS HERE: model="@load(vm.documentList)" -->
+            <listbox model="@load(vm.documentList)" emptyMessage="Aucun document trouvé." mold="paging" pageSize="10">
+                <listhead>
+                    <listheader label="Libellé" sort="auto(libelle)"/>
+                    <listheader label="Remarque" sort="auto(remarque)"/>
+                    <listheader label="Actions" width="120px" align="center"/>
+                </listhead>
+                <template name="model" var="doc">
+                    <listitem>
+                        <listcell label="@load(doc.libelle)"/>
+                        <listcell label="@load(doc.remarque)"/>
+                        <listcell>
+                            <a iconSclass="z-icon-pencil" tooltiptext="Modifier"
+                               onClick="@command('edit', doc=doc)"/>
+                            <a iconSclass="z-icon-trash" tooltiptext="Supprimer"
+                               onClick="@command('deleteDocument', id=doc.documentConcoursId)"
+                               sclass="text-danger" style="margin-left: 12px;"/>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+    </div>
+</zk>

@@ -1,0 +1,40 @@
+<zk>
+    <div hflex="1" vflex="1" sclass="content-area"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.FiliereViewModel')">
+        <div sclass="content-header">
+            <div>
+                <label value="Liste des Filières" sclass="page-title"/>
+            </div>
+            <div sclass="header-actions">
+                <button label="Nouvelle Filière" sclass="btn-primary" onClick="@command('addFiliere')"/>
+            </div>
+        </div>
+        <div class="panel" style="margin-top: 16px;">
+            <div class="panel-body" style="display: flex; gap: 8px;">
+                <textbox hflex="1" placeholder="Rechercher..." value="@bind(vm.searchQuery)" onOK="@command('search')"/>
+                <button label="Rechercher" onClick="@command('search')"/>
+            </div>
+        </div>
+        <div class="panel" style="margin-top: 16px;">
+            <listbox model="@load(vm.filiereList)" emptyMessage="Aucune filière trouvée." mold="paging" pageSize="10">
+                <listhead>
+                    <listheader label="Code"/>
+                    <listheader label="Libellé"/>
+                    <listheader label="Type"/>
+                    <listheader label="Actions"/>
+                </listhead>
+                <template name="model" var="f">
+                    <listitem>
+                        <listcell label="@load(f.code)"/>
+                        <listcell label="@load(f.libelle)"/>
+                        <listcell label="@load(f.sysId)"/>
+                        <listcell>
+                            <a iconSclass="z-icon-pencil" onClick="@command('edit', filiereToEdit=f)"/>
+                            <a iconSclass="z-icon-trash" onClick="@command('deleteFiliere', id=f.filiereId)"/>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+    </div>
+</zk>

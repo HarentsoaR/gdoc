@@ -18,7 +18,10 @@
 
             <!-- 3. Contenu Principal (Dashboard) -->
             <vlayout vflex="1" hflex="1">
-                <include src="@load(vm.currentView)" hflex="1" vflex="1" />
+                <include src="@load(vm.currentView)" hflex="1" vflex="1"
+                         concoursToManage="@load(vm.navigationArgs.concoursToManage)"
+                         filiereToManage="@load(vm.navigationArgs.filiereToManage)"
+                         promotionToManage="@load(vm.navigationArgs.promotionToManage)"/>
             </vlayout>
 
             <!-- 4. Panneau de droite (Prévisualisation) -->

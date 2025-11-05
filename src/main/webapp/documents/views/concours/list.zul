@@ -1,55 +1,56 @@
-<!-- FIX 1 : Ajout du namespace "native" pour utiliser n:i -->
-<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
-    <!--
-      Cette vue affiche la liste des concours dans un tableau de données moderne.
-    -->
-    <!-- FIX 2 : La déclaration du ViewModel a été replacée ici, sur l'élément principal -->
+<zk>
     <div hflex="1" vflex="1" sclass="content-area"
          viewModel="@id('cv') @init('mg.md2i.gedi.control.viewmodel.ConcoursViewModel')">
 
-        <!-- 1. En-tête de la page (Titre, Recherche, Boutons) -->
         <div sclass="content-header">
-            <label value="Liste des Concours" sclass="page-title" />
+            <div>
+                <label value="Liste des Concours" sclass="page-title"/>
+                <label value="Gérer les concours existants" sclass="text-muted"
+                       style="display: block; margin-top: 4px;"/>
+            </div>
             <div sclass="header-actions">
-                <div sclass="search-box">
-                    <n:i class="z-icon-search search-icon" />
-                    <textbox placeholder="Rechercher..." sclass="search-input"
-                             value="@bind(cv.searchQuery)" onOK="@command('search')" />
-                </div>
-                <button label="Rafraîchir" sclass="btn-secondary" iconSclass="z-icon-refresh" onClick="@command('refresh')" />
-                <button label="Ajouter un Concours" sclass="btn-primary" iconSclass="z-icon-plus" onClick="@command('addConcours')" />
+                <button label="Nouveau Concours" sclass="btn-primary" iconSclass="z-icon-plus"
+                        onClick="@command('addConcours')"/>
             </div>
         </div>
 
-        <!-- 2. Tableau de données moderne -->
-        <div sclass="data-table-container" vflex="1">
-            <!-- La liaison @load(cv.concours) va maintenant fonctionner correctement -->
-            <listbox model="@load(cv.concours)" sclass="data-table" vflex="1" hflex="1" emptyMessage="Aucun concours trouvé.">
-                <listhead sclass="data-table-header">
-                    <listheader label="N° Arrêté" width="150px" />
-                    <listheader label="Avis de Concours" />
-                    <listheader label="Promotion" width="120px" align="center"/>
-                    <listheader label="Actions" width="140px" align="center"/>
+        <div class="panel" style="margin-top: 16px;">
+            <div class="panel-body" style="display: flex; gap: 8px;">
+                <textbox hflex="1" placeholder="Rechercher par avis, arrêté, promotion..."
+                         value="@bind(cv.searchQuery)"
+                         onOK="@command('search')"/>
+                <button label="Rechercher" sclass="btn" onClick="@command('search')"/>
+                <button label="Rafraîchir" sclass="btn-secondary" iconSclass="z-icon-refresh" onClick="@command('refreshConcoursList')"/>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-top: 16px;">
+            <listbox model="@load(cv.concoursList)" emptyMessage="Aucun concours trouvé." mold="paging" pageSize="10">
+                <listhead>
+                    <listheader label="Avis de Concours" sort="auto(avisConcours)"/>
+                    <listheader label="N° Arrêté" sort="auto(numeroArrete)" width="150px"/>
+                    <listheader label="Date Arrêté" sort="auto(dateArrete)" width="150px"/>
+                    <listheader label="Promotion" sort="auto(promotion.libelle)" width="250px"/>
+                    <listheader label="Actions" width="120px" align="center"/>
                 </listhead>
-                <template name="model" var="co">
-                    <listitem sclass="data-table-row">
-                        <listcell sclass="data-table-cell fw-bold" label="@load(co.numeroArrete)" />
-                        <listcell sclass="data-table-cell" label="@load(co.avisConcours)" />
-                        <listcell sclass="data-table-cell" label="@load(co.promotionId)" />
-                        <listcell sclass="data-table-cell actions-cell">
-                            <hlayout spacing="6px">
-                                <button sclass="btn-icon" iconSclass="z-icon-eye" tooltiptext="Voir"
-                                        onClick="@command('view', id=co.concoursId)" />
-                                <button sclass="btn-icon" iconSclass="z-icon-pencil" tooltiptext="Modifier"
-                                        onClick="@command('edit', id=co.concoursId)" />
-                                <button sclass="btn-icon btn-icon-danger" iconSclass="z-icon-trash-o" tooltiptext="Supprimer"
-                                        onClick="@command('delete', id=co.concoursId)" />
-                            </hlayout>
+                <template name="model" var="concours">
+                    <listitem>
+                        <listcell label="@load(concours.avisConcours)"/>
+                        <listcell label="@load(concours.numeroArrete)"/>
+                        <listcell>
+                            <label value="@load(concours.dateArrete) @converter('formatedDate', format='dd/MM/yyyy')"/>
+                        </listcell>
+                        <listcell label="@load(concours.promotion.libelle)"/>
+                        <listcell>
+                            <a iconSclass="z-icon-pencil" tooltiptext="Modifier"
+                               onClick="@command('edit', concours=concours)"/>
+                            <a iconSclass="z-icon-trash" tooltiptext="Supprimer"
+                               onClick="@command('deleteConcours', id=concours.concoursId)"
+                               sclass="text-danger" style="margin-left: 12px;"/>
                         </listcell>
                     </listitem>
                 </template>
             </listbox>
         </div>
-
     </div>
 </zk>

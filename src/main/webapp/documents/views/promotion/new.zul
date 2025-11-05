@@ -1,0 +1,64 @@
+<zk>
+    <div hflex="1" vflex="1" sclass="content-area"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.PromotionViewModel', promotionToManage=arg.promotionToManage)">
+
+        <div sclass="content-header">
+            <div>
+                <label value="Nouvelle Promotion" sclass="page-title"/>
+            </div>
+            <div sclass="header-actions">
+                <button label="Annuler" sclass="btn-secondary" iconSclass="z-icon-times" onClick="@command('cancel')"/>
+                <button label="Sauvegarder" sclass="btn-primary" iconSclass="z-icon-save" onClick="@command('savePromotion')"/>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-top: 16px;">
+            <div class="panel-body">
+                <grid>
+                    <columns><column width="150px"/><column/></columns>
+                    <rows>
+                        <row>
+                            <cell><label value="Filière *" sclass="fw-bold"/></cell>
+                            <cell>
+                                <!-- FIX: Bind to the Filiere object directly using 'selectedItem' -->
+                                <combobox model="@load(vm.filiereList)"
+                                          selectedItem="@bind(vm.currentPromotion.filiere)"
+                                          constraint="no empty: La filière est obligatoire" width="100%"
+                                          readonly="true" autodrop="true">
+                                    <template name="model" var="f">
+                                        <comboitem label="@load(f.libelle)"/>
+                                    </template>
+                                </combobox>
+                            </cell>
+                        </row>
+                        <!-- Other rows are the same -->
+                        <row>
+                            <cell><label value="Libellé *" sclass="fw-bold"/></cell>
+                            <cell><textbox value="@bind(vm.currentPromotion.libelle)" width="100%" constraint="no empty: Le libellé est obligatoire"/></cell>
+                        </row>
+                        <row>
+                            <cell><label value="N° Promotion *" sclass="fw-bold"/></cell>
+                            <cell><textbox value="@bind(vm.currentPromotion.numeroPromotion)" width="100%" constraint="no empty: Le numéro de promotion est obligatoire"/></cell>
+                        </row>
+                        <row>
+                            <cell><label value="Année Concours *" sclass="fw-bold"/></cell>
+                            <cell><intbox value="@bind(vm.currentPromotion.anneeConcours)" width="100%" constraint="no empty: L'année du concours est obligatoire"/></cell>
+                        </row>
+                        <row>
+                            <cell><label value="Date Début" sclass="fw-bold"/></cell>
+                            <cell><datebox value="@bind(vm.currentPromotion.dateDebut)" width="100%" format="dd/MM/yyyy"/></cell>
+                        </row>
+                        <row>
+                            <cell><label value="Date Fin" sclass="fw-bold"/></cell>
+                            <cell><datebox value="@bind(vm.currentPromotion.dateFin)" width="100%" format="dd/MM/yyyy"/></cell>
+                        </row>
+                        <row>
+                            <cell><label value="Remarque" sclass="fw-bold"/></cell>
+                            <cell><textbox value="@bind(vm.currentPromotion.remarque)" width="100%" rows="3"/></cell>
+                        </row>
+                    </rows>
+                </grid>
+            </div>
+        </div>
+    </div>
+</zk>

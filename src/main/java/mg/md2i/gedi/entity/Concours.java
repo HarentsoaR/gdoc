@@ -63,10 +63,10 @@ public class Concours implements Serializable {
 	private String remarque;
 
 	@Column(name="co_statut", nullable =true)
-	private Integer statut;
+	private boolean statut;
 	
 	@Column(name="co_list_plublier", nullable=true)
-	private Integer listePublier;
+	private boolean listePublier;
 	
 	@Column(name = "co_version")
 	private Integer version = 1;
@@ -169,11 +169,11 @@ public class Concours implements Serializable {
 	}
 
 	
-	public Integer getListePublier() {
+	public boolean getListePublier() {
 		return listePublier;
 	}
 
-	public void setListePublier(Integer listePublier) {
+	public void setListePublier(boolean listePublier) {
 		this.listePublier = listePublier;
 	}
 
@@ -182,11 +182,11 @@ public class Concours implements Serializable {
 		return promotion.getFiliere().getCode() + "|" + numeroArrete + "|" + avisConcours;
 	}
 
-	public Integer getStatut() {
+	public boolean getStatut() {
 		return statut;
 	}
 
-	public void setStatut(Integer statut) {
+	public void setStatut(boolean statut) {
 		this.statut = statut;
 	}
 
@@ -204,8 +204,8 @@ public class Concours implements Serializable {
 		result = prime * result + ((numeroArrete == null) ? 0 : numeroArrete.hashCode());
 		result = prime * result + ((promotionId == null) ? 0 : promotionId.hashCode());
 		result = prime * result + ((remarque == null) ? 0 : remarque.hashCode());
-		result = prime * result + ((statut == null) ? 0 : statut.hashCode());
-		result = prime * result + ((listePublier == null) ? 0 : listePublier.hashCode());
+//		result = prime * result + ((statut == null) ? 0 : statut.hashCode());
+//		result = prime * result + ((listePublier == null) ? 0 : listePublier.hashCode());
 		result = prime * result + ((version == null) ? 0 : version.hashCode());
 		return result;
 	}
@@ -269,16 +269,16 @@ public class Concours implements Serializable {
 				return false;
 		} else if (!remarque.equals(other.remarque))
 			return false;
-		if (statut == null) {
-			if (other.statut != null)
-				return false;
-		} else if (!statut.equals(other.statut))
-			return false;
-		if (statut == null) {
-			if (other.listePublier != null)
-				return false;
-		} else if (!statut.equals(other.listePublier))
-			return false;
+//		if (statut == null) {
+//			if (other.statut != null)
+//				return false;
+//		} else if (!statut.equals(other.statut))
+//			return false;
+//		if (statut == null) {
+//			if (other.listePublier != null)
+//				return false;
+//		} else if (!statut.equals(other.listePublier))
+//			return false;
 		if (version == null) {
 			if (other.version != null)
 				return false;

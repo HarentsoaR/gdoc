@@ -53,7 +53,7 @@ public class ConcoursUploadViewModel {
         } else {
             this.dossiersConcours = ListeDossierConcoursGestion.findAll();
         }
-        this.candidats = CandidatGestion.findAll();
+//        this.candidats = CandidatGestion.findAll();
         if (candidatId != null) {
             // Preselect candidate by id
             for (Candidat c : candidats) { if (c.getCandidatId().equals(candidatId)) { this.selectedCandidat = c; break; } }

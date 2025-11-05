@@ -1,238 +1,88 @@
-<zk xmlns="http://www.zkoss.org/2005/zul">
+<zk>
     <style>
-        .candidat-form-container {
-            max-width: 1200px;
-            overflow-y: auto;
-            max-height: 80vh;
-            padding: 16px;
-        }
-        
-        .candidat-form-grid {
-            width: 100%;
-        }
-        
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .candidat-form-container {
-                max-width: 100%;
-                padding: 8px;
-            }
-            
-            .candidat-form-grid .z-column {
-                width: 100% !important;
-            }
-            
-            .candidat-form-grid .z-row .z-cell {
-                display: block !important;
-                width: 100% !important;
-                margin-bottom: 8px;
-            }
-        }
-        
-        @media (max-width: 1024px) {
-            .candidat-form-container {
-                max-width: 100%;
-            }
-        }
+        .candidat-form-container { max-width: 1200px; overflow-y: auto; max-height: 80vh; padding: 16px; }
+        .candidat-form-grid { width: 100%; }
     </style>
-    <div hflex="1" vflex="1" sclass="content-area">
+    
+    <div hflex="1" vflex="1" sclass="content-area"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.CandidatViewModel', candidatToManage=arg.candidatToManage)">
 
-        <!-- En-tête de page -->
         <div sclass="content-header">
             <div>
                 <label value="Modifier Candidat" sclass="page-title"/>
                 <label value="Modifier les informations du candidat" sclass="text-muted" style="display: block; margin-top: 4px;"/>
             </div>
             <div sclass="header-actions">
-                <button label="Annuler" sclass="btn-secondary" iconSclass="z-icon-times" 
-                        onClick="@command('cancelCandidat')"/>
-                <button label="Sauvegarder" sclass="btn-primary" iconSclass="z-icon-save" 
-                        onClick="@command('saveCandidat')"/>
+                <button label="Annuler" sclass="btn-secondary" iconSclass="z-icon-times" onClick="@command('cancelCandidat')"/>
+                <button label="Sauvegarder" sclass="btn-primary" iconSclass="z-icon-save" onClick="@command('saveCandidat')"/>
             </div>
         </div>
 
-        <!-- Formulaire -->
         <div class="candidat-form-container">
             <grid class="candidat-form-grid">
                 <columns>
-                    <column width="200px"/>
-                    <column/>
-                    <column width="200px"/>
-                    <column/>
+                    <column width="200px"/><column/><column width="200px"/><column/>
                 </columns>
                 <rows>
-                    <!-- Informations personnelles -->
+                    <row><cell colspan="4" sclass="fw-bold" style="padding: 16px 0 8px 0; border-bottom: 1px solid var(--border-color);"><label value="Informations Personnelles"/></cell></row>
                     <row>
-                        <cell colspan="4" sclass="fw-bold" style="padding: 16px 0 8px 0; border-bottom: 1px solid var(--border-color);">
-                            <label value="Informations Personnelles"/>
-                        </cell>
+                        <cell><label value="Numéro d’inscription *" sclass="fw-bold"/></cell>
+                        <cell><textbox value="@bind(vm.currentCandidat.numInscription)" width="100%" constraint="no empty"/></cell>
+                        <cell><label value="Numéro d’enregistrement *" sclass="fw-bold"/></cell>
+                        <cell><textbox value="@bind(vm.currentCandidat.numeroEnregistrement)" width="100%" constraint="no empty"/></cell>
                     </row>
-                    
                     <row>
                         <cell><label value="Nom *" sclass="fw-bold"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.candidatViewModel.currentCandidat.nom)" 
-                                     placeholder="Nom de famille" 
-                                     width="100%" 
-                                     constraint="no empty: Le nom est obligatoire"/>
-                        </cell>
+                        <cell><textbox value="@bind(vm.currentCandidat.nom)" width="100%" constraint="no empty"/></cell>
                         <cell><label value="Prénom" sclass="fw-bold"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.candidatViewModel.currentCandidat.prenom)" 
-                                     placeholder="Prénom" 
-                                     width="100%"/>
-                        </cell>
+                        <cell><textbox value="@bind(vm.currentCandidat.prenom)" width="100%"/></cell>
                     </row>
-                    
                     <row>
                         <cell><label value="Sexe *" sclass="fw-bold"/></cell>
-                        <cell>
-                            <radiogroup value="@bind(vm.candidatViewModel.currentCandidat.sexe)">
-                                <radio label="Masculin" value="1"/>
-                                <radio label="Féminin" value="2"/>
-                            </radiogroup>
-                        </cell>
+                        <cell><radiogroup selectedItem="@bind(vm.currentCandidat.sexe)"><radio label="Masculin" value="1"/><radio label="Féminin" value="2"/></radiogroup></cell>
                         <cell><label value="Date de naissance *" sclass="fw-bold"/></cell>
-                        <cell>
-                            <datebox value="@bind(vm.candidatViewModel.currentCandidat.dateNaissance)" 
-                                     width="100%" 
-                                     format="dd/MM/yyyy"
-                                     constraint="no empty: La date de naissance est obligatoire"/>
-                        </cell>
+                        <cell><datebox value="@bind(vm.currentCandidat.dateNaissance)" width="100%" format="dd/MM/yyyy" constraint="no empty"/></cell>
                     </row>
-                    
                     <row>
                         <cell><label value="Lieu de naissance *" sclass="fw-bold"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.candidatViewModel.currentCandidat.lieuNaissance)" 
-                                     placeholder="Lieu de naissance" 
-                                     width="100%"
-                                     constraint="no empty: Le lieu de naissance est obligatoire"/>
-                        </cell>
+                        <cell><textbox value="@bind(vm.currentCandidat.lieuNaissance)" width="100%" constraint="no empty"/></cell>
                         <cell><label value="Téléphone" sclass="fw-bold"/></cell>
-                        <cell>
-                            <intbox value="@bind(vm.candidatViewModel.currentCandidat.contactTelephonique)" 
-                                    placeholder="Numéro de téléphone" 
-                                    width="100%"/>
-                        </cell>
+                        <cell><textbox value="@bind(vm.currentCandidat.contactTelephonique)" width="100%"/></cell>
                     </row>
-                    
                     <row>
                         <cell><label value="Adresse *" sclass="fw-bold"/></cell>
-                        <cell colspan="3">
-                            <textbox value="@bind(vm.candidatViewModel.currentCandidat.adresseEleve)" 
-                                     placeholder="Adresse complète" 
-                                     width="100%"
-                                     constraint="no empty: L'adresse est obligatoire"/>
-                        </cell>
+                        <cell colspan="3"><textbox value="@bind(vm.currentCandidat.adresseEleve)" width="100%" constraint="no empty"/></cell>
                     </row>
-                    
                     <row>
                         <cell><label value="Email" sclass="fw-bold"/></cell>
-                        <cell colspan="3">
-                            <textbox value="@bind(vm.candidatViewModel.currentCandidat.mail)" 
-                                     placeholder="adresse@email.com" 
-                                     width="100%"/>
-                        </cell>
+                        <cell colspan="3"><textbox value="@bind(vm.currentCandidat.mail)" width="100%"/></cell>
                     </row>
-
-                    <!-- Informations concours -->
                     <row>
-                        <cell colspan="4" sclass="fw-bold" style="padding: 24px 0 8px 0; border-bottom: 1px solid var(--border-color);">
-                            <label value="Informations Concours"/>
-                        </cell>
+                        <cell><label value="Situation matrimoniale" sclass="fw-bold"/></cell>
+                        <cell><combobox value="@bind(vm.currentCandidat.situationMatrimoniale)" autodrop="true" width="100%"><comboitem label="Célibataire"/><comboitem label="Marié(e)"/><comboitem label="Divorcé(e)"/><comboitem label="Veuf(ve)"/></combobox></cell>
+                        <cell><label value="Nombre d’enfants" sclass="fw-bold"/></cell>
+                        <cell><intbox value="@bind(vm.currentCandidat.nombreEnfant)" width="100%"/></cell>
                     </row>
-                    
+                    <row><cell><label value="Nom du père" sclass="fw-bold"/></cell><cell><textbox value="@bind(vm.currentCandidat.nomPere)" width="100%"/></cell><cell><label value="Profession du père" sclass="fw-bold"/></cell><cell><textbox value="@bind(vm.currentCandidat.professionPere)" width="100%"/></cell></row>
+                    <row><cell><label value="Nom de la mère" sclass="fw-bold"/></cell><cell><textbox value="@bind(vm.currentCandidat.nomMere)" width="100%"/></cell><cell><label value="Profession de la mère" sclass="fw-bold"/></cell><cell><textbox value="@bind(vm.currentCandidat.professionMere)" width="100%"/></cell></row>
+                    <row><cell><label value="Personne à prévenir" sclass="fw-bold"/></cell><cell><textbox value="@bind(vm.currentCandidat.personneAPrevenir)" width="100%"/></cell><cell><label value="Tel personne à prévenir" sclass="fw-bold"/></cell><cell><textbox value="@bind(vm.currentCandidat.telPersonneAPrevenir)" width="100%"/></cell></row>
+                    <row><cell colspan="4" sclass="fw-bold" style="padding: 24px 0 8px 0; border-bottom: 1px solid var(--border-color);"><label value="Informations Concours"/></cell></row>
                     <row>
                         <cell><label value="Concours *" sclass="fw-bold"/></cell>
-                        <cell>
-                            <combobox model="@load(vm.candidatViewModel.concoursList)"
-                                      width="100%"
-                                      constraint="no empty: Le concours est obligatoire"
-                                      onSelect="@command('onConcoursChange', self=self)">
-                                <template name="model" var="concours">
-                                    <comboitem label="@load(concours.toString())" value="@load(concours.concoursId)"/>
-                                </template>
-                            </combobox>
-                        </cell>
+                        <cell><combobox model="@load(vm.concoursList)" selectedItem="@bind(vm.currentCandidat.concours)" autodrop="true" width="100%" constraint="no empty"><template name="model"><comboitem label="@load(each.avisConcours)"/></template></combobox></cell>
                         <cell><label value="Centre d'examen *" sclass="fw-bold"/></cell>
-                        <cell>
-                            <combobox model="@load(vm.candidatViewModel.centreExamenList)"
-                                      width="100%"
-                                      constraint="no empty: Le centre d'examen est obligatoire"
-                                      onSelect="@command('onCentreExamenChange', self=self)">
-                                <template name="model" var="centre">
-                                    <comboitem label="@load(centre.getLibelle())" value="@load(centre.centreExamenId)"/>
-                                </template>
-                            </combobox>
-                        </cell>
+                        <cell><combobox model="@load(vm.centreExamenList)" selectedItem="@bind(vm.currentCandidat.centreExamen)" autodrop="true" width="100%" constraint="no empty"><template name="model"><comboitem label="@load(each.libelle)"/></template></combobox></cell>
                     </row>
-                    
                     <row>
-                        <cell><label value="Numéro d'enregistrement *" sclass="fw-bold"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.candidatViewModel.currentCandidat.numeroEnregistrement)" 
-                                     placeholder="Numéro d'enregistrement" 
-                                     width="100%"
-                                     constraint="no empty: Le numéro d'enregistrement est obligatoire"/>
-                        </cell>
                         <cell><label value="Rang concours" sclass="fw-bold"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.candidatViewModel.currentCandidat.rangConcours)" 
-                                     placeholder="Rang au concours" 
-                                     width="100%"/>
-                        </cell>
-                    </row>
-                    
-                    <row>
+                        <cell><textbox value="@bind(vm.currentCandidat.rangConcours)" width="100%"/></cell>
                         <cell><label value="Date de dépôt" sclass="fw-bold"/></cell>
-                        <cell colspan="3">
-                            <datebox value="@bind(vm.candidatViewModel.currentCandidat.dateDepotCandidature)" 
-                                     width="200px" 
-                                     format="dd/MM/yyyy"/>
-                        </cell>
+                        <cell><datebox value="@bind(vm.currentCandidat.dateDepotCandidature)" width="100%" format="dd/MM/yyyy"/></cell>
                     </row>
-
-                    <!-- Informations professionnelles -->
-                    <row>
-                        <cell colspan="4" sclass="fw-bold" style="padding: 24px 0 8px 0; border-bottom: 1px solid var(--border-color);">
-                            <label value="Informations Professionnelles (Optionnel)"/>
-                        </cell>
-                    </row>
-                    
-                    <row>
-                        <cell><label value="Statut fonctionnaire" sclass="fw-bold"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.candidatViewModel.currentCandidat.statutFonctionnaire)" 
-                                     placeholder="Statut fonctionnaire" 
-                                     width="100%"/>
-                        </cell>
-                        <cell><label value="IM Fonctionnaire" sclass="fw-bold"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.candidatViewModel.currentCandidat.imFonctionnaire)" 
-                                     placeholder="Identifiant matricule" 
-                                     width="100%"/>
-                        </cell>
-                    </row>
-                    
-                    <row>
-                        <cell><label value="Dernière fonction" sclass="fw-bold"/></cell>
-                        <cell colspan="3">
-                            <textbox value="@bind(vm.candidatViewModel.currentCandidat.derniereFonction)" 
-                                     placeholder="Dernière fonction occupée" 
-                                     width="100%"/>
-                        </cell>
-                    </row>
-                    
-                    <row>
-                        <cell><label value="Remarques" sclass="fw-bold"/></cell>
-                        <cell colspan="3">
-                            <textbox value="@bind(vm.candidatViewModel.currentCandidat.remarque)" 
-                                     placeholder="Remarques additionnelles" 
-                                     width="100%" 
-                                     rows="3"/>
-                        </cell>
-                    </row>
+                    <row><cell colspan="4" sclass="fw-bold" style="padding: 24px 0 8px 0; border-bottom: 1px solid var(--border-color);"><label value="Informations Professionnelles (Optionnel)"/></cell></row>
+                    <row><cell><label value="Statut fonctionnaire" sclass="fw-bold"/></cell><cell><textbox value="@bind(vm.currentCandidat.statutFonctionnaire)" width="100%"/></cell><cell><label value="IM Fonctionnaire" sclass="fw-bold"/></cell><cell><textbox value="@bind(vm.currentCandidat.imFonctionnaire)" width="100%"/></cell></row>
+                    <row><cell><label value="Dernière fonction" sclass="fw-bold"/></cell><cell colspan="3"><textbox value="@bind(vm.currentCandidat.derniereFonction)" width="100%"/></cell></row>
+                    <row><cell><label value="Remarques" sclass="fw-bold"/></cell><cell colspan="3"><textbox value="@bind(vm.currentCandidat.remarque)" width="100%" rows="3"/></cell></row>
                 </rows>
             </grid>
         </div>

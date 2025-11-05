@@ -26,7 +26,7 @@
     <!--
         CORRECTION: Un seul composant parent (ce Div) possède le ViewModel.
         Tout ce qui est à l'intérieur (bannière ET fenêtre) peut y accéder
-        en utilisant "vm". C'est la solution la plus simple et la plus fiable.
+        en utilisant "vm"
     -->
     <div viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.IndexViewModel')">
 
@@ -38,7 +38,7 @@
             <label value="@load(vm.flashMessage)" />
         </div>
 
-        <!-- La fenêtre est aussi un enfant, elle voit 'vm' sans problème -->
+        <!-- La fenêtre enfant -->
         <window
             title=""
             border="none"
@@ -54,17 +54,17 @@
                 <label value="GEDI" style="font-size:30px;font-weight:700;color:#005A9E"/>
                 <label value="Bienvenue dans votre espace GEDI" style="color:#6b7280"/>
 
-                <!-- Les boutons sont dans la fenêtre, ils voient aussi 'vm' -->
+             
                 <vbox spacing="14px" hflex="1" style="width:100%">
                     <button label="Documents" hflex="1"
                             iconSclass="z-icon-folder-o"
                             onClick="@command('goDocs')"
                             style="height:48px;background:#1976D2;color:#fff;border:none;border-radius:8px"/>
 
-                    <button label="Bibliothèque" hflex="1"
+                   <!-- <button label="Bibliothèque" hflex="1"
                             iconSclass="z-icon-book"
                             onClick="@command('goBiblio')"
-                            style="height:48px;background:#2E7D32;color:#fff;border:none;border-radius:8px"/>
+                            style="height:48px;background:#2E7D32;color:#fff;border:none;border-radius:8px"/> -->
 
                     <button label="Administration" hflex="1"
                             iconSclass="z-icon-cog"

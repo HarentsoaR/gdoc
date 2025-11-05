@@ -51,6 +51,38 @@ public class Document implements Serializable {
     @Transient
     private String emplacement;
 
+    public String getTitre() {
+        return titre;
+    }
+
+    public Date getDateUpload() {
+        return dateUpload;
+    }
+
+    public String getResume() {
+        return resume;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public Long getTaille() {
+        return taille;
+    }
+
+    public Integer getActif() {
+        return actif;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public String getRemarque() {
+        return remarque;
+    }
+
     public void setActif(int actif) {
         this.actif = actif;
     }

@@ -1,0 +1,34 @@
+<zk>
+    <window title="Modifier le Document Concours" border="normal" width="600px" closable="true"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.DocumentConcoursViewModel', documentToManage=arg.documentToManage)">
+        
+        <div style="padding: 16px;">
+            <grid>
+                <columns>
+                    <column width="120px"/>
+                    <column/>
+                </columns>
+                <rows>
+                    <row>
+                        <cell><label value="Libellé *" sclass="fw-bold"/></cell>
+                        <cell>
+                            <textbox value="@bind(vm.currentDocument.libelle)" width="100%"
+                                     constraint="no empty: Le libellé est obligatoire."/>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell><label value="Remarque" sclass="fw-bold"/></cell>
+                        <cell>
+                            <textbox value="@bind(vm.currentDocument.remarque)" width="100%" rows="4"/>
+                        </cell>
+                    </row>
+                </rows>
+            </grid>
+        </div>
+
+        <div class="z-window-footer">
+            <button label="Annuler" sclass="btn-secondary" onClick="@command('cancel', view=self.root)"/>
+            <button label="Sauvegarder" sclass="btn-primary" onClick="@command('saveDocument', view=self.root)"/>
+        </div>
+    </window>
+</zk>

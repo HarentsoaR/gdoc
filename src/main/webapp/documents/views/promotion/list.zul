@@ -1,0 +1,53 @@
+<zk>
+    <div hflex="1" vflex="1" sclass="content-area"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.PromotionViewModel')">
+
+        <div sclass="content-header">
+            <div>
+                <label value="Liste des Promotions" sclass="page-title"/>
+                <label value="Gérer les promotions existantes" sclass="text-muted"
+                       style="display: block; margin-top: 4px;"/>
+            </div>
+            <div sclass="header-actions">
+                <button label="Nouvelle Promotion" sclass="btn-primary" iconSclass="z-icon-plus"
+                        onClick="@command('addPromotion')"/>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-top: 16px;">
+            <div class="panel-body" style="display: flex; gap: 8px;">
+                <textbox hflex="1" placeholder="Rechercher par libellé, numéro..."
+                         value="@bind(vm.searchQuery)"
+                         onOK="@command('search')"/>
+                <button label="Rechercher" sclass="btn" onClick="@command('search')"/>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-top: 16px;">
+            <listbox model="@load(vm.promotionList)" emptyMessage="Aucune promotion trouvée." mold="paging" pageSize="10">
+                <listhead>
+                    <listheader label="Libellé" sort="auto(libelle)"/>
+                    <listheader label="N° Promotion" sort="auto(numeroPromotion)" width="150px"/>
+                    <listheader label="Filière" sort="auto(filiere.libelle)" width="200px"/>
+                    <listheader label="Année Concours" sort="auto(anneeConcours)" width="150px"/>
+                    <listheader label="Actions" width="120px"/>
+                </listhead>
+                <template name="model" var="promo">
+                    <listitem>
+                        <listcell label="@load(promo.libelle)"/>
+                        <listcell label="@load(promo.numeroPromotion)"/>
+                        <listcell label="@load(promo.filiere.libelle)"/>
+                        <listcell label="@load(promo.anneeConcours)"/>
+                        <listcell>
+                            <a iconSclass="z-icon-pencil" tooltiptext="Modifier"
+                               onClick="@command('edit', promotionToEdit=promo)"/>
+                            <a iconSclass="z-icon-trash" tooltiptext="Supprimer"
+                               onClick="@command('deletePromotion', id=promo.promotionId)"
+                               sclass="text-danger" style="margin-left: 8px;"/>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+    </div>
+</zk>

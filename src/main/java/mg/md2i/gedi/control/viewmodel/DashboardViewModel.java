@@ -1,57 +1,66 @@
 package mg.md2i.gedi.control.viewmodel;
 
-import lombok.Getter;
-import lombok.Setter;
 import mg.md2i.gedi.entity.Document;
+import mg.md2i.gedi.entity.DocumentConcours;
+import mg.md2i.gedi.gestionmetier.DocumentConcoursGestion;
 import mg.md2i.gedi.gestionmetier.DocumentGestion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zkoss.bind.BindUtils;
-import org.zkoss.bind.annotation.Command;
-import org.zkoss.bind.annotation.BindingParam;
-import org.zkoss.bind.annotation.Init;
-import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
+/**
+ * Clean, Lombok-free version so ZK always finds getters.
+ */
 public class DashboardViewModel {
 
-    @Getter
+    private static final Logger log = LoggerFactory.getLogger(DashboardViewModel.class);
+
     private List<Document> recentFolders = new ArrayList<>();
-
-    @Getter
     private List<Document> recentFiles = new ArrayList<>();
-
-    @Setter
     private boolean showRecentFolders = true;
-    @Setter
     private boolean showRecentFiles = true;
 
-    public boolean getShowRecentFolders() { return showRecentFolders; }
-    public boolean getShowRecentFiles() { return showRecentFiles; }
+    // ---------------- Getters / Setters ----------------
+    public List<Document> getRecentFolders() { return recentFolders; }
+    public void setRecentFolders(List<Document> recentFolders) { this.recentFolders = recentFolders; }
 
+    public List<Document> getRecentFiles() { return recentFiles; }
+    public void setRecentFiles(List<Document> recentFiles) { this.recentFiles = recentFiles; }
+
+    public boolean isShowRecentFolders() { return showRecentFolders; }
+    public void setShowRecentFolders(boolean showRecentFolders) { this.showRecentFolders = showRecentFolders; }
+
+    public boolean isShowRecentFiles() { return showRecentFiles; }
+    public void setShowRecentFiles(boolean showRecentFiles) { this.showRecentFiles = showRecentFiles; }
+
+    // ---------------- Lifecycle ----------------
     @Init
     public void init() {
+        log.info("✅ Initialisation de DashboardViewModel...");
         loadData();
     }
 
-    // Actions forwarded to the main document VM via global commands
+    // ---------------- Commands ----------------
     @Command
     public void viewFile(@BindingParam("doc") Document file) {
         if (file != null) {
-            java.util.Map<String, Object> args = new java.util.HashMap<>();
+            Map<String, Object> args = new HashMap<>();
             args.put("doc", file);
             BindUtils.postGlobalCommand(null, null, "selectDocFromDashboard", args);
+//            log.debug("📄 Fichier sélectionné : {}", file.getTitre());
         }
     }
 
     @Command
     public void downloadFile(@BindingParam("doc") Document file) {
         if (file != null) {
-            java.util.Map<String, Object> args = new java.util.HashMap<>();
+            Map<String, Object> args = new HashMap<>();
             args.put("doc", file);
             BindUtils.postGlobalCommand(null, null, "downloadDocument", args);
+//            log.debug("⬇️ Téléchargement demandé : {}", file.getTitre());
         }
     }
 
@@ -63,36 +72,65 @@ public class DashboardViewModel {
         } else if ("files".equals(key)) {
             showRecentFiles = !showRecentFiles;
         }
+        log.debug("🔁 Toggle effectué : folders={}, files={}", showRecentFolders, showRecentFiles);
     }
 
     @Command
     @NotifyChange({"recentFolders", "recentFiles"})
     public void loadData() {
-        List<Document> all = DocumentGestion.findAllDocuments();
+        log.info("Chargement des documents récents...");
+//        List<Document> all = DocumentGestion.findAllDocuments();
+//        if (all == null) all = new ArrayList<>();
+        List<Document> all = new ArrayList<>();
+        List<DocumentConcours> concoursDocs = DocumentConcoursGestion.findAll();
+        if (concoursDocs != null) {
+            for (DocumentConcours dc : concoursDocs) {
+                all.add(convertToDocument(dc));
+            }
+        }
         split(all);
+    }
+
+    // ---------------- Helpers ----------------
+    private Document convertToDocument(DocumentConcours dc) {
+        Document doc = new Document();
+        doc.setTitre(dc.getLibelle());
+        doc.setEmplacement("Concours"); // Or another meaningful location
+        doc.setType("file"); // Default type
+        doc.setDateUpload(new Date()); // No date on DocumentConcours, using current
+        doc.setActif(dc.getActif());
+        doc.setVersion(dc.getVersion());
+        doc.setRemarque(dc.getRemarque());
+        // Set other fields to default values if needed
+        return doc;
     }
 
     private void split(List<Document> documents) {
         recentFolders.clear();
         recentFiles.clear();
+
         for (Document d : documents) {
-            String t = d.getType() != null ? d.getType().toLowerCase(Locale.ROOT) : "";
+            String t = (d.getType() != null ? d.getType().toLowerCase(Locale.ROOT) : "");
             if ("folder".equals(t)) {
                 recentFolders.add(d);
             } else {
                 recentFiles.add(d);
             }
         }
+
         if (recentFolders.isEmpty()) {
-            recentFolders.add(sample("Classroom", "Dans Mon Drive", "folder"));
-            recentFolders.add(sample("GetMyOS", "Dans Mon Drive", "folder"));
-            recentFolders.add(sample("Partagés avec moi", "Accès rapide", "folder"));
+//            recentFolders.add(sample("Classroom", "Dans Mon Drive", "folder"));
+//            recentFolders.add(sample("GetMyOS", "Dans Mon Drive", "folder"));
+//            recentFolders.add(sample("Partagés avec moi", "Accès rapide", "folder"));
         }
+
         if (recentFiles.isEmpty()) {
-            recentFiles.add(sample("Sidebar Navigation Menu", "Google AI Studio", "text/plain"));
+//            recentFiles.add(sample("Sidebar Navigation Menu", "Google AI Studio", "text/plain"));
         }
+
         BindUtils.postNotifyChange(null, null, this, "recentFolders");
         BindUtils.postNotifyChange(null, null, this, "recentFiles");
+        log.info("📂 {} dossiers | 📄 {} fichiers", recentFolders.size(), recentFiles.size());
     }
 
     private Document sample(String title, String location, String type) {
@@ -106,5 +144,3 @@ public class DashboardViewModel {
         return d;
     }
 }
-
-

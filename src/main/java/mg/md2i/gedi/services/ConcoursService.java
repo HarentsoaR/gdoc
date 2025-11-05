@@ -9,6 +9,9 @@ public interface ConcoursService {
     void save(Concours concours);
     void softDelete(Integer id);
     List<Concours> search(String query);
+
+    List<String> getDistinctAvis();
+    List<String> getDistinctNumeros();
 }
 
 

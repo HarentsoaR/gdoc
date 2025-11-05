@@ -1,0 +1,136 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <!-- Le seul composant racine est maintenant la <window> -->
+    <window title="Modifier le Concours" border="normal" width="950px" closable="true"
+         viewModel="@id('cv') @init('mg.md2i.gedi.control.viewmodel.ConcoursViewModel', concoursToManage=arg.concoursToManage)">
+        
+        <!-- Le style est maintenant A L'INTERIEUR de la fenêtre -->
+        <style>
+            .concours-form-container {
+                overflow-y: auto;
+                max-height: 70vh; /* Adjusted for modal */
+                padding: 16px;
+            }
+            .concours-form-grid {
+                width: 100%;
+            }
+        </style>
+        
+        <div class="z-window-footer" style="padding: 10px; text-align: right;">
+            <button label="Annuler" sclass="btn-secondary" iconSclass="z-icon-times"
+                    onClick="@command('cancel', view=self.root)"/>
+            <button label="Sauvegarder" sclass="btn-primary" iconSclass="z-icon-save"
+                    onClick="@command('saveConcours', view=self.root)"/>
+        </div>
+
+        <div class="concours-form-container">
+            <grid sclass="concours-form-grid">
+                <columns>
+                    <column width="200px"/>
+                    <column/>
+                </columns>
+                <rows>
+                    <row>
+                        <cell colspan="2" sclass="fw-bold" style="padding: 16px 0 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <label value="Informations Générales"/>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell><label value="Filière *" sclass="fw-bold"/></cell>
+                        <cell>
+                            <combobox model="@load(cv.filiereList)"
+                                      selectedItem="@bind(cv.selectedFiliere)"
+                                      onSelect="@command('onSelectFiliere')"
+                                      placeholder="Sélectionnez une filière"
+                                      width="100%"
+                                      constraint="no empty: La filière est obligatoire">
+                                <template name="model">
+                                    <comboitem label="@load(each.libelle)"/>
+                                </template>
+                            </combobox>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell><label value="Promotion *" sclass="fw-bold"/></cell>
+                        <cell>
+                            <combobox model="@load(cv.availablePromotions)"
+                                      selectedItem="@bind(cv.currentConcours.promotion)"
+                                      placeholder="Sélectionnez d'abord une filière"
+                                      width="100%"
+                                      constraint="no empty: La promotion est obligatoire">
+                                <template name="model">
+                                    <comboitem label="@load(each.libelle)"/>
+                                </template>
+                            </combobox>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell><label value="Numéro d’arrêté *" sclass="fw-bold"/></cell>
+                        <cell>
+                            <combobox model="@load(cv.numeroArreteList)"
+                                      value="@bind(cv.currentConcours.numeroArrete)"
+                                      placeholder="Sélectionnez ou saisissez un N°" width="100%"
+                                      constraint="no empty: Le numéro d’arrêté est obligatoire"/>
+                        </cell>
+                    </row>
+                     <row>
+                        <cell><label value="Avis de concours *" sclass="fw-bold"/></cell>
+                        <cell>
+                            <combobox model="@load(cv.avisList)"
+                                      value="@bind(cv.currentConcours.avisConcours)"
+                                      placeholder="Sélectionnez ou saisissez un avis" width="100%"
+                                      constraint="no empty: L'avis de concours est obligatoire"/>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell><label value="Date de l'arrêté *" sclass="fw-bold"/></cell>
+                        <cell>
+                            <datebox value="@bind(cv.currentConcours.dateArrete)"
+                                     width="100%" format="dd/MM/yyyy"
+                                     constraint="no empty: La date de l'arrêté est obligatoire"/>
+                        </cell>
+                    </row>
+                     <row>
+                        <cell><label value="Nombre de postes *" sclass="fw-bold"/></cell>
+                        <cell>
+                             <intbox value="@bind(cv.currentConcours.nombrePoste)" width="100%"
+                                     constraint="no empty: Le nombre de poste est obligatoire"/>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell colspan="2" sclass="fw-bold" style="padding: 24px 0 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <label value="Limite d'âge"/>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell><label value="Date de début limite d'âge *" sclass="fw-bold"/></cell>
+                        <cell>
+                            <datebox value="@bind(cv.currentConcours.dateDebutLimiteAge)"
+                                     width="100%" format="dd/MM/yyyy"
+                                     constraint="no empty: La date de début est obligatoire"/>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell><label value="Date de fin limite d'âge *" sclass="fw-bold"/></cell>
+                        <cell>
+                            <datebox value="@bind(cv.currentConcours.dateFinLimiteAge)"
+                                     width="100%" format="dd/MM/yyyy"
+                                     constraint="no empty: La date de fin est obligatoire"/>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell colspan="2" sclass="fw-bold" style="padding: 24px 0 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <label value="Autres Informations"/>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell><label value="Remarques" sclass="fw-bold"/></cell>
+                        <cell>
+                            <textbox value="@bind(cv.currentConcours.remarque)"
+                                     width="100%" rows="3"/>
+                        </cell>
+                    </row>
+                </rows>
+            </grid>
+        </div>
+    </window>
+</zk>

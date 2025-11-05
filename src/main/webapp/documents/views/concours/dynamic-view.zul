@@ -1,0 +1,4 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <include src="@load(Executions.getCurrent().getAttribute('currentView'))" 
+             parentModel="@load(Executions.getCurrent().getAttribute('parentModel'))"/>
+</zk>

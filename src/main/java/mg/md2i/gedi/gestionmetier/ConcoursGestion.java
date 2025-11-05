@@ -36,6 +36,14 @@ public class ConcoursGestion {
     public static List<Concours> search(String q) {
         return getService().search(q);
     }
+
+    public static List<String> findAllAvis() {
+        return getService().getDistinctAvis();
+    }
+
+    public static List<String> findAllNumeros() {
+        return getService().getDistinctNumeros();
+    }
 }
 
 
