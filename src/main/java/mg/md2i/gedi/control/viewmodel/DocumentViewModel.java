@@ -1,138 +1,104 @@
 package mg.md2i.gedi.control.viewmodel;
 
-import mg.md2i.gedi.entity.Document;
+import mg.md2i.gedi.dto.SearchResult;
 import mg.md2i.gedi.entity.Candidat;
+import mg.md2i.gedi.entity.Document;
 import mg.md2i.gedi.gestionmetier.DocumentGestion;
+import mg.md2i.gedi.services.LuceneService;
+import mg.md2i.gedi.services.impl.LuceneServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Window;
-import org.zkoss.util.media.Media;
+import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zul.Bandbox;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-/**
- * DocumentViewModel without Lombok (explicit getters/setters) to ensure ZK can find properties.
- */
 public class DocumentViewModel {
 
     private static final Logger log = LoggerFactory.getLogger(DocumentViewModel.class);
+    
+    private LuceneService luceneService = new LuceneServiceImpl();
 
     private List<Document> documents = new ArrayList<>();
-    private List<String> recentActivities = new ArrayList<>();
+    private Map<String, Object> navigationArgs;
+    private CandidatViewModel candidatViewModel = new CandidatViewModel();
+    private boolean concoursExpanded = false;
+    
+    private List<SearchResult> searchResults = new ArrayList<>();
+    private List<SearchResult> suggestions = new ArrayList<>();
+    private List<SearchResult> filteredSearchResults = new ArrayList<>();
     private String searchQuery = "";
     private String currentPath = "Mes Documents";
-    private Document selectedDocument;
     private String currentView = "/documents/views/dashboard.zul";
-    private boolean concoursExpanded = false;
-    private CandidatViewModel candidatViewModel = new CandidatViewModel();
-    private Map<String, Object> navigationArgs;
 
+    private List<String> availableConcoursFilters = new ArrayList<>();
+    private List<String> availableDocTypeFilters = new ArrayList<>();
+    private String selectedConcoursFilter = "";
+    private String selectedDocTypeFilter = "";
+    
+    private List<String> availableFilieres = new ArrayList<>();
+    private List<String> availablePromotions = new ArrayList<>();
+    private List<String> availableCentres = new ArrayList<>();
+    private String selectedFiliere = "";
+    private String selectedPromotion = "";
+    private String selectedCentre = "";
 
-    // --- Getters / Setters ---
+    @Wire("#searchBox") 
+    private Bandbox searchBox;
+
     public List<Document> getDocuments() { return documents; }
     public void setDocuments(List<Document> documents) { this.documents = documents; }
-
-    public List<String> getRecentActivities() { return recentActivities; }
-    public void setRecentActivities(List<String> recentActivities) { this.recentActivities = recentActivities; }
-
+    public List<SearchResult> getSearchResults() { return searchResults; }
+    public List<SearchResult> getSuggestions() { return suggestions; } 
     public String getSearchQuery() { return searchQuery; }
     public void setSearchQuery(String searchQuery) { this.searchQuery = searchQuery; }
-
     public String getCurrentPath() { return currentPath; }
     public void setCurrentPath(String currentPath) { this.currentPath = currentPath; }
-
-    public Document getSelectedDocument() { return selectedDocument; }
-    public void setSelectedDocument(Document selectedDocument) { this.selectedDocument = selectedDocument; }
-
     public String getCurrentView() { return currentView; }
     public void setCurrentView(String currentView) { this.currentView = currentView; }
-
-    public boolean isConcoursExpanded() { return concoursExpanded; }
-    public void setConcoursExpanded(boolean concoursExpanded) { this.concoursExpanded = concoursExpanded; }
-
-    public CandidatViewModel getCandidatViewModel() { return candidatViewModel; }
-    public void setCandidatViewModel(CandidatViewModel candidatViewModel) { this.candidatViewModel = candidatViewModel; }
-
     public Map<String, Object> getNavigationArgs() { return navigationArgs; }
     public void setNavigationArgs(Map<String, Object> navigationArgs) { this.navigationArgs = navigationArgs; }
+    public CandidatViewModel getCandidatViewModel() { return candidatViewModel; }
+    public void setCandidatViewModel(CandidatViewModel candidatViewModel) { this.candidatViewModel = candidatViewModel; }
+    public boolean isConcoursExpanded() { return concoursExpanded; }
+    public void setConcoursExpanded(boolean concoursExpanded) { this.concoursExpanded = concoursExpanded; }
+    public List<SearchResult> getFilteredSearchResults() { return filteredSearchResults; }
+    public List<String> getAvailableConcoursFilters() { return availableConcoursFilters; }
+    public List<String> getAvailableDocTypeFilters() { return availableDocTypeFilters; }
+    public String getSelectedConcoursFilter() { return selectedConcoursFilter; }
+    public void setSelectedConcoursFilter(String selectedConcoursFilter) { this.selectedConcoursFilter = selectedConcoursFilter; }
+    public String getSelectedDocTypeFilter() { return selectedDocTypeFilter; }
+    public void setSelectedDocTypeFilter(String selectedDocTypeFilter) { this.selectedDocTypeFilter = selectedDocTypeFilter; }
+    public List<String> getAvailableFilieres() { return availableFilieres; }
+    public List<String> getAvailablePromotions() { return availablePromotions; }
+    public List<String> getAvailableCentres() { return availableCentres; }
+    public String getSelectedFiliere() { return selectedFiliere; }
+    public void setSelectedFiliere(String selectedFiliere) { this.selectedFiliere = selectedFiliere; }
+    public String getSelectedPromotion() { return selectedPromotion; }
+    public void setSelectedPromotion(String selectedPromotion) { this.selectedPromotion = selectedPromotion; }
+    public String getSelectedCentre() { return selectedCentre; }
+    public void setSelectedCentre(String selectedCentre) { this.selectedCentre = selectedCentre; }
 
-    // --- Lifecycle ---
     @Init
     public void init() {
-        log.info("Initialisation de DocumentViewModel...");
         loadDocuments();
-        loadRecentActivities();
         if (candidatViewModel != null) {
             candidatViewModel.init();
         }
     }
-
-    // --- Commands ---
+    
     @Command
     @NotifyChange("documents")
     public void loadDocuments() {
-        List<Document> found = DocumentGestion.findAllDocuments();
-        if (found == null) found = new ArrayList<>();
-        this.documents = found;
-        log.info("✅ {} documents chargés", documents.size());
-    }
-
-    private void loadRecentActivities() {
-        recentActivities.clear();
-        recentActivities.add("Alice a ajouté 'Rapport Annuel 2024'");
-        recentActivities.add("Marc a modifié 'Contrats Clients'");
-        recentActivities.add("Vous avez partagé 'Présentation.pptx'");
-    }
-
-    @Command
-    @NotifyChange("documents")
-    public void searchDocuments() {
-        if (searchQuery == null || searchQuery.trim().isEmpty()) {
-            loadDocuments();
-        } else {
-            List<Document> results = DocumentGestion.search(searchQuery);
-            this.documents = (results != null ? results : new ArrayList<>());
-        }
-    }
-
-    @Command
-    public void openUploadModal() {
-        Window win = (Window) Executions.createComponents("/documents/views/concours/upload-candidat.zul", null, null);
-        if (win != null) win.doModal();
-    }
-
-    @Command
-    @NotifyChange("selectedDocument")
-    public void selectDocument(@BindingParam("doc") Document doc) {
-        this.selectedDocument = doc;
-    }
-
-    @GlobalCommand
-    @NotifyChange("selectedDocument")
-    public void selectDocFromDashboard(@BindingParam("doc") Document doc) {
-        this.selectedDocument = doc;
-    }
-
-    @Command
-    public void downloadDocument(@BindingParam("doc") Document doc) {
-        downloadDocumentInternal(doc);
-    }
-
-    private void downloadDocumentInternal(Document doc) {
-        if (doc != null) {
-            // implement Filedownload.save(...) if needed
-//            log.info("Download requested for document id: {}", doc.getId());
-        }
+        this.documents = DocumentGestion.findAllDocuments();
+        if (this.documents == null) this.documents = new ArrayList<>();
     }
 
     @Command
@@ -140,168 +106,136 @@ public class DocumentViewModel {
         Executions.sendRedirect("/home");
     }
 
-    @Command
-    public void deleteDocument(@BindingParam("docId") Integer docId) {
-        Messagebox.show("Supprimer ce document ?", "Confirmation",
-                Messagebox.YES | Messagebox.NO, Messagebox.QUESTION, evt -> {
-                    if (Messagebox.ON_YES.equals(evt.getName())) {
-                        DocumentGestion.delete(docId);
-                        loadDocuments();
-                        BindUtils.postNotifyChange(null, null, this, "documents");
-                        Messagebox.show("✅ Document supprimé avec succès");
-                    }
-                });
-    }
-
-    @Command
-    @NotifyChange({"currentView", "currentPath"})
-    public void navigateTo(@BindingParam("view") String view,
-                           @BindingParam("label") String label,
-                           @BindingParam("section") String section,
-                           @BindingParam("page") String page) {
-        if (view == null || view.trim().isEmpty()) {
-            return;
-        }
-        this.currentView = view;
-        if (section != null && !section.trim().isEmpty() && page != null && !page.trim().isEmpty()) {
-            this.currentPath = section + " \u203A " + page;
-        } else if (label != null && !label.trim().isEmpty()) {
-            this.currentPath = label;
-        }
-    }
-
-//    @GlobalCommand
-//    @NotifyChange({"currentView", "currentPath", "navigationArgs"})
-//    public void navigateToGlobal(@BindingParam("view") String view,
-//                                 @BindingParam("label") String label,
-//                                 @BindingParam("section") String section,
-//                                 @BindingParam("page") String page,
-//                                 @BindingParam("parentModel") Object parentModel) {
-//
-//        this.currentView = view;
-//        this.navigationArgs = new HashMap<>();
-//        if (parentModel != null) {
-//            this.navigationArgs.put("parentModel", parentModel);
-//        }
-//
-//        if (section != null && !section.trim().isEmpty() && page != null && !page.trim().isEmpty()) {
-//            this.currentPath = section + " \u203A " + page;
-//        } else if (label != null && !label.trim().isEmpty()) {
-//            this.currentPath = label;
-//        }
     @GlobalCommand
     @NotifyChange({"currentView", "currentPath", "navigationArgs"})
-    public void navigateToGlobal(@BindingParam("view") String view,
-                                 @BindingParam("label") String label,
-                                 @BindingParam("section") String section,
-                                 @BindingParam("page") String page,
-                                 @BindingParam("parentModel") Object payload) { // Changed name to 'payload' for clarity
-
+    public void navigateToGlobal(@BindingParam("view") String view, @BindingParam("label") String label, @BindingParam("section") String section, @BindingParam("page") String page, @BindingParam("parentModel") Object payload) {
         this.currentView = view;
-        
-        // *** CRITICAL FIX HERE ***
-        // We receive the arguments map directly as the payload.
-        // This map will be passed to the <include> tag.
-        if (payload instanceof Map) {
-            this.navigationArgs = (Map<String, Object>) payload;
-        } else {
-            this.navigationArgs = new HashMap<>(); // Reset if payload is not a map
-        }
-
-        if (section != null && !section.trim().isEmpty() && page != null && !page.trim().isEmpty()) {
-            this.currentPath = section + " \u203A " + page;
-        } else if (label != null && !label.trim().isEmpty()) {
-            this.currentPath = label;
-        }
+        this.navigationArgs = (payload instanceof Map) ? (Map<String, Object>) payload : new HashMap<>();
+        this.currentPath = (section != null && !section.trim().isEmpty() && page != null && !page.trim().isEmpty()) ? section + " \u203A " + page : (label != null ? label : "");
     }
-//    }
+    
+    @Command
+    @NotifyChange({"currentView", "currentPath"})
+    public void navigateTo(@BindingParam("view") String view, @BindingParam("label") String label, @BindingParam("section") String section, @BindingParam("page") String page) {
+        if (view == null || view.trim().isEmpty()) return;
+        this.currentView = view;
+        this.currentPath = (section != null && !section.trim().isEmpty() && page != null && !page.trim().isEmpty()) ? section + " \u203A " + page : (label != null ? label : "");
+    }
 
     @Command
     @NotifyChange("concoursExpanded")
     public void toggleConcoursSection() {
         concoursExpanded = !concoursExpanded;
     }
-
+    
     @Command
-    @NotifyChange({"documents", "selectedDocument"})
-    public void handleUpload(@BindingParam("titre") String titre,
-                             @BindingParam("remarque") String remarque,
-                             @BindingParam("file") Media media) {
-        if (media == null) {
-            Messagebox.show("Veuillez sélectionner un fichier.", "Erreur", Messagebox.OK, Messagebox.ERROR);
+    @NotifyChange({"suggestions", "searchResults", "filteredSearchResults", "availableConcoursFilters", "availableDocTypeFilters", "availableFilieres", "availablePromotions", "availableCentres"})
+    public void updateDynamicSearch() {
+        if (searchQuery == null || searchQuery.trim().length() < 2) {
+            suggestions.clear();
+            if (searchBox != null) searchBox.close();
             return;
         }
 
-        try {
-            String safeTitle = (titre != null && !titre.trim().isEmpty()) ? titre.trim() : media.getName();
-            String baseDir = "/Users/mac/gedi_storage";
-            Path uploadDir = Paths.get(baseDir);
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
-            }
-
-            String originalName = media.getName();
-            String fileExt = "";
-            int dot = originalName.lastIndexOf('.');
-            if (dot > 0 && dot < originalName.length() - 1) {
-                fileExt = originalName.substring(dot);
-            }
-
-            String storedFileName = UUID.randomUUID() + fileExt;
-            Path targetPath = uploadDir.resolve(storedFileName);
-
-            if (media.isBinary()) {
-                byte[] data = media.getByteData();
-                Files.write(targetPath, data);
-            } else {
-                try (InputStream in = media.getStreamData()) {
-                    Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                }
-            }
-
-            java.io.File savedFile = targetPath.toFile();
-
-            Document document = new Document();
-            document.setTitre(safeTitle);
-            document.setResume(null);
-            document.setPath(targetPath.toString());
-            document.setType(media.getContentType());
-            document.setTaille(savedFile.length());
-            document.setDateUpload(new Date());
-            document.setActif(1);
-            document.setVersion(1);
-            document.setRemarque(remarque);
-
-            DocumentGestion.save(document);
-
-            loadDocuments();
-            Messagebox.show("✅ Document importé avec succès", "Succès", Messagebox.OK, Messagebox.INFORMATION);
-        } catch (IOException ex) {
-            log.error("Erreur lors de l'enregistrement du fichier", ex);
-            Messagebox.show("Erreur lors de l'import du document.", "Erreur", Messagebox.OK, Messagebox.ERROR);
+        this.suggestions = luceneService.getSuggestions(searchQuery);
+        if (searchBox != null) {
+            if (suggestions.isEmpty()) searchBox.close();
+            else searchBox.open();
         }
+
+        this.searchResults = luceneService.search(searchQuery);
+        populateFilters();
+        applyFilters();
+    }
+    
+    @Command
+    @NotifyChange({"searchQuery", "suggestions"})
+    public void selectSuggestion(@BindingParam("suggestion") SearchResult result) {
+        this.searchQuery = result.getCandidateFullName();
+        this.suggestions.clear();
+        if (searchBox != null) {
+            searchBox.close();
+        }
+        searchDocuments();
     }
 
-    // Candidate delegation commands (simple forwarders)
-    @Command @NotifyChange("candidatViewModel")
-    public void newCandidat() { candidatViewModel.newCandidat(); }
-    @Command @NotifyChange("candidatViewModel")
-    public void editCandidat(@BindingParam("candidat") Candidat candidat) { candidatViewModel.editCandidat(candidat); }
-    @Command @NotifyChange("candidatViewModel")
-    public void saveCandidat() { candidatViewModel.save(); }
-    @Command @NotifyChange("candidatViewModel")
-    public void cancelCandidat() { candidatViewModel.cancel(); }
-    @Command @NotifyChange("candidatViewModel")
-    public void deleteCandidat(@BindingParam("id") Integer id) { candidatViewModel.delete(id); }
-    @Command @NotifyChange("candidatViewModel")
-    public void viewCandidat(@BindingParam("candidat") Candidat candidat) { candidatViewModel.viewCandidat(candidat); }
-    @Command @NotifyChange("candidatViewModel")
-    public void refreshCandidats() { candidatViewModel.refresh(); }
-    @Command @NotifyChange("candidatViewModel")
-    public void searchCandidats() { candidatViewModel.search(); }
-    @Command @NotifyChange("candidatViewModel")
-    public void onConcoursChange(@BindingParam("self") org.zkoss.zul.Combobox combobox) { candidatViewModel.onConcoursChange(combobox); }
-    @Command @NotifyChange("candidatViewModel")
-    public void onCentreExamenChange(@BindingParam("self") org.zkoss.zul.Combobox combobox) { candidatViewModel.onCentreExamenChange(combobox); }
+    @Command
+    @NotifyChange({"searchResults", "filteredSearchResults", "currentView", "currentPath", "suggestions", "availableConcoursFilters", "availableDocTypeFilters", "availableFilieres", "availablePromotions", "availableCentres", "selectedConcoursFilter", "selectedDocTypeFilter", "selectedFiliere", "selectedPromotion", "selectedCentre"})
+    public void searchDocuments() {
+        if (searchBox != null) searchBox.close();
+        this.suggestions.clear();
+        
+        if (searchQuery == null || searchQuery.trim().isEmpty()) {
+            goHomeSearch();
+            return;
+        }
+        
+        this.searchResults = luceneService.search(searchQuery);
+        populateFilters();
+        applyFilters();
+        
+        navigateToGlobal("/documents/views/shared/search-results.zul", "Résultats de la recherche", null, null, null);
+    }
+    
+    @Command
+    @NotifyChange({"searchResults", "filteredSearchResults", "currentView", "currentPath"})
+    public void goHomeSearch() {
+        this.searchResults.clear();
+        this.filteredSearchResults.clear();
+        navigateToGlobal("/documents/views/dashboard.zul", "Mes Documents", null, null, null);
+    }
+    
+    private void populateFilters() {
+        this.availableConcoursFilters = extractDistinctValues(SearchResult::getConcoursDisplayInfo);
+        this.availableDocTypeFilters = extractDistinctValues(SearchResult::getDocTypeName);
+        this.availableFilieres = extractDistinctValues(SearchResult::getFiliere);
+        this.availablePromotions = extractDistinctValues(SearchResult::getPromotion);
+        this.availableCentres = extractDistinctValues(SearchResult::getCentreExamen);
+    }
 
+    private List<String> extractDistinctValues(java.util.function.Function<SearchResult, String> extractor) {
+        return searchResults.stream()
+            .map(extractor)
+            .filter(s -> s != null && !s.isEmpty())
+            .distinct()
+            .sorted()
+            .collect(Collectors.toList());
+    }
+
+    @Command
+    @NotifyChange("filteredSearchResults")
+    public void applyFilters() {
+        this.filteredSearchResults = this.searchResults.stream()
+            .filter(result -> {
+                boolean concoursMatch = selectedConcoursFilter == null || selectedConcoursFilter.isEmpty() || selectedConcoursFilter.equals(result.getConcoursDisplayInfo());
+                boolean docTypeMatch = selectedDocTypeFilter == null || selectedDocTypeFilter.isEmpty() || selectedDocTypeFilter.equals(result.getDocTypeName());
+                boolean filiereMatch = selectedFiliere == null || selectedFiliere.isEmpty() || selectedFiliere.equals(result.getFiliere());
+                boolean promotionMatch = selectedPromotion == null || selectedPromotion.isEmpty() || selectedPromotion.equals(result.getPromotion());
+                boolean centreMatch = selectedCentre == null || selectedCentre.isEmpty() || selectedCentre.equals(result.getCentreExamen());
+                return concoursMatch && docTypeMatch && filiereMatch && promotionMatch && centreMatch;
+            })
+            .collect(Collectors.toList());
+    }
+    
+    @Command
+    @NotifyChange({"filteredSearchResults", "selectedConcoursFilter", "selectedDocTypeFilter", "selectedFiliere", "selectedPromotion", "selectedCentre"})
+    public void clearFilters() {
+        this.selectedConcoursFilter = "";
+        this.selectedDocTypeFilter = "";
+        this.selectedFiliere = "";
+        this.selectedPromotion = "";
+        this.selectedCentre = "";
+        applyFilters(); 
+    }
+
+    @Command @NotifyChange("candidatViewModel") public void newCandidat() { candidatViewModel.newCandidat(); }
+    @Command @NotifyChange("candidatViewModel") public void editCandidat(@BindingParam("candidat") Candidat c) { candidatViewModel.editCandidat(c); }
+    @Command @NotifyChange("candidatViewModel") public void saveCandidat() { candidatViewModel.save(); }
+    @Command @NotifyChange("candidatViewModel") public void cancelCandidat() { candidatViewModel.cancel(); }
+    @Command @NotifyChange("candidatViewModel") public void deleteCandidat(@BindingParam("id") Integer id) { candidatViewModel.delete(id); }
+    @Command @NotifyChange("candidatViewModel") public void viewCandidat(@BindingParam("candidat") Candidat c) { candidatViewModel.viewCandidat(c); }
+    @Command @NotifyChange("candidatViewModel") public void refreshCandidats() { candidatViewModel.refresh(); }
+    @Command @NotifyChange("candidatViewModel") public void searchCandidats() { candidatViewModel.search(); }
+    @Command @NotifyChange("candidatViewModel") public void onConcoursChange(@BindingParam("self") org.zkoss.zul.Combobox c) { candidatViewModel.onConcoursChange(c); }
+    @Command @NotifyChange("candidatViewModel") public void onCentreExamenChange(@BindingParam("self") org.zkoss.zul.Combobox c) { candidatViewModel.onCentreExamenChange(c); }
 }

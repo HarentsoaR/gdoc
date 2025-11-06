@@ -13,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.zkoss.bind.annotation.Transient;
+
 /**
  * Entite(concours) avec mapping pour les tables de la BDD pour l'ENMG
  * http://www.md2i.eu en collaboration avec ENMG
@@ -286,6 +288,28 @@ public class Concours implements Serializable {
 			return false;
 		return true;
 	}
+	
+	
+	/**
+     * NOUVELLE MÉTHODE POUR L'AFFICHAGE
+     * Construit une chaîne de caractères propre pour l'affichage dans les listes déroulantes.
+     * Cette méthode est robuste et gère les valeurs nulles ou vides.
+     * L'annotation @Transient indique à JPA de ne pas essayer de mapper cette méthode à une colonne de la BDD.
+     * @return Une chaîne formatée comme "Avis: [avis] / Arrêté: [arrêté]".
+     */
+
+	@Transient
+    public String getDisplayInfo() {
+		String promotionCode = (this.promotion != null && this.promotion.getFiliere() != null) ? this.promotion.getFiliere().getCode() : "N/A";
+        String avis = (this.avisConcours != null && !this.avisConcours.trim().isEmpty()) ? this.avisConcours.trim() : "N/A";
+        String arrete = (this.numeroArrete != null && !this.numeroArrete.trim().isEmpty()) ? this.numeroArrete.trim() : "N/A";
+
+        if ("N/A".equals(promotionCode) && ("N/A".equals(avis) && "N/A".equals(arrete))) {
+            return "Concours ID: " + this.concoursId;
+        }
+
+        return String.format("%s|%s|%s", promotionCode, avis, arrete);
+    }
 	
 }
 

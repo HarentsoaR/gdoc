@@ -1,0 +1,119 @@
+<zk>
+    <div viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.ImportViewModel')" hflex="1" vflex="1">
+
+        <div hflex="1" vflex="1" style="overflow-y: auto;">
+        
+            <div style="max-width: 800px; width: 100%; margin: auto; padding: 24px;">
+
+                <label value="Centre d'Importation des Documents" sclass="h2 text-primary" />
+                <separator bar="true" sclass="mt-2 mb-4"/>
+    
+                <!-- ETAPE 1: Sélection du Concours -->
+                <groupbox mold="3d">
+                    <caption label="Étape 1: Sélectionner le Concours" sclass="h4" />
+                    <grid sclass="p-3">
+                        <columns>
+                            <column width="200px"/>
+                            <column/>
+                        </columns>
+                        <rows>
+                            <row>
+                                <label value="Concours" sclass="font-weight-bold" />
+                                <combobox model="@load(vm.filteredConcours)"
+                                          selectedItem="@bind(vm.selectedConcours)"
+                                          placeholder="Saisissez pour rechercher un concours..." 
+                                          hflex="1"
+                                          autodrop="true"
+                                          onChanging="@command('filterConcours', text=event.value)"
+                                          onSelect="@command('onSelectConcours')">
+                                    <template name="model" var="c">
+                                        <comboitem label="@load(c.displayInfo)" />
+                                    </template>
+                                </combobox>
+                            </row>
+                        </rows>
+                    </grid>
+                </groupbox>
+    
+                <!-- ETAPE 2: Sélection du Candidat -->
+                <groupbox mold="3d" sclass="mt-4" visible="@load(not empty vm.selectedConcours)">
+                    <caption label="Étape 2: Sélectionner le Candidat" sclass="h4" />
+                    <grid sclass="p-3">
+                        <columns><column width="200px"/><column/></columns>
+                        <rows>
+                            <row>
+                                <label value="Candidat" sclass="font-weight-bold" />
+                                <combobox model="@load(vm.filteredCandidats)"
+                                          selectedItem="@bind(vm.selectedCandidat)"
+                                          placeholder="Saisissez pour rechercher un candidat..." 
+                                          hflex="1"
+                                          autodrop="true"
+                                          onChanging="@command('filterCandidats', text=event.value)"
+                                          onSelect="@command('onSelectCandidat')"
+                                          disabled="@load(empty vm.filteredCandidats)"
+                                          >
+                                    <template name="model" var="c">
+                                        <comboitem label="@load(c.nom.concat(' ').concat(c.prenom))"/>
+                                    </template>
+                                </combobox>
+                            </row>
+                        </rows>
+                    </grid>
+                </groupbox>
+                
+                <!-- ETAPE 3: Sélection du Type de document -->
+                <groupbox mold="3d" sclass="mt-4" visible="@load(not empty vm.selectedCandidat)">
+                    <caption label="Étape 3: Spécifier le type de document" sclass="h4" />
+                    <grid sclass="p-3">
+                        <columns><column width="200px"/><column/></columns>
+                        <rows>
+                            <row>
+                                <label value="Type de Document" sclass="font-weight-bold" />
+                                <combobox model="@load(vm.filteredDocumentTypes)"
+                                          selectedItem="@bind(vm.selectedDocumentType)"
+                                          placeholder="Saisissez pour rechercher un type..." 
+                                          hflex="1"
+                                          autodrop="true"
+                                          onChanging="@command('filterDocumentTypes', text=event.value)">
+                                    <template name="model" var="dc">
+                                        <comboitem label="@load(dc.libelle)"/>
+                                    </template>
+                                </combobox>
+                            </row>
+                        </rows>
+                    </grid>
+                </groupbox>
+    
+                <!-- ETAPE 4: Upload du Fichier -->
+                <groupbox mold="3d" sclass="mt-4" visible="@load(not empty vm.selectedDocumentType)">
+                    <caption label="Étape 4: Uploader le fichier" sclass="h4" />
+                    <vlayout sclass="p-4">
+                        <vlayout droppable="true" hflex="1"
+                                 style="border:2px dashed #007bff; border-radius:8px; padding:30px; text-align:center; background-color:#f8f9fa;">
+                            <attribute name="onDrop"><![CDATA[
+                                import org.zkoss.util.media.Media;
+                                Media[] medias = event.getMedias();
+                                if (medias != null && medias.length > 0) {
+                                    org.zkoss.bind.BindUtils.postCommand(null, null, "prepareUpload",
+                                        java.util.Collections.singletonMap("file", medias[0]));
+                                }
+                            ]]></attribute>
+                            <label value="Glissez-déposez le fichier ici" style="font-size:1.2rem; color:#555"/>
+                            <label value="ou" sclass="text-muted my-2"/>
+                            <fileupload label="Parcourir les fichiers..." upload="true,maxsize=10485760"
+                                        onUpload="@command('prepareUpload', file=event.media)" sclass="btn-secondary"/>
+                            <label value="@load(vm.pendingFileName)" sclass="text-info font-weight-bold mt-3"/>
+                        </vlayout>
+    
+                        <div sclass="mt-4 text-center">
+                            <button label="Importer le document" sclass="btn-primary btn-lg" iconSclass="z-icon-upload"
+                                    disabled="@load(empty vm.pendingFileName)"
+                                    onClick="@command('executeImport')" />
+                        </div>
+                    </vlayout>
+                </groupbox>
+                
+            </div> 
+        </div>
+    </div>
+</zk>

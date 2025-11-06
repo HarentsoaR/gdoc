@@ -5,6 +5,7 @@ import mg.md2i.gedi.repository.ListeDossierConcoursCandidatRepository;
 import mg.md2i.gedi.services.ListeDossierConcoursCandidatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,17 +26,18 @@ public class ListeDossierConcoursCandidatServiceImpl implements ListeDossierConc
     }
 
     @Override
-    public void save(ListeDossierConcoursCandidat entity) {
-        repository.save(entity);
+    @Transactional
+    public ListeDossierConcoursCandidat save(ListeDossierConcoursCandidat entity) {
+        return repository.save(entity);
     }
 
     @Override
+    @Transactional
     public void softDelete(Integer id) {
-        ListeDossierConcoursCandidat e = repository.findById(id).orElse(null);
-        if (e != null) {
+        repository.findById(id).ifPresent(e -> {
             e.setActif(0);
             repository.save(e);
-        }
+        });
     }
 
     @Override
@@ -53,12 +55,8 @@ public class ListeDossierConcoursCandidatServiceImpl implements ListeDossierConc
         return repository.findByFilters(documentConcoursId, candidatId);
     }
     
- // NOUVELLE IMPLÉMENTATION À AJOUTER
     @Override
     public List<ListeDossierConcoursCandidat> findWithAdvancedFilters(Integer documentConcoursId, Integer concoursId, Integer centreId, String nomCandidat) {
-        // Appelle directement la méthode du repository
         return repository.findWithAdvancedFilters(documentConcoursId, concoursId, centreId, nomCandidat);
     }
 }
-
-

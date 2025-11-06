@@ -1,21 +1,46 @@
-<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
-    <div sclass="topbar">
-        <!-- Section gauche : Logo et chemin actuel -->
+<zk>
+    <div sclass="topbar z-depth-1">
         <div sclass="topbar-left">
-            <image src="/img/logo-gedi.png" width="30px" />
+            <image src="/img/logo-gedi.png" width="36px" />
             <label value="GEDI Drive" sclass="app-title" />
-            <separator orient="vertical" bar="true" />
+            <separator orient="vertical" bar="true" sclass="separator-v" />
             <label value="@load(vm.currentPath)" sclass="breadcrumb" />
         </div>
 
-        <!-- Section droite : Recherche, Import et Utilisateur -->
         <div sclass="topbar-right">
-            <textbox sclass="search-input" placeholder="Rechercher un document..." 
-                     value="@bind(vm.searchQuery)" instant="true"
-                     onChanging="@command('searchDocuments')" />
-            <button label="Importer" sclass="btn-primary" iconSclass="z-icon-upload"
-                    onClick="@command('openUploadModal')" />
-            <image src="/img/user-avatar.png" width="36px" sclass="user-avatar" />
+            <bandbox id="searchBox"
+                     sclass="search-bandbox"
+                     placeholder="Rechercher un candidat..."
+                     value="@bind(vm.searchQuery)"
+                     instant="true" 
+                     onChanging="@command('updateDynamicSearch')"
+                     onOK="@command('searchDocuments')">
+                <bandpopup sclass="suggestion-popup">
+                    <listbox model="@load(vm.suggestions)"
+                             sclass="suggestion-listbox"
+                             emptyMessage="Aucun candidat ne correspond à votre recherche."
+                             onSelect="@command('selectSuggestion', suggestion=self.selectedItem.value)">
+                        <template name="model" var="s">
+                            <listitem value="@load(s)" sclass="suggestion-item">
+                                <listcell>
+                                    <hlayout valign="center">
+                                        <div sclass="z-icon-user suggestion-icon"/>
+                                        <vlayout>
+                                            <label value="@load(s.candidateFullName)" sclass="suggestion-title"/>
+                                            <label value="@load(s.concoursDisplayInfo)" sclass="suggestion-subtitle"/>
+                                        </vlayout>
+                                    </hlayout>
+                                </listcell>
+                            </listitem>
+                        </template>
+                    </listbox>
+                </bandpopup>
+            </bandbox>
+
+            <button label="Importer" sclass="btn-import" iconSclass="z-icon-upload"
+                    onClick="@global-command('navigateToGlobal', view='/documents/views/import/import-view.zul', label='Centre d\'Importation')" />
+            
+            <image src="/img/user-avatar.png" sclass="user-avatar" />
         </div>
     </div>
 </zk>
