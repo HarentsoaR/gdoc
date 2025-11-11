@@ -25,17 +25,33 @@ public class ListeDossierConcoursCandidatGestion {
         return savedEntity;
     }
 
+    // NOUVELLE MÉTHODE (pour l'erreur 2)
+    public static ListeDossierConcoursCandidat updateAndIndex(ListeDossierConcoursCandidat entity) {
+        // La méthode save gère à la fois la création et la mise à jour, 
+        // donc on peut réutiliser saveAndIndex
+        return saveAndIndex(entity);
+    }
+
     public static void deleteAndDeindex(Integer id) {
-        luceneService.deleteDocument(id.longValue());
+        luceneService.deleteDocument(id.longValue()); // Lucene utilise souvent des Long pour les ID
         getService().softDelete(id);
     }
 
-    // --- Les autres méthodes restent inchangées ---
     public static List<ListeDossierConcoursCandidat> findAll() { return getService().getAllActive(); }
     public static ListeDossierConcoursCandidat findById(Integer id) { return getService().getById(id); }
     public static void save(ListeDossierConcoursCandidat e) { getService().save(e); }
     public static void delete(Integer id) { getService().softDelete(id); }
-    public static List<ListeDossierConcoursCandidat> findByCandidat(Integer candidatId) { return getService().getByCandidat(candidatId); }
+    
+    // CORRECTION (pour l'erreur 3) : Renommage de findByCandidat en findByCandidatId
+    public static List<ListeDossierConcoursCandidat> findByCandidatId(Integer candidatId) { 
+        return getService().getByCandidat(candidatId); 
+    }
+
+    // NOUVELLE MÉTHODE (pour l'erreur 1)
+    public static ListeDossierConcoursCandidat findByCandidatIdAndDocumentId(Integer candidatId, Integer documentConcoursId) {
+        return getService().getByCandidatAndDocumentType(candidatId, documentConcoursId).orElse(null);
+    }
+
     public static List<ListeDossierConcoursCandidat> findByDocumentConcours(Integer documentConcoursId) { return getService().getByDocumentConcours(documentConcoursId); }
     public static List<ListeDossierConcoursCandidat> findByFilters(Integer documentConcoursId, Integer candidatId) {
         return getService().getByFilters(documentConcoursId, candidatId);

@@ -1,40 +1,54 @@
-<zk>
-    <div hflex="1" vflex="1" sclass="content-area"
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <div hflex="1" vflex="1" sclass="page-container"
          viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.FiliereViewModel')">
-        <div sclass="content-header">
-            <div>
-                <label value="Liste des Filières" sclass="page-title"/>
+        
+        <vlayout hflex="1" vflex="1" sclass="z-flex z-flex-col" style="gap: 16px;">
+
+            <!-- En-tête de page -->
+            <div sclass="page-header">
+                <div>
+                    <label value="Liste des Filières" sclass="page-title"/>
+                    <label value="Gérer les filières de formation" sclass="page-subtitle"/>
+                </div>
+                <div sclass="header-actions">
+                    <button label="Nouvelle Filière" sclass="btn-primary" iconSclass="z-icon-plus" onClick="@command('addFiliere')"/>
+                </div>
             </div>
-            <div sclass="header-actions">
-                <button label="Nouvelle Filière" sclass="btn-primary" onClick="@command('addFiliere')"/>
+
+            <!-- Barre de filtres -->
+            <div sclass="filter-bar">
+                <div sclass="search-box" hflex="1">
+                    <n:i class="z-icon-search search-icon" />
+                    <textbox hflex="1" placeholder="Rechercher par code ou libellé..." value="@bind(vm.searchQuery)" onOK="@command('search')" instant="true"/>
+                </div>
+                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" onClick="@command('search')"/>
             </div>
-        </div>
-        <div class="panel" style="margin-top: 16px;">
-            <div class="panel-body" style="display: flex; gap: 8px;">
-                <textbox hflex="1" placeholder="Rechercher..." value="@bind(vm.searchQuery)" onOK="@command('search')"/>
-                <button label="Rechercher" onClick="@command('search')"/>
+
+            <!-- Panneau du tableau -->
+            <div class="panel" vflex="1">
+                <listbox model="@load(vm.filiereList)" emptyMessage="Aucune filière trouvée." mold="paging" pageSize="10" vflex="1">
+                    <listhead>
+                        <listheader label="Code" width="200px" sort="auto(code)"/>
+                        <listheader label="Libellé" sort="auto(libelle)"/>
+                        <listheader label="Type" width="200px" sort="auto(sysId)"/>
+                        <listheader label="Actions" width="120px" align="center"/>
+                    </listhead>
+                    <template name="model" var="f">
+                        <listitem>
+                            <listcell label="@load(f.code)"/>
+                            <listcell label="@load(f.libelle)"/>
+                            <listcell label="@load(f.sysId)"/>
+                            <listcell sclass="actions-cell">
+                                <div hflex="1" align="center" style="display: flex; gap: 16px; justify-content: center;">
+                                    <a iconSclass="z-icon-pencil" tooltiptext="Modifier" onClick="@command('edit', filiereToEdit=f)"/>
+                                    <a iconSclass="z-icon-trash" tooltiptext="Supprimer" sclass="text-danger" onClick="@command('deleteFiliere', id=f.filiereId)"/>
+                                </div>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
             </div>
-        </div>
-        <div class="panel" style="margin-top: 16px;">
-            <listbox model="@load(vm.filiereList)" emptyMessage="Aucune filière trouvée." mold="paging" pageSize="10">
-                <listhead>
-                    <listheader label="Code"/>
-                    <listheader label="Libellé"/>
-                    <listheader label="Type"/>
-                    <listheader label="Actions"/>
-                </listhead>
-                <template name="model" var="f">
-                    <listitem>
-                        <listcell label="@load(f.code)"/>
-                        <listcell label="@load(f.libelle)"/>
-                        <listcell label="@load(f.sysId)"/>
-                        <listcell>
-                            <a iconSclass="z-icon-pencil" onClick="@command('edit', filiereToEdit=f)"/>
-                            <a iconSclass="z-icon-trash" onClick="@command('deleteFiliere', id=f.filiereId)"/>
-                        </listcell>
-                    </listitem>
-                </template>
-            </listbox>
-        </div>
+
+        </vlayout>
     </div>
 </zk>

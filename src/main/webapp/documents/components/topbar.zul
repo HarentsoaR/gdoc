@@ -1,9 +1,7 @@
 <zk>
     <div sclass="topbar z-depth-1">
+    
         <div sclass="topbar-left">
-            <image src="/img/logo-gedi.png" width="36px" />
-            <label value="GEDI Drive" sclass="app-title" />
-            <separator orient="vertical" bar="true" sclass="separator-v" />
             <label value="@load(vm.currentPath)" sclass="breadcrumb" />
         </div>
 

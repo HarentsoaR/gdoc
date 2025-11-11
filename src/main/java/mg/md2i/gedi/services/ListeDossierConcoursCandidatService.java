@@ -2,6 +2,7 @@ package mg.md2i.gedi.services;
 
 import mg.md2i.gedi.entity.ListeDossierConcoursCandidat;
 import java.util.List;
+import java.util.Optional; // Importez Optional
 
 public interface ListeDossierConcoursCandidatService {
     
@@ -9,12 +10,14 @@ public interface ListeDossierConcoursCandidatService {
     
     ListeDossierConcoursCandidat getById(Integer id);
     
-    // CORRECTION : La méthode save retourne maintenant l'entité sauvegardée
     ListeDossierConcoursCandidat save(ListeDossierConcoursCandidat entity);
     
     void softDelete(Integer id);
     
     List<ListeDossierConcoursCandidat> getByCandidat(Integer candidatId);
+    
+    // NOUVELLE MÉTHODE
+    Optional<ListeDossierConcoursCandidat> getByCandidatAndDocumentType(Integer candidatId, Integer documentConcoursId);
     
     List<ListeDossierConcoursCandidat> getByDocumentConcours(Integer documentConcoursId);
     

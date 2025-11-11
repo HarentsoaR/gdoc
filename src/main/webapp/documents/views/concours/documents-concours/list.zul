@@ -1,54 +1,60 @@
-<zk>
-    <div hflex="1" vflex="1" sclass="content-area"
+<zk xmlns:n="native">
+  
+    <div hflex="1" vflex="1" sclass="page-container"
          viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.DocumentConcoursViewModel')">
-
-        <!-- Header de la page -->
-        <div sclass="content-header">
-            <div>
-                <label value="Documents Concours" sclass="page-title"/>
-                <label value="Gérer les types de documents requis pour les concours" sclass="text-muted"
-                       style="display: block; margin-top: 4px;"/>
+    
+        <vlayout hflex="1" vflex="1" sclass="z-flex z-flex-col" style="gap: 16px;">
+        
+            <!-- En-tête de la page -->
+            <div sclass="page-header">
+                <div>
+                    <label value="Documents Concours" sclass="page-title"/>
+                    <label value="Gérer les types de documents requis pour les concours" sclass="page-subtitle"/>
+                </div>
+                <div sclass="header-actions">
+                    <button label="Nouveau Document" sclass="btn-primary" iconSclass="z-icon-plus"
+                            onClick="@command('addDocument')"/>
+                </div>
             </div>
-            <div sclass="header-actions">
-                <button label="Nouveau Document" sclass="btn-primary" iconSclass="z-icon-plus"
-                        onClick="@command('addDocument')"/>
-            </div>
-        </div>
 
-        <!-- Panneau de recherche et actions -->
-        <div class="panel" style="margin-top: 16px;">
-            <div class="panel-body" style="display: flex; gap: 8px;">
-                <textbox hflex="1" placeholder="Rechercher par libellé..."
-                         value="@bind(vm.searchQuery)"
-                         onOK="@command('search')"/>
-                <button label="Rechercher" sclass="btn" onClick="@command('search')"/>
-                <button label="Rafraîchir" sclass="btn-secondary" iconSclass="z-icon-refresh" onClick="@command('refreshDocumentList')"/>
+            <!-- Barre de filtres -->
+            <div sclass="filter-bar">
+                <div sclass="search-box" hflex="1">
+                    <n:i class="z-icon-search search-icon" />
+                    <textbox placeholder="Rechercher par libellé..."
+                             value="@bind(vm.searchQuery)"
+                             onOK="@command('search')"
+                             instant="true" />
+                </div>
+                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" onClick="@command('refreshDocumentList')"/>
             </div>
-        </div>
 
-        <!-- Liste des données -->
-        <div class="panel" style="margin-top: 16px;">
-            <!-- THE FIX IS HERE: model="@load(vm.documentList)" -->
-            <listbox model="@load(vm.documentList)" emptyMessage="Aucun document trouvé." mold="paging" pageSize="10">
-                <listhead>
-                    <listheader label="Libellé" sort="auto(libelle)"/>
-                    <listheader label="Remarque" sort="auto(remarque)"/>
-                    <listheader label="Actions" width="120px" align="center"/>
-                </listhead>
-                <template name="model" var="doc">
-                    <listitem>
-                        <listcell label="@load(doc.libelle)"/>
-                        <listcell label="@load(doc.remarque)"/>
-                        <listcell>
-                            <a iconSclass="z-icon-pencil" tooltiptext="Modifier"
-                               onClick="@command('edit', doc=doc)"/>
-                            <a iconSclass="z-icon-trash" tooltiptext="Supprimer"
-                               onClick="@command('deleteDocument', id=doc.documentConcoursId)"
-                               sclass="text-danger" style="margin-left: 12px;"/>
-                        </listcell>
-                    </listitem>
-                </template>
-            </listbox>
-        </div>
+            <!-- Panneau du tableau -->
+            <div sclass="panel" vflex="1">
+                <listbox model="@load(vm.documentList)" emptyMessage="Aucun document trouvé." mold="paging" pageSize="10" vflex="1">
+                    <listhead>
+                        <listheader label="Libellé" sort="auto(libelle)"/>
+                        <listheader label="Remarque" sort="auto(remarque)"/>
+                        <listheader label="Actions" width="100px" align="center"/>
+                    </listhead>
+                    <template name="model" var="doc">
+                        <listitem>
+                            <listcell label="@load(doc.libelle)"/>
+                            <listcell label="@load(doc.remarque)"/>
+                            <listcell sclass="actions-cell">
+                                <div hflex="1" align="center" style="display: flex; gap: 16px; justify-content: center;">
+                                    <a iconSclass="z-icon-pencil" tooltiptext="Modifier"
+                                       onClick="@command('edit', doc=doc)"/>
+                                    <a iconSclass="z-icon-trash" tooltiptext="Supprimer"
+                                       onClick="@command('deleteDocument', id=doc.documentConcoursId)"
+                                       sclass="text-danger"/>
+                                </div>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+            
+        </vlayout>
     </div>
 </zk>

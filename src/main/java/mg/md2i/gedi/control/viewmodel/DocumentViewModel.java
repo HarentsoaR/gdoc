@@ -14,7 +14,6 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Bandbox;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,18 @@ public class DocumentViewModel {
     private String selectedFiliere = "";
     private String selectedPromotion = "";
     private String selectedCentre = "";
+    
+    // This is the state for our sidebar
+    private boolean sidebarCollapsed = false;
+    public boolean isSidebarCollapsed() { return sidebarCollapsed; }
+    public void setSidebarCollapsed(boolean sidebarCollapsed) { this.sidebarCollapsed = sidebarCollapsed; }
+
+    // This is the command that correctly toggles the state and notifies the UI
+    @Command
+    @NotifyChange("sidebarCollapsed")
+    public void toggleSidebar() {
+        sidebarCollapsed = !sidebarCollapsed;
+    }
 
     @Wire("#searchBox") 
     private Bandbox searchBox;
@@ -220,14 +231,19 @@ public class DocumentViewModel {
     @Command
     @NotifyChange({"filteredSearchResults", "selectedConcoursFilter", "selectedDocTypeFilter", "selectedFiliere", "selectedPromotion", "selectedCentre"})
     public void clearFilters() {
-        this.selectedConcoursFilter = "";
-        this.selectedDocTypeFilter = "";
-        this.selectedFiliere = "";
-        this.selectedPromotion = "";
-        this.selectedCentre = "";
+        this.selectedConcoursFilter = null;
+        this.selectedDocTypeFilter = null;
+        this.selectedFiliere = null;
+        this.selectedPromotion = null;
+        this.selectedCentre = null;
         applyFilters(); 
     }
-
+    
+    @Command @NotifyChange({"selectedConcoursFilter", "filteredSearchResults"}) public void removeConcoursFilter() { this.selectedConcoursFilter = null; applyFilters(); }
+    @Command @NotifyChange({"selectedDocTypeFilter", "filteredSearchResults"}) public void removeDocTypeFilter() { this.selectedDocTypeFilter = null; applyFilters(); }
+    @Command @NotifyChange({"selectedFiliere", "filteredSearchResults"}) public void removeFiliereFilter() { this.selectedFiliere = null; applyFilters(); }
+    @Command @NotifyChange({"selectedPromotion", "filteredSearchResults"}) public void removePromotionFilter() { this.selectedPromotion = null; applyFilters(); }
+    @Command @NotifyChange({"selectedCentre", "filteredSearchResults"}) public void removeCentreFilter() { this.selectedCentre = null; applyFilters(); }
     @Command @NotifyChange("candidatViewModel") public void newCandidat() { candidatViewModel.newCandidat(); }
     @Command @NotifyChange("candidatViewModel") public void editCandidat(@BindingParam("candidat") Candidat c) { candidatViewModel.editCandidat(c); }
     @Command @NotifyChange("candidatViewModel") public void saveCandidat() { candidatViewModel.save(); }

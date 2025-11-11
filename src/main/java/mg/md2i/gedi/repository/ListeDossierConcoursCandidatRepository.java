@@ -8,14 +8,22 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional; // Importez Optional
 
 @Repository
 public interface ListeDossierConcoursCandidatRepository extends JpaRepository<ListeDossierConcoursCandidat, Integer> {
 
-    // --- Existing methods (kept for compatibility) ---
     List<ListeDossierConcoursCandidat> findByActif(Integer actif);
-    List<ListeDossierConcoursCandidat> findByCandidatId(Integer candidatId);
+
+    // CORRECTION : S'assure de ne récupérer que les documents actifs
+    @Query("SELECT e FROM ListeDossierConcoursCandidat e WHERE e.actif = 1 AND e.candidatId = :candidatId")
+    List<ListeDossierConcoursCandidat> findByCandidatId(@Param("candidatId") Integer candidatId);
+
     List<ListeDossierConcoursCandidat> findByDocumentConcoursId(Integer documentConcoursId);
+
+    // NOUVELLE MÉTHODE : Trouve un document spécifique pour un candidat donné.
+    // Utilise Optional pour gérer élégamment le cas où le document n'existe pas.
+    Optional<ListeDossierConcoursCandidat> findByCandidatIdAndDocumentConcoursIdAndActif(Integer candidatId, Integer documentConcoursId, Integer actif);
 
     @Query("SELECT e FROM ListeDossierConcoursCandidat e " +
            "WHERE e.actif = 1 " +
@@ -25,11 +33,6 @@ public interface ListeDossierConcoursCandidatRepository extends JpaRepository<Li
             @Param("docId") Integer documentConcoursId,
             @Param("candidatId") Integer candidatId);
 
-    /**
-     * NOUVELLE MÉTHODE DE RECHERCHE AVANCÉE
-     * Recherche les documents en joignant les informations du candidat pour filtrer
-     * par concours, centre d'examen et nom/prénom.
-     */
     @Query("SELECT e FROM ListeDossierConcoursCandidat e JOIN e.candidat c " +
            "WHERE e.actif = 1 " +
            "AND (:docId IS NULL OR e.documentConcoursId = :docId) " +

@@ -1,53 +1,62 @@
-<zk>
-    <div hflex="1" vflex="1" sclass="content-area"
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <div hflex="1" vflex="1" sclass="page-container"
          viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.PromotionViewModel')">
 
-        <div sclass="content-header">
-            <div>
-                <label value="Liste des Promotions" sclass="page-title"/>
-                <label value="Gérer les promotions existantes" sclass="text-muted"
-                       style="display: block; margin-top: 4px;"/>
+        <vlayout hflex="1" vflex="1" sclass="z-flex z-flex-col" style="gap: 16px;">
+        
+            <!-- En-tête de page -->
+            <div sclass="page-header">
+                <div>
+                    <label value="Liste des Promotions" sclass="page-title"/>
+                    <label value="Gérer les promotions existantes" sclass="page-subtitle"/>
+                </div>
+                <div sclass="header-actions">
+                    <button label="Nouvelle Promotion" sclass="btn-primary" iconSclass="z-icon-plus"
+                            onClick="@command('addPromotion')"/>
+                </div>
             </div>
-            <div sclass="header-actions">
-                <button label="Nouvelle Promotion" sclass="btn-primary" iconSclass="z-icon-plus"
-                        onClick="@command('addPromotion')"/>
-            </div>
-        </div>
 
-        <div class="panel" style="margin-top: 16px;">
-            <div class="panel-body" style="display: flex; gap: 8px;">
-                <textbox hflex="1" placeholder="Rechercher par libellé, numéro..."
-                         value="@bind(vm.searchQuery)"
-                         onOK="@command('search')"/>
-                <button label="Rechercher" sclass="btn" onClick="@command('search')"/>
+            <!-- Barre de filtres -->
+            <div class="panel-body filter-bar">
+                <div class="search-box" hflex="1">
+                    <n:i class="z-icon-search search-icon" />
+                    <textbox hflex="1" placeholder="Rechercher par libellé, numéro..."
+                             value="@bind(vm.searchQuery)"
+                             onOK="@command('search')" instant="true"/>
+                </div>
+                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" onClick="@command('search')"/>
             </div>
-        </div>
 
-        <div class="panel" style="margin-top: 16px;">
-            <listbox model="@load(vm.promotionList)" emptyMessage="Aucune promotion trouvée." mold="paging" pageSize="10">
-                <listhead>
-                    <listheader label="Libellé" sort="auto(libelle)"/>
-                    <listheader label="N° Promotion" sort="auto(numeroPromotion)" width="150px"/>
-                    <listheader label="Filière" sort="auto(filiere.libelle)" width="200px"/>
-                    <listheader label="Année Concours" sort="auto(anneeConcours)" width="150px"/>
-                    <listheader label="Actions" width="120px"/>
-                </listhead>
-                <template name="model" var="promo">
-                    <listitem>
-                        <listcell label="@load(promo.libelle)"/>
-                        <listcell label="@load(promo.numeroPromotion)"/>
-                        <listcell label="@load(promo.filiere.libelle)"/>
-                        <listcell label="@load(promo.anneeConcours)"/>
-                        <listcell>
-                            <a iconSclass="z-icon-pencil" tooltiptext="Modifier"
-                               onClick="@command('edit', promotionToEdit=promo)"/>
-                            <a iconSclass="z-icon-trash" tooltiptext="Supprimer"
-                               onClick="@command('deletePromotion', id=promo.promotionId)"
-                               sclass="text-danger" style="margin-left: 8px;"/>
-                        </listcell>
-                    </listitem>
-                </template>
-            </listbox>
-        </div>
+            <!-- Panneau du tableau -->
+            <div class="panel" vflex="1">
+                <listbox model="@load(vm.promotionList)" emptyMessage="Aucune promotion trouvée." mold="paging" pageSize="10" vflex="1">
+                    <listhead>
+                        <listheader label="Libellé" sort="auto(libelle)"/>
+                        <listheader label="N° Promotion" sort="auto(numeroPromotion)"/>
+                        <listheader label="Filière" sort="auto(filiere.libelle)"/>
+                        <listheader label="Année Concours" sort="auto(anneeConcours)"/>
+                        <listheader label="Actions" width="120px" align="center"/>
+                    </listhead>
+                    <template name="model" var="promo">
+                        <listitem>
+                            <listcell label="@load(promo.libelle)"/>
+                            <listcell label="@load(promo.numeroPromotion)"/>
+                            <listcell label="@load(promo.filiere.libelle)"/>
+                            <listcell label="@load(promo.anneeConcours)"/>
+                            <listcell sclass="actions-cell">
+                                <div hflex="1" align="center" style="display: flex; gap: 16px; justify-content: center;">
+                                    <a iconSclass="z-icon-pencil" tooltiptext="Modifier"
+                                       onClick="@command('edit', promotionToEdit=promo)"/>
+                                    <a iconSclass="z-icon-trash" tooltiptext="Supprimer"
+                                       onClick="@command('deletePromotion', id=promo.promotionId)"
+                                       sclass="text-danger"/>
+                                </div>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+            
+        </vlayout>
     </div>
 </zk>

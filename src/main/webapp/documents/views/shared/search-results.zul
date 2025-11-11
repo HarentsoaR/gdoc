@@ -1,156 +1,116 @@
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
-    <style>
-        .filter-bar {
-            padding: 16px;
-            background-color: #f7f9fc;
-            border: 1px solid #dee2e6;
-            border-radius: 12px;
-            margin-bottom: 24px;
-        }
-        .filters-grid .z-column-content, .filters-grid .z-label {
-            font-weight: 500;
-            font-size: 13px;
-        }
-        .filter-actions .z-button {
-            height: 36px;
-        }
-        .active-filters-bar {
-             margin-top:12px; 
-             align-items:center;
-        }
-        .pill {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: #e9ecef; color: #333; border-radius: 16px;
-            padding: 4px 12px; margin-left: 8px; font-size: 12px;
-        }
-        .results-meta { 
-            color: #6c757d; 
-            font-size: 13px; 
-        }
-        .result-item-title {
-            font-weight: 500;
-            color: #1a0dab;
-        }
-        .result-item-subtitle {
-            font-size: 13px;
-            color: #5f6368;
-        }
-        .result-item-icon {
-            font-size: 24px;
-            color: #d93025; /* PDF icon color */
-            width: 32px;
-            text-align: center;
-        }
-    </style>
 
-    <vlayout hflex="1" vflex="1" sclass="content-area">
+    <div hflex="1" vflex="1" sclass="page-container">
+        
+        <vlayout hflex="1" vflex="1" sclass="z-flex z-flex-col" style="gap: 16px;">
 
-        <div sclass="filter-bar">
-            <grid sclass="filters-grid">
-                <columns>
-                    <column hflex="1"/><column hflex="1"/><column hflex="1"/>
-                </columns>
-                <rows>
-                    <row>
-                        <vlayout>
-                            <label value="Concours"/>
-                            <combobox model="@load(vm.availableConcoursFilters)" selectedItem="@bind(vm.selectedConcoursFilter)"
-                                      hflex="1" placeholder="Tous les concours" readonly="true"
-                                      onChange="@command('applyFilters')" />
-                        </vlayout>
-                        <vlayout>
-                            <label value="Filière"/>
-                            <combobox model="@load(vm.availableFilieres)" selectedItem="@bind(vm.selectedFiliere)"
-                                      hflex="1" placeholder="Toutes les filières" readonly="true"
-                                      onChange="@command('applyFilters')" />
-                        </vlayout>
-                        <vlayout>
-                            <label value="Promotion"/>
-                            <combobox model="@load(vm.availablePromotions)" selectedItem="@bind(vm.selectedPromotion)"
-                                      hflex="1" placeholder="Toutes les promotions" readonly="true"
-                                      onChange="@command('applyFilters')" />
-                        </vlayout>
-                    </row>
-                    <row>
-                        <vlayout>
-                            <label value="Centre d'examen"/>
-                            <combobox model="@load(vm.availableCentres)" selectedItem="@bind(vm.selectedCentre)"
-                                      hflex="1" placeholder="Tous les centres" readonly="true"
-                                      onChange="@command('applyFilters')" />
-                        </vlayout>
-                         <vlayout>
-                            <label value="Type de document"/>
-                             <combobox model="@load(vm.availableDocTypeFilters)" selectedItem="@bind(vm.selectedDocTypeFilter)"
-                                      hflex="1" placeholder="Tous les types" readonly="true"
-                                      onChange="@command('applyFilters')" />
-                        </vlayout>
-                        <vlayout sclass="filter-actions" style="padding-top:20px;">
-                            <button label="Effacer les filtres" sclass="btn-secondary" iconSclass="z-icon-eraser" onClick="@command('clearFilters')"/>
-                        </vlayout>
-                    </row>
-                </rows>
-            </grid>
+            <!-- En-tête de la page -->
+            <div sclass="page-header">
+                <div>
+                    <label value="Recherche Avancée" sclass="page-title"/>
+                    <label value="Trouvez des documents en utilisant des filtres multiples" sclass="page-subtitle"/>
+                </div>
+            </div>
 
-            <hlayout sclass="active-filters-bar"
-                     visible="@load(not empty vm.selectedConcoursFilter or not empty vm.selectedFiliere or not empty vm.selectedPromotion or not empty vm.selectedCentre or not empty vm.selectedDocTypeFilter)">
-                <label value="Filtres actifs:" sclass="results-meta"/>
-                <div sclass="pill" visible="@load(not empty vm.selectedConcoursFilter)">
-                    <label value="@load(vm.selectedConcoursFilter)"/>
-                </div>
-                <div sclass="pill" visible="@load(not empty vm.selectedFiliere)">
-                    <label value="@load(vm.selectedFiliere)"/>
-                </div>
-                <div sclass="pill" visible="@load(not empty vm.selectedPromotion)">
-                    <label value="@load(vm.selectedPromotion)"/>
-                </div>
-                <div sclass="pill" visible="@load(not empty vm.selectedCentre)">
-                    <label value="@load(vm.selectedCentre)"/>
-                </div>
-                 <div sclass="pill" visible="@load(not empty vm.selectedDocTypeFilter)">
-                    <label value="@load(vm.selectedDocTypeFilter)"/>
-                </div>
-            </hlayout>
-        </div>
-
-        <div class="data-table-container" style="border:1px solid #dee2e6; border-radius:12px;" vflex="1">
-             <hlayout style="padding:12px 1; align-items:center; justify-content:space-between; border-bottom:1px solid #dee2e6;">
-                <label value="@load('Recherche pour : \''.concat(vm.searchQuery).concat('\''))" sclass="item-title"/>
-                <label value="@load(vm.filteredSearchResults.size())" sclass="results-meta"/>
-            </hlayout>
-
-            <listbox model="@load(vm.filteredSearchResults)" vflex="1" hflex="1" sclass="data-table" emptyMessage="Aucun document ne correspond à votre recherche ou à vos filtres.">
-                <listhead>
-                    <listheader label="Document" />
-                    <listheader label="Détails du Concours" />
-                    <listheader label="Actions" width="120px" align="right"/>
-                </listhead>
-                <template name="model" var="result">
-                    <listitem>
-                        <listcell>
-                             <hlayout spacing="16px" valign="center">
-                                <n:i class="z-icon-file-pdf-o result-item-icon"/>
-                                <vlayout>
-                                    <a label="@load(result.docTypeName.concat(' - ').concat(result.candidateFullName))" sclass="result-item-title"
-                                       href="@load(result.filePath)" download="@load(result.filePath.substring(result.filePath.lastIndexOf('/')+1))" />
-                                </vlayout>
-                            </hlayout>
-                        </listcell>
-                        <listcell>
+            <!-- Panneau des filtres -->
+            <div sclass="panel-filters">
+                <grid>
+                    <columns><column hflex="1"/><column hflex="1"/><column hflex="1"/></columns>
+                    <rows>
+                        <row>
                             <vlayout>
-                                <label value="@load('Concours: '.concat(result.concoursDisplayInfo))" sclass="result-item-subtitle"/>
-                               <!-- <label value="@load('Centre: '.concat(result.centreExamen))" sclass="result-item-subtitle"/> -->
+                                <label value="Concours"/>
+                                <combobox model="@load(vm.availableConcoursFilters)" selectedItem="@bind(vm.selectedConcoursFilter)"
+                                          hflex="1" placeholder="Tous les concours" readonly="true"
+                                          onChange="@command('applyFilters')" /> <!-- FIX: Ajout de l'événement -->
                             </vlayout>
-                        </listcell>
-                        <listcell>
-                            <hlayout style="justify-content: flex-end;">
-                                <button sclass="btn-icon" iconSclass="z-icon-download" tooltiptext="Télécharger"
-                                        href="@load(result.filePath)" download="@load(result.filePath.substring(result.filePath.lastIndexOf('/')+1))"/>
-                                <button sclass="btn-icon" iconSclass="z-icon-eye" tooltiptext="Voir"/>
-                            </hlayout>
-                        </listcell>
-                    </listitem>
-                </template>
-            </listbox>
-        </div>
-    </vlayout>
+                            <vlayout>
+                                <label value="Filière"/>
+                                <combobox model="@load(vm.availableFilieres)" selectedItem="@bind(vm.selectedFiliere)"
+                                          hflex="1" placeholder="Toutes les filières" readonly="true"
+                                          onChange="@command('applyFilters')" /> <!-- FIX: Ajout de l'événement -->
+                            </vlayout>
+                            <vlayout>
+                                <label value="Promotion"/>
+                                <combobox model="@load(vm.availablePromotions)" selectedItem="@bind(vm.selectedPromotion)"
+                                          hflex="1" placeholder="Toutes les promotions" readonly="true"
+                                          onChange="@command('applyFilters')" /> <!-- FIX: Ajout de l'événement -->
+                            </vlayout>
+                        </row>
+                        <row>
+                            <vlayout>
+                                <label value="Centre d'examen"/>
+                                <combobox model="@load(vm.availableCentres)" selectedItem="@bind(vm.selectedCentre)"
+                                          hflex="1" placeholder="Tous les centres" readonly="true"
+                                          onChange="@command('applyFilters')" /> <!-- FIX: Ajout de l'événement -->
+                            </vlayout>
+                            <vlayout>
+                                <label value="Type de document"/>
+                                <combobox model="@load(vm.availableDocTypeFilters)" selectedItem="@bind(vm.selectedDocTypeFilter)"
+                                          hflex="1" placeholder="Tous les types" readonly="true"
+                                          onChange="@command('applyFilters')" /> <!-- FIX: Ajout de l'événement -->
+                            </vlayout>
+                            <vlayout style="padding-top:20px;">
+                                <button label="Effacer les filtres" sclass="btn" iconSclass="z-icon-eraser" onClick="@command('clearFilters')"/>
+                            </vlayout>
+                        </row>
+                    </rows>
+                </grid>
+                
+                <!-- Pilules de filtres actifs -->
+                <hlayout valign="middle" style="flex-wrap: wrap;"
+                         visible="@load(not empty vm.selectedConcoursFilter or not empty vm.selectedFiliere or not empty vm.selectedPromotion or not empty vm.selectedCentre or not empty vm.selectedDocTypeFilter)">
+                    <label value="Filtres actifs:" style="font-size: 13px; color: var(--text-muted); margin: 4px;"/>
+                    <div sclass="filter-pill" visible="@load(not empty vm.selectedConcoursFilter)">
+                        <label value="@load(vm.selectedConcoursFilter)"/>
+                        <button iconSclass="z-icon-times" onClick="@command('removeConcoursFilter')"/>
+                    </div>
+                    <div sclass="filter-pill" visible="@load(not empty vm.selectedFiliere)">
+                        <label value="@load(vm.selectedFiliere)"/>
+                        <button iconSclass="z-icon-times" onClick="@command('removeFiliereFilter')"/>
+                    </div>
+                    <div sclass="filter-pill" visible="@load(not empty vm.selectedPromotion)">
+                        <label value="@load(vm.selectedPromotion)"/>
+                        <button iconSclass="z-icon-times" onClick="@command('removePromotionFilter')"/>
+                    </div>
+                    <div sclass="filter-pill" visible="@load(not empty vm.selectedCentre)">
+                        <label value="@load(vm.selectedCentre)"/>
+                        <button iconSclass="z-icon-times" onClick="@command('removeCentreFilter')"/>
+                    </div>
+                    <div sclass="filter-pill" visible="@load(not empty vm.selectedDocTypeFilter)">
+                        <label value="@load(vm.selectedDocTypeFilter)"/>
+                        <button iconSclass="z-icon-times" onClick="@command('removeDocTypeFilter')"/>
+                    </div>
+                </hlayout>
+            </div>
+            
+            <!-- Panneau des résultats -->
+            <div class="panel" vflex="1">
+                <listbox model="@load(vm.filteredSearchResults)" vflex="1" hflex="1" 
+                         emptyMessage="Aucun document ne correspond à vos filtres."
+                         mold="paging" pageSize="15">
+                    <listhead>
+                        <listheader label="Document"/>
+                        <listheader label="Candidat"/>
+                        <listheader label="Concours"/>
+                        <listheader label="Actions" width="120px" align="center"/>
+                    </listhead>
+                    <template name="model" var="result">
+                        <listitem>
+                            <listcell label="@load(result.docTypeName)"/>
+                            <listcell label="@load(result.candidateFullName)"/>
+                            <listcell label="@load(result.concoursDisplayInfo)"/>
+                            <listcell sclass="actions-cell">
+                                <div hflex="1" align="center" style="display: flex; gap: 16px; justify-content: center;">
+                                    <a iconSclass="z-icon-download" tooltiptext="Télécharger"
+                                       href="@load(result.filePath)" download="@load(result.filePath.substring(result.filePath.lastIndexOf('/')+1))"/>
+                                </div>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+
+        </vlayout>
+    </div>
 </zk>

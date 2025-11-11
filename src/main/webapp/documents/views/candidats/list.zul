@@ -1,83 +1,79 @@
 <!-- candidat/list.zul -->
-<zk xmlns="http://www.zkoss.org/2005/zul">
-    <div hflex="1" vflex="1" sclass="content-area" 
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native"> <!-- Ajout de xmlns:n="native" -->
+    <div hflex="1" vflex="1" sclass="page-container" 
          viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.CandidatViewModel')">
 
-        <!-- En-tête de page -->
-        <div sclass="content-header">
-            <div>
-                <label value="Gestion des Candidats" sclass="page-title"/>
-                <label value="Gérez les candidats aux concours" sclass="text-muted" style="display: block; margin-top: 4px;"/>
-            </div>
-            <div sclass="header-actions">
-                <button label="Nouveau Candidat" sclass="btn-primary" iconSclass="z-icon-plus" 
-                        onClick="@command('newCandidat')"/>
-            </div>
-        </div>
+        <!-- Utilisation de vlayout pour une disposition verticale correcte -->
+        <vlayout hflex="1" vflex="1" sclass="z-flex z-flex-col" style="gap: 16px;">
 
-        <!-- Barre de recherche et actions -->
-        <div sclass="content-header">
-            <div class="search-box">
-                <!-- FIX: Bind to vm.searchQuery and call the 'search' command -->
-                <textbox placeholder="🔍 Rechercher par nom..." 
-                         value="@bind(vm.searchQuery)" 
-                         onOK="@command('search')"
-                         sclass="search-input"/>
+            <!-- En-tête de page standardisé -->
+            <div sclass="page-header">
+                <div>
+                    <label value="Gestion des Candidats" sclass="page-title"/>
+                    <label value="Gérez les candidats aux concours" sclass="page-subtitle"/>
+                </div>
+                <div sclass="header-actions">
+                    <button label="Nouveau Candidat" sclass="btn-primary" iconSclass="z-icon-plus" 
+                            onClick="@command('newCandidat')"/>
+                </div>
             </div>
-            <div>
-                <!-- FIX: Call the 'refresh' command -->
-                <button label="Rafraîchir" sclass="btn-secondary" iconSclass="z-icon-refresh" 
+
+            <!-- Barre de filtres standardisée -->
+            <div sclass="filter-bar">
+                <div sclass="search-box" hflex="1">
+                    <n:i class="z-icon-search search-icon" />
+                    <textbox placeholder="Rechercher par nom, prénom..." 
+                             value="@bind(vm.searchQuery)" 
+                             onOK="@command('search')"
+                             instant="true"/>
+                </div>
+                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" 
                         onClick="@command('refresh')"/>
             </div>
-        </div>
 
-        <!-- Tableau des candidats -->
-        <div sclass="data-table-container" vflex="1">
-            <!-- FIX: Bind the model directly to vm.candidats -->
-            <listbox model="@load(vm.candidats)" vflex="1" hflex="1" sclass="data-table" 
-                     emptyMessage="Aucun candidat trouvé.">
-                <listhead sclass="data-table-header">
-                    <listheader label="NOM" width="200px"/>
-                    <listheader label="PRÉNOM" width="200px"/>
-                    <listheader label="CONCOURS" width="250px"/>
-                    <listheader label="CENTRE D'EXAMEN" width="200px"/>
-                    <listheader label="DATE DÉPÔT" width="150px"/>
-                    <listheader label="ACTIONS" width="120px" align="center"/>
-                </listhead>
-                <template name="model" var="candidat">
-                    <listitem sclass="data-table-row">
-                        <listcell sclass="data-table-cell">
-                            <label value="@load(candidat.nom)" sclass="fw-bold"/>
-                        </listcell>
-                        <listcell sclass="data-table-cell">
-                            <label value="@load(candidat.prenom)"/>
-                        </listcell>
-                        <listcell sclass="data-table-cell">
-                            <!-- This expression is now safe because of the JOIN FETCH -->
-                            <label value="@load(candidat.concours.avisConcours)"/>
-                            <label value="@load(candidat.concours.numeroArrete)"/>
-                        </listcell>
-                        <listcell sclass="data-table-cell">
-                            <label value="@load(candidat.centreExamen.libelle)"/>
-                        </listcell>
-                        <listcell sclass="data-table-cell text-muted">
-                            <!-- Suggestion: Format the date for better display -->
-                            <label value="@load(candidat.dateDepotCandidature) @converter('formatedDate', format='dd/MM/yyyy')"/>
-                        </listcell>
-                        <listcell sclass="data-table-cell actions-cell">
-                            <hlayout spacing="6px">
-                                <button sclass="btn-icon" iconSclass="z-icon-eye" tooltiptext="Voir"
-                                        onClick="@command('viewCandidat', candidat=candidat)"/>
-                                <button sclass="btn-icon" iconSclass="z-icon-edit" tooltiptext="Modifier"
-                                        onClick="@command('editCandidat', candidat=candidat)"/>
-                                <!-- FIX: Call the 'delete' command as defined in the ViewModel -->
-                                <button sclass="btn-icon btn-icon-danger" iconSclass="z-icon-trash-o" tooltiptext="Supprimer"
-                                        onClick="@command('delete', id=candidat.candidatId)"/>
-                            </hlayout>
-                        </listcell>
-                    </listitem>
-                </template>
-            </listbox>
-        </div>
+            <!-- Panneau du tableau (vflex="1" pour prendre tout l'espace) -->
+            <div sclass="panel" vflex="1">
+                <!-- Listbox (vflex="1" pour remplir le panneau) -->
+                <listbox model="@load(vm.candidats)" vflex="1" hflex="1" 
+                         emptyMessage="Aucun candidat trouvé." mold="paging" pageSize="10">
+                    <listhead>
+                        <listheader label="NOM"/>
+                        <listheader label="PRÉNOM"/>
+                        <listheader label="CONCOURS"/>
+                        <listheader label="CENTRE D'EXAMEN"/>
+                        <listheader label="DATE DÉPÔT"/>
+                        <listheader label="ACTIONS" width="120px" align="center"/>
+                    </listhead>
+                    <template name="model" var="candidat">
+                        <listitem>
+                            <listcell label="@load(candidat.nom)"/>
+                            <listcell label="@load(candidat.prenom)"/>
+                            <listcell>
+                                <!-- Affichage sur deux lignes pour plus de clarté -->
+                                <vlayout>
+                                    <label value="@load(candidat.concours.avisConcours)" style="font-weight: 500;"/>
+                                    <label value="@load(candidat.concours.numeroArrete)" sclass="text-muted" style="font-size: 12px;"/>
+                                </vlayout>
+                            </listcell>
+                            <listcell label="@load(candidat.centreExamen.libelle)"/>
+                            <listcell>
+                                <label value="@load(candidat.dateDepotCandidature) @converter('formatedDate', format='dd/MM/yyyy')"/>
+                            </listcell>
+                            <listcell sclass="actions-cell">
+                                <div hflex="1" align="center" style="display: flex; gap: 16px; justify-content: center;">
+                                    <a iconSclass="z-icon-eye" tooltiptext="Voir"
+                                            onClick="@command('viewCandidat', candidat=candidat)"/>
+                                    <a iconSclass="z-icon-pencil" tooltiptext="Modifier"
+                                            onClick="@command('editCandidat', candidat=candidat)"/>
+                                    <a sclass="text-danger" iconSclass="z-icon-trash-o" tooltiptext="Supprimer"
+                                            onClick="@command('delete', id=candidat.candidatId)"/>
+                                </div>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+
+        </vlayout>
     </div>
 </zk>

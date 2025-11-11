@@ -1,382 +1,695 @@
-/* ===================================================================
-   GEDI - Modern UI Stylesheet v2.1
-   -------------------------------------------------------------------
-   Fichier de style complet et unifié.
-   Structure :
-   1. Variables Globales (Design Tokens) -> Le centre de contrôle du design
-   2. Reset et Styles de Base -> Pour une base saine et cohérente
-   3. Structure Principale (Layout) -> Topbar, Sidebar, Content Area
-   4. Composants UI -> Boutons, Tableaux, Formulaires...
-   5. Classes Utilitaires -> Aides rapides
-   6. Media Queries (Responsive) -> Pour l'adaptation aux écrans
-   =================================================================== */
-
-/* --- 1. Variables Globales (Design Tokens) --- */
 :root {
-    /* Palette de couleurs principale */
-    --primary-color: #2563eb;       /* Bleu vif et professionnel */
-    --primary-color-dark: #1d4ed8;    /* Pour les :hover */
-    --primary-color-light: #dbeafe;  /* Pour les fonds subtils, :hover sur les lignes */
-
-    /* Palette de couleurs secondaire et neutre */
-    --secondary-color: #e5e7eb;
-    --secondary-color-dark: #d1d5db;
-    --bg-color: #f9fafb;             /* Fond général de l'application */
-    --surface-color: #ffffff;        /* Fond des cartes, tableaux, popups */
-    --border-color: #e5e7eb;
-
-    /* Palette sémantique */
-    --danger-color: #dc2626;
-    --danger-color-light: #fee2e2;
-
-    /* Typographie */
-    --text-color: #111827;           /* Couleur principale du texte */
-    --text-color-muted: #6b7280;     /* Pour les labels, textes secondaires */
-    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --font-size-sm: 12px;
-    --font-size-base: 14px;
-    --font-size-lg: 16px;
-    --font-size-xl: 20px;
-    --font-size-xxl: 24px;
-
-    /* Autres variables de design */
-    --border-radius: 8px;
-    --border-radius-lg: 12px;
-    --border-radius-full: 9999px;
-    --shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --topbar-height: 60px;
+  --primary-color: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #eff6ff;
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --text: #111827;
+  --muted: #6b7280;
+  --radius: 12px;
+  --sidebar-expanded: 260px;
+  --sidebar-collapsed: 72px;
+  --transition: 0.25s ease;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* --- 2. Reset et Styles de Base --- */
+/* ---- GLOBAL ---- */
 html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    font-family: var(--font-family);
-    color: var(--text-color);
-    background-color: var(--bg-color);
-    font-size: var(--font-size-base);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  margin: 0; padding: 0;
+  height: 100%; width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  overflow: hidden;
+}
+.gedi-main-window, .z-window-content { padding: 0 !important; border: none !important; }
+
+
+* { box-sizing: border-box; user-select: none; }
+
+/* ---- MAIN LAYOUT ---- */
+.gedi-main-layout {
+  display: flex;
+  height: 100vh;
+  width: 100%;
 }
 
-* { box-sizing: border-box; }
-
-/* Scrollbar personnalisée */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f1f1f1; }
-::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #aaa; }
-
-
-/* --- 3. Structure Principale (Layout) --- */
-
-/* Overrides ZK pour un layout pleine page */
-.gedi-main-window.z-window { padding: 0 !important; border: none !important; background: transparent; }
-.gedi-main-window > .z-window-content { padding: 0 !important; }
-
-/* Topbar */
-.topbar { display: flex; justify-content: space-between; align-items: center; background-color: var(--surface-color); border-bottom: 1px solid var(--border-color); padding: 8px 24px; height: var(--topbar-height); box-shadow: var(--shadow); }
-.topbar-left, .topbar-right { display: flex; align-items: center; gap: 16px; }
-.app-title { font-size: 18px; font-weight: 600; }
-.user-avatar { border-radius: 50%; }
-
-/* Sidebar */
-.sidebar { background-color: var(--bg-color); border-right: 1px solid var(--border-color); padding: 8px; display: flex; flex-direction: column; position: sticky; top: var(--topbar-height); height: calc(100vh - var(--topbar-height)); overflow-y: auto; }
-.sidebar-section { padding: 8px 4px; }
-.sidebar-nav { display: flex; flex-direction: column; gap: 4px; }
-.sidebar-title { font-size: var(--font-size-sm); font-weight: 600; color: var(--text-color-muted); text-transform: uppercase; padding: 12px 16px; }
-.sidebar-title.no-padding { padding: 12px 0; }
-
-/* Compact collapse button in sidebar header */
-/* Drive-like row toggle */
-.sidebar-toggle { display: flex; align-items: center; gap: 8px; padding: 6px 12px; cursor: pointer; border-radius: var(--border-radius-full); width: 100%; }
-.sidebar-toggle:hover { background-color: #f1f3f4; }
-.sidebar-caret { transition: transform 0.15s ease; color: var(--text-color-muted); }
-.sidebar-toggle.open .sidebar-caret { transform: rotate(90deg); }
-.concours-subnav { padding-left: 20px; }
-
-/* Zone de contenu principale */
-.content-area { padding: 24px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
-.content-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-.page-title { font-size: var(--font-size-xxl); font-weight: 700; color: var(--text-color); }
-.header-actions { display: flex; align-items: center; gap: 12px; }
-
-
-/* --- 4. Composants UI --- */
-
-/* -- Boutons -- */
-.z-button { transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s; }
-.btn-primary { background-color: var(--primary-color) !important; color: white !important; border-radius: var(--border-radius) !important; border: none !important; padding: 10px 16px !important; cursor: pointer; font-weight: 500; }
-.btn-primary:hover { background-color: var(--primary-color-dark) !important; }
-.btn-secondary { background-color: var(--surface-color) !important; border: 1px solid var(--border-color) !important; color: var(--text-color) !important; padding: 10px 16px !important; border-radius: var(--border-radius) !important; cursor: pointer; font-weight: 500; }
-.btn-secondary:hover { background-color: var(--bg-color) !important; }
-
-/* Bouton Spécial "Nouveau" (style Drive) */
-.sidebar .btn-new { background-color: var(--surface-color) !important; color: #1f2937 !important; font-weight: 500; border: 1px solid var(--border-color) !important; border-radius: 16px !important; padding: 16px 24px !important; margin: 8px; box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15); }
-.sidebar .btn-new:hover { background-color: #f7f9fa !important; box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15); }
-
-/* Boutons de navigation de la Sidebar */
-.sidebar .z-button.sidebar-button { background: none !important; border: none !important; box-shadow: none !important; width: 100%; text-align: left; border-radius: var(--border-radius-full) !important; padding: 12px 16px !important; color: var(--text-color); font-weight: 400; display: flex; align-items: center; gap: 16px; }
-.sidebar .z-button.sidebar-button:hover { background-color: #f1f3f4 !important; }
-.sidebar .z-button.sidebar-button.active { background-color: var(--primary-color-light) !important; color: var(--primary-color) !important; font-weight: 600; }
-
-/* Boutons d'icônes (dans les tableaux) */
-.btn-icon { background: none !important; border: none !important; cursor: pointer; padding: 8px !important; border-radius: 50% !important; line-height: 1; }
-.btn-icon .z-button-image { font-size: 16px; color: var(--text-color-muted) !important; transition: color 0.2s; } /* La correction clé pour la visibilité */
-.btn-icon .z-icon, .btn-icon .z-button-icon { color: var(--text-color-muted) !important; font-size: 16px; }
-.btn-icon:hover { background-color: var(--secondary-color) !important; }
-.btn-icon:hover .z-button-image { color: var(--text-color) !important; } /* Devient plus sombre au survol */
-.btn-icon:hover .z-icon, .btn-icon:hover .z-button-icon { color: var(--text-color) !important; }
-.btn-icon-danger:hover { background-color: var(--danger-color-light) !important; }
-.btn-icon-danger:hover .z-button-image { color: var(--danger-color) !important; } /* Devient rouge au survol */
-.btn-icon-danger:hover .z-icon, .btn-icon-danger:hover .z-button-icon { color: var(--danger-color) !important; }
-
-/* Actions column alignment */
-.actions-cell .z-listcell-content { display: flex; justify-content: center; }
-
-/* Ensure action icons are ALWAYS visible (not only on selection) */
-.data-table .actions-cell .btn-icon,
-.data-table .actions-cell .btn-icon * {
-    opacity: 1 !important;
-}
-.data-table .actions-cell .btn-icon .z-button-image,
-.data-table .actions-cell .btn-icon .z-icon,
-.data-table .actions-cell .btn-icon .z-button-icon {
-    color: #6b7280 !important; /* neutral gray for default state */
-}
-.data-table .z-listitem:hover .actions-cell .btn-icon .z-button-image,
-.data-table .z-listitem:hover .actions-cell .btn-icon .z-icon,
-.data-table .z-listitem:hover .actions-cell .btn-icon .z-button-icon {
-    color: #111827 !important; /* darker on row hover */
+.main-content-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
 }
 
-
-/* -- Formulaires (Inputs) -- */
-.search-box { position: relative; }
-.search-input { border-radius: var(--border-radius); border: 1px solid var(--border-color); padding: 8px 12px 8px 36px; width: 250px; transition: border-color 0.2s, box-shadow 0.2s; }
-.search-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-color-light); }
-.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-color-muted); }
-
-
-/* -- Tableaux de Données (Listbox) -- */
-.data-table-container { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); box-shadow: var(--shadow); overflow: hidden; display: flex; }
-.data-table { border: none !important; }
-
-/* En-tête du tableau */
-.data-table .z-listhead { background-color: var(--surface-color) !important; border-bottom: 2px solid var(--border-color) !important; } /* Correction clé: fond blanc, bordure plus épaisse */
-.data-table .z-listheader { background: transparent !important; } /* Assure qu'aucun style enfant ne met du bleu */
-.data-table .z-listheader-content { font-size: var(--font-size-sm); font-weight: 600; color: var(--text-color-muted); text-transform: uppercase; padding: 12px 24px !important; }
-
-/* Lignes du tableau */
-.data-table .z-listitem { background: transparent !important; transition: background-color 0.15s ease-in-out; }
-.data-table .z-listitem:hover > .z-listcell { background-color: var(--primary-color-light) !important; }
-.data-table .z-listcell { border-top: 1px solid var(--border-color) !important; padding: 14px 24px !important; background: transparent !important; vertical-align: middle; }
-.data-table .z-listitem:first-child .z-listcell { border-top: none !important; }
-.data-table .z-listcell-content { color: var(--text-color); }
-
-/* Message quand le tableau est vide */
-.data-table .z-listbox-emptybody td { padding: 48px !important; color: var(--text-color-muted); font-style: italic; }
-
-
-/* -- Panneau de Stockage (Sidebar) -- */
-.sidebar-storage { padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: #374151; }
-.storage-title { font-weight: 500; }
-.storage-text { font-size: 12px; color: #6b7280; }
-.storage-progress { height: 6px; border-radius: 3px; background: #e5e7eb; }
-.storage-progress > .z-progressmeter-bar { background-color: var(--primary-color); border-radius: 3px; }
-.btn-storage { background: none !important; border: 1px solid #d1d5db !important; color: var(--primary-color) !important; font-weight: 500; padding: 8px 12px !important; border-radius: var(--border-radius-full) !important; margin-top: 8px; }
-.btn-storage:hover { background-color: var(--primary-color-light) !important; }
-
-
-/* --- 5. Classes Utilitaires --- */
-.fw-bold { font-weight: 600 !important; }
-.text-danger { color: var(--danger-color) !important; }
-.text-muted { color: var(--text-color-muted) !important; }
-
-
-/* --- 6. Media Queries (Responsive) --- */
-@media (max-width: 1024px) {
-    .content-area {
-        padding: 16px;
+.content-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 24px 40px;
 }
-.page-title {
-        font-size: var(--font-size-xl);
-    }
-    .sidebar {
-        /* Sur les écrans plus petits, la sidebar pourrait être cachée par défaut */
-        /* display: none; */
-    }
+
+/* ---- SIDEBAR ---- */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  transition: width var(--transition), padding var(--transition), box-shadow var(--transition);
+  height: 100vh;
+  overflow: hidden;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
 }
-@media (max-width: 768px) {
-    .content-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .header-actions {
-    flex-direction: column;
-        align-items: stretch;
-    }
-    .search-input {
-        width: 100%;
-    }
+
+.sidebar-expanded {
+  width: var(--sidebar-expanded);
+  padding: 20px 16px;
+}
+
+.sidebar-collapsed {
+  width: var(--sidebar-collapsed);
+  padding: 12px 6px;
+  align-items: center;
+}
+
+/* ---- HEADER ---- */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-left: 12px;
+}
+
+.app-title {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--primary-color);
+  letter-spacing: -0.3px;
+}
+
+.sidebar-collapsed .app-title .sidebar-header { display: none; }
+
+.sidebar-toggle-btn {
+  background: lightblue !important;
+  border: none !important;
+  width: 20px; height: 20px;
+  display: flex !important;
+  align-items: center; justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 2px !important;
+  transition: background var(--transition), transform var(--transition);
+}
+.sidebar-toggle-btn:hover {
+  background: var(--primary-light) !important;
+  transform: scale(1.1);
+}
+
+/* ---- EXPANDED NAV BUTTONS ---- */
+.sidebar-section {
+  margin-bottom: 12px;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-button {
+  display: flex; align-items: center;
+  gap: 14px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: var(--radius) !important;
+  padding: 10px 14px !important;
+  color: var(--text) !important;
+  font-weight: 500;
+  text-align: left;
+  transition: background var(--transition), color var(--transition), transform var(--transition);
+}
+.sidebar-button:hover {
+  background: var(--primary-light) !important;
+  transform: translateX(3px);
+}
+.sidebar-button.active {
+  background: var(--primary-light) !important;
+  color: var(--primary-color) !important;
+  font-weight: 600;
+}
+.sidebar-button .z-button-image {
+  font-size: 18px;
+  color: var(--muted);
+}
+.sidebar-button.active .z-button-image {
+  color: var(--primary-color) !important;
+}
+
+/* ---- COLLAPSED BAR ---- */
+.icon-btn {
+  width: 46px; height: 46px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center; justify-content: center;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.icon-btn .z-button-image { font-size: 20px; }
+.icon-btn:hover {
+  background: var(--primary-light) !important;
+  color: var(--primary-color);
+  transform: scale(1.1);
+}
+.icon-btn.active {
+  background: var(--primary-light) !important;
+  color: var(--primary-color);
+  box-shadow: inset 0 0 0 2px var(--primary-color);
+}
+
+/* ---- COLLAPSED CONTENT ---- */
+.sidebar-collapsed-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+.collapsed-icons-top {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---- CONCOURS SUBMENU ---- */
+.concours-toggle {
+  display: flex; align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: background var(--transition), transform var(--transition);
+}
+.concours-toggle:hover {
+  background: var(--primary-light);
+  transform: translateX(3px);
+}
+.concours-toggle-label { flex-grow: 1; font-weight: 500; }
+.concours-toggle-caret { transition: transform var(--transition); }
+.concours-toggle.open .concours-toggle-caret { transform: rotate(90deg); }
+
+.concours-subnav {
+  margin-left: 32px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ---- POPUP ---- */
+.z-menupopup {
+  border-radius: var(--radius) !important;
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
+  padding: 8px !important;
+}
+
+/* ---- TOPBAR ---- */
 .topbar {
-    padding: 8px 16px;
-    }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 32px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  height: 65px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+}
+.topbar-left .breadcrumb {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.search-bandbox.z-bandbox {
+  width: 300px;
+}
+.search-bandbox .z-bandbox-input {
+  border-radius: var(--radius);
+  padding: 8px 12px;
 }
 
+.btn-import {
+  background-color: var(--primary-color) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: var(--radius) !important;
+  padding: 8px 16px !important;
+  font-weight: 500;
+  transition: background var(--transition), transform var(--transition);
+}
+.btn-import:hover {
+  background-color: var(--primary-dark) !important;
+  transform: translateY(-1px);
+}
 
-/* ===================================================================
-   SECTION 7: DASHBOARD & CARTES DE DOCUMENT (STYLE DRIVE)
-   =================================================================== */
+.user-avatar.z-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
 
-.dashboard.content-area {
-    gap: 32px; /* Plus d'espace entre les sections */
-    padding: 16px 32px;
+/*PAGE CONTENT STYLES*/
+/* Add these new styles to your existing style.css */
+
+/* --- Page Layout & Content --- */
+.page-container {
+    padding: 24px 32px;
 }
 
 .page-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-}
-
-.dashboard-section {
-    display: flex;
-    flex-direction: column;
+    align-items: flex-start;
     gap: 16px;
+    flex-wrap: wrap; /* For responsiveness */
 }
 
-.section-header {
+.page-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.page-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* --- Panel/Card Styling --- */
+.panel {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden; /* Important for listbox styling */
+}
+.panel-body {
+    padding: 16px;
+}
+
+/* --- Filter/Action Bar --- */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap; /* For responsiveness */
+}
+
+.search-box {
+    position: relative;
+    flex-grow: 1; /* Takes available space */
+}
+
+.search-box .z-textbox {
+    padding-left: 36px !important;
+    width: 100%;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 16px;
+}
+
+
+/* --- Button Styles --- */
+.btn-primary, .btn-secondary, .btn {
+    border: none !important;
+    border-radius: var(--radius) !important;
+    padding: 8px 16px !important;
+    font-weight: 500;
+    transition: background-color var(--transition);
+}
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+.btn-primary:hover {
+    background-color: var(--primary-dark) !important;
+}
+.btn-secondary {
+    background-color: var(--primary-light) !important;
+    color: var(--primary-color) !important;
+}
+.btn-secondary:hover {
+    background-color: #dbeafe !important; /* Slightly darker light blue */
+}
+.btn {
+     background-color: var(--surface) !important;
+     color: var(--text-secondary) !important;
+     border: 1px solid var(--border) !important;
+}
+.btn:hover {
+    border-color: #d1d5db !important;
+    background-color: #f9fafb !important;
+}
+
+
+/* --- Modern Listbox/Table Styling --- */
+.z-listbox {
+    border: none !important; /* Remove default border, panel has it */
+}
+
+/* Header */
+.z-listhead-bar {
+    background: var(--primary-color) !important;
+    border: none !important;
+}
+.z-listheader-content {
+    color: white !important;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 16px !important;
+}
+
+/* Rows and Cells */
+.z-listitem {
+    background: var(--surface) !important;
+    border-top: 1px solid var(--border) !important;
+    transition: background-color var(--transition);
+}
+.z-listitem:hover {
+    background-color: var(--primary-light) !important;
+}
+.z-listcell-content {
+    padding: 14px 16px !important;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* Action Icons */
+.actions-cell .z-a, .actions-cell .z-button {
+    color: var(--primary-color);
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none !important;
+    transition: opacity var(--transition);
+    opacity: 0.7;
+}
+.actions-cell .z-a:hover, .actions-cell .z-button:hover {
+    opacity: 1;
+}
+.actions-cell .text-danger {
+    color: #ef4444; /* Red for delete */
+}
+
+/* Paging Controls */
+.z-paging {
+    border-top: 1px solid var(--border) !important;
+    padding: 10px 16px !important;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .page-container {
+        padding: 16px;
+    }
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .page-header .header-actions {
+        width: 100%;
+    }
+    .page-header .header-actions .btn-primary {
+        width: 100%;
+    }
+}
+
+/* --- EXPLORER DOSSIER CANDIDAT --- */
+
+/* --- Breadcrumb Navigation --- */
+.breadcrumb {
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 14px;
 }
-
-.section-title {
-    font-size: var(--font-size-lg);
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.section-toggle .z-button-image {
-    color: var(--text-color-muted);
-    font-size: 20px;
-}
-
-
-/* -- Grille des dossiers suggérés -- */
-.suggested-folders-grid {
-    display: grid;
-    /* Crée des colonnes flexibles, chacune d'au moins 250px */
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 16px;
-}
-
-
-/* -- Carte de Document (Nouveau Style) -- */
-.doc-card {
-    background-color: var(--bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-lg);
-    padding: 16px;
+.breadcrumb-link {
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.doc-card:hover {
-    background-color: #f0f2f5; /* Un gris légèrement plus foncé au survol */
-    border-color: #d1d5db;
-    box-shadow: var(--shadow-md);
-}
-
-.doc-card-icon {
-    font-size: 20px;
-    color: var(--text-color-muted);
-    margin-right: 12px;
-}
-
-.doc-card .doc-title {
+    color: var(--primary-color);
+    text-decoration: none;
     font-weight: 500;
-    color: var(--text-color);
-    /* Pour gérer les noms de fichiers longs */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+}
+.breadcrumb-link:hover {
+    text-decoration: underline;
+}
+.breadcrumb-current {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+.breadcrumb-separator {
+    color: var(--text-muted);
 }
 
-.doc-card-footer {
+/* --- Advanced Filter Panel --- */
+.panel-filters {
+    padding: 16px;
+    background-color: var(--primary-light);
+    border: 1px solid #dbeafe; /* Lighter blue border */
+    border-radius: var(--radius);
+}
+.panel-filters .z-label {
+    font-weight: 500;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+/* --- Filter Pills (for showing active filters) --- */
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Espace pour le bouton de fermeture */
+    background: #e9ecef;
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 4px 8px 4px 12px; /* Padding ajusté */
+    margin: 4px; /* Permet le passage à la ligne */
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* Style spécifique pour le bouton 'x' dans la pilule */
+.filter-pill .z-button {
+    background: transparent !important;
+    border: none !important;
+    padding: 2px !important;
+    height: auto;
+    width: auto;
+    box-shadow: none !important;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.filter-pill .z-button:hover {
+    color: var(--text-primary);
+}
+
+/* --- Explorer/File List View Styles --- */
+.explorer-item {
+    cursor: pointer;
+}
+.explorer-item-icon {
+    font-size: 22px;
+    color: #6c757d;
+    width: 28px;
+    text-align: center;
+}
+.explorer-item-title {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+.explorer-item-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+.z-listitem:hover .explorer-item-icon {
+    color: var(--primary-color); /* Highlight icon on hover */
+}
+
+
+
+/* Search Results */
+/* --- Barre de méta-informations (nombre de résultats) --- */
+.results-bar {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-.doc-card .doc-subtitle {
-    font-size: var(--font-size-sm);
-    color: var(--text-color-muted);
+.results-bar-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
 }
-
-
-/* -- Liste de Fichiers (Style Spécifique) -- */
-.data-table-container.file-list-table {
-    border: none;
-    box-shadow: none;
-    background-color: transparent;
-    border-radius: 0;
-}
-
-.file-list-table .z-listhead {
-    background: transparent !important;
-    border-bottom: 1px solid var(--border-color) !important;
-}
-
-/* Finalise the file list specific styles (the previous file ended abruptly) */
-.file-list-table .z-listheader-content {
-    font-size: var(--font-size-sm);
+.results-bar-count {
     font-weight: 600;
-    color: var(--text-color-muted);
-    text-transform: uppercase;
-    padding: 12px 24px !important;
+    color: var(--primary-color);
 }
 
-.file-list-table .z-listitem {
-    background: transparent !important;
-    transition: background-color 0.15s ease-in-out;
+/* --- Style pour les éléments de la liste de résultats de recherche --- */
+.search-result-item {
+    border-top: 1px solid var(--border); 
+}
+.search-result-item:first-child {
+    border-top: none; /* Pas de bordure pour le premier élément */
+}
+.search-result-title a { /* Cible le lien (<a>) */
+    font-weight: 600;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 15px;
+}
+.search-result-title a:hover {
+    text-decoration: underline;
+}
+.search-result-details {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+.search-result-icon {
+    font-size: 28px;
+    color: #d93025; /* Rouge PDF */
+    width: 36px;
+    text-align: center;
 }
 
-.file-list-table .z-listcell {
-    border-top: 1px solid var(--border-color) !important;
-    padding: 14px 24px !important;
-    background: transparent !important;
-    vertical-align: middle;
+/*IMPORT VIEW*/
+/* --- Statut (pour les listes) --- */
+
+/* --- Style de Listbox "Léger" --- */
+.listbox-light .z-listheader-content {
+    padding: 10px 16px !important;
+    font-size: 12px;
+}
+.listbox-light .z-listcell-content {
+    padding: 12px 16px !important; /* Moins de padding vertical */
+    font-size: 14px;
 }
 
-.file-list-table .z-listitem:first-child .z-listcell {
-    border-top: none !important;
+/* --- Variantes de Boutons pour la Listbox --- */
+/* Bouton "Importer" principal, plus visible */
+.btn-import-primary {
+    background-color: #6d28d9 !important; /* Violet */
+    color: white !important;
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.btn-import-primary:hover {
+    background-color: #5b21b6 !important;
 }
 
-.file-list-table .z-listitem:hover > .z-listcell {
-    background-color: var(--primary-color-light) !important;
+/* Bouton "Mettre à jour" secondaire, plus discret */
+.btn-update-secondary {
+    background-color: #eef2ff !important; /* Indigo très clair */
+    color: #4338ca !important; /* Indigo foncé */
+    border: 1px solid #c7d2fe !important;
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.btn-update-secondary:hover {
+    background-color: #e0e7ff !important;
+}
+.status-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+.status-label.status-success, .status-label .z-icon-check-circle {
+    color: #16a34a; /* Vert */
+}
+.status-label.status-warning, .status-label .z-icon-times-circle {
+    color: #f97316; /* Orange */
 }
 
-/* File type icon helpers */
-.file-icon-pdf { color: #ef4444; }
-.file-icon-default { color: #6b7280; }
-
-/* Ensure header action button in page header matches style */
-.page-header .btn-icon .z-button-image,
-.page-header .btn-icon .z-icon,
-.page-header .btn-icon .z-button-icon {
-    color: var(--text-color-muted) !important;
+/* --- Zone de Glisser-Déposer (Upload) --- */
+.upload-panel {
+    margin-top: 16px;
 }
-.page-header .btn-icon:hover .z-button-image,
-.page-header .btn-icon:hover .z-icon,
-.page-header .btn-icon:hover .z-button-icon {
-    color: var(--text-color) !important;
+.upload-dropzone {
+    border: 2px dashed var(--primary-color);
+    border-radius: var(--radius);
+    padding: 24px;
+    background-color: var(--primary-light);
+    text-align: center;
+    transition: background-color var(--transition);
+}
+.upload-dropzone-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+.upload-pending-file {
+    margin-top: 16px;
+    padding: 12px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.upload-pending-file-info {
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+/* --- Message Placeholder --- */
+.placeholder-message {
+    padding: 40px;
+    text-align: center;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.placeholder-message-icon {
+    font-size: 48px;
+    color: var(--text-muted);
+}
+.placeholder-message-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-top: 16px;
 }

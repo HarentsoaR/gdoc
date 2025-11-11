@@ -1,32 +1,22 @@
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="xhtml">
-    <!-- 
-        Ce fichier est le point d'entrée. Il initialise le ViewModel et
-        assemble les composants principaux de l'interface.
-    -->
     <style src="/documents/style.css" />
 
     <window viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.DocumentViewModel')"
-            width="100%" height="100%" border="none" sclass="gedi-main-window"
-            style="padding:0;border:none;background:transparent" contentStyle="padding:0">
+            width="100%" height="100%" sclass="gedi-main-window">
 
-        <!-- 1. Barre du haut (Topbar) -->
-        <include src="/documents/components/topbar.zul"/>
+        <div sclass="gedi-main-layout">
+            <include src="/documents/components/sidebar.zul" />
 
-        <hlayout vflex="1" hflex="1" spacing="0">
-            <!-- 2. Barre latérale gauche (Sidebar) -->
-            <include src="/documents/components/sidebar.zul" hflex="min" />
-
-            <!-- 3. Contenu Principal (Dashboard) -->
-            <vlayout vflex="1" hflex="1">
-                <include src="@load(vm.currentView)" hflex="1" vflex="1"
-                         concoursToManage="@load(vm.navigationArgs.concoursToManage)"
-                         filiereToManage="@load(vm.navigationArgs.filiereToManage)"
-                         promotionToManage="@load(vm.navigationArgs.promotionToManage)"/>
-            </vlayout>
-
-            <!-- 4. Panneau de droite (Prévisualisation) -->
-            <!-- <include src="/documents/components/previewPanel.zul" hflex="min" /> -->
-        </hlayout>
+            <div sclass="main-content-wrapper @load(vm.sidebarCollapsed ? 'shifted' : '')">
+                <include src="/documents/components/topbar.zul"/>
+                <div sclass="content-area">
+                    <include src="@load(vm.currentView)"
+                             concoursToManage="@load(vm.navigationArgs.concoursToManage)"
+                             filiereToManage="@load(vm.navigationArgs.filiereToManage)"
+                             promotionToManage="@load(vm.navigationArgs.promotionToManage)"/>
+                </div>
+            </div>
+        </div>
 
     </window>
 </zk>

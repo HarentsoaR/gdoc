@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional; // Importez Optional
 
 @Service
 public class ListeDossierConcoursCandidatServiceImpl implements ListeDossierConcoursCandidatService {
@@ -43,6 +44,12 @@ public class ListeDossierConcoursCandidatServiceImpl implements ListeDossierConc
     @Override
     public List<ListeDossierConcoursCandidat> getByCandidat(Integer candidatId) {
         return repository.findByCandidatId(candidatId);
+    }
+
+    // NOUVELLE MÉTHODE : Implémentation
+    @Override
+    public Optional<ListeDossierConcoursCandidat> getByCandidatAndDocumentType(Integer candidatId, Integer documentConcoursId) {
+        return repository.findByCandidatIdAndDocumentConcoursIdAndActif(candidatId, documentConcoursId, 1);
     }
 
     @Override
