@@ -1,136 +1,22 @@
-<?page title="GEDI - Gestion Documentaire" contentType="text/html;charset=UTF-8"?>
+<?page title="GEDI - Administration" contentType="text/html;charset=UTF-8"?>
 <zk xmlns="http://www.zkoss.org/2005/zul">
+    <style src="/admin/style.css" />
 
-<window border="none"
-        viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.LayoutViewModel')"
-        sclass="root-window" vflex="1" hflex="1">
+    <window border="none"
+            sclass="gedi-main-window"
+            width="100%" height="100%"
+            viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.AdminViewModel')">
 
-    <div sclass="root-layout">
-        <div sclass="main-body">
+        <div sclass="gedi-main-layout admin-shell">
+            <include src="/admin/components/sidebar.zul"/>
 
-            <!-- Sidebar -->
-            <div sclass="@load(vm.sidebarVisible ? 'sidebar-area open' : 'sidebar-area collapsed')">
-                <include src="/includes/sidebar.zul"/>
-            </div>
+            <div sclass="main-content-wrapper @load(vm.sidebarCollapsed ? 'shifted' : '') admin-content-wrapper">
+                <include src="/admin/components/topbar.zul"/>
 
-            <!-- Main content -->
-            <div sclass="admin-content">
-                <include src="/includes/navbar.zul"/>
-                <div sclass="dynamic-content">
-                    <include src="@load(vm.currentPage)" mode="defer" />
+                <div sclass="content-area admin-content-area">
+                    <include src="@load(vm.currentView)" mode="defer" />
                 </div>
             </div>
         </div>
-
-        <!-- Overlay (for mobile) -->
-        <div sclass="@load(vm.sidebarVisible ? 'overlay visible' : 'overlay')" onClick="@command('toggleSidebar')"></div>
-    </div>
-
-    <style>
-    
-    /* 🧹 Reset unwanted ZK defaults */
-html, body {
-    margin: 0 !important;
-    padding: 0 !important;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-}
-
-.z-window, .z-window-content {
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    background: transparent !important;
-    height: 100% !important;
-    width: 100% !important;
-    box-sizing: border-box;
-}
-        .root-layout {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: #f8fafc;
-        }
-
-        .main-body {
-            display: flex;
-            flex: 1;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        /* --- Sidebar --- */
-        .sidebar-area {
-            width: 240px;
-            background: #1e293b;
-            color: white;
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-            height: 100%;
-            overflow-y: auto;
-            box-shadow: 2px 0 6px rgba(0,0,0,0.1);
-            z-index: 100;
-        }
-        .sidebar-area.collapsed {
-            width: 64px;
-        }
-
-        /* --- Main Content --- */
-        .admin-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background: #f8fafc;
-        }
-
-        .dynamic-content {
-            flex: 1;
-            overflow: auto;
-            padding: 24px;
-            background: #f8fafc;
-        }
-
-        /* --- Mobile Overlay --- */
-        .overlay { display: none; }
-        /* By default (desktop), never show overlay even if 'visible' class is present */
-        .overlay.visible { display: none; }
-
-        /* --- Responsive --- */
-        @media (max-width: 900px) {
-            .sidebar-area {
-                position: fixed;
-                top: 0;
-                left: -240px;
-                height: 100vh;
-                transition: left 0.3s ease;
-            }
-            .sidebar-area.open {
-                left: 0;
-            }
-            .sidebar-area.collapsed {
-                left: -240px;
-            }
-            /* On mobile, actually show overlay when sidebar is open */
-            .overlay.visible {
-                display: block;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.4);
-                z-index: 50;
-                transition: opacity 0.3s ease;
-            }
-            .main-body {
-                flex-direction: column;
-            }
-            .dynamic-content {
-                padding: 16px;
-            }
-        }
-    </style>
-</window>
+    </window>
 </zk>

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class LayoutViewModel {
 
-    private String currentPage = "/admin/dashboard.zul";
+    private String currentPage = "/admin/views/dashboard.zul";
     private boolean sidebarVisible = true; // default expanded
     private final List<String> breadcrumbs = new ArrayList<>();
     private boolean usersMenuOpen = false;

@@ -27,7 +27,7 @@ public class MainViewModel {
         );
 
         // default page
-        currentPage = "/admin/utilisateurs/list.zul";
+        currentPage = "/admin/views/utilisateurs/list.zul";
     }
 
     public boolean isAdminVisible() {
@@ -42,12 +42,12 @@ public class MainViewModel {
     @NotifyChange("currentPage")
     public void navigateTo(@BindingParam("page") String page) {
         switch (page) {
-            case "utilisateurs": currentPage = "/admin/utilisateurs/list.zul"; break;
-            case "documents": currentPage = "/admin/documents.zul"; break;
-            case "audit": currentPage = "/admin/audit.zul"; break;
-            case "access": currentPage = "/admin/acces.zul"; break;
-            case "parametres": currentPage = "/admin/parametres.zul"; break;
-            default: currentPage = "/admin/utilisateurs/list.zul";
+            case "utilisateurs": currentPage = "/admin/views/utilisateurs/list.zul"; break;
+            case "documents": currentPage = "/admin/views/documents.zul"; break;
+            case "audit": currentPage = "/admin/views/utilisateurs/audit.zul"; break;
+            case "access": currentPage = "/admin/views/utilisateurs/acces.zul"; break;
+            case "parametres": currentPage = "/admin/views/parametres.zul"; break;
+            default: currentPage = "/admin/views/utilisateurs/list.zul";
         }
     }
 

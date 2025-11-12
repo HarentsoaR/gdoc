@@ -1,0 +1,27 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <div sclass="topbar admin-topbar">
+        <div sclass="topbar-left">
+            <button sclass="btn-icon ghost mobile-only"
+                    iconSclass="z-icon-bars"
+                    onClick="@command('toggleSidebar')"
+                    tooltiptext="Afficher/masquer le menu" />
+            <label value="@load(vm.currentPath)" sclass="breadcrumb" />
+        </div>
+
+        <div sclass="topbar-right">
+            <textbox placeholder="Rechercher..."
+                     sclass="topbar-search" />
+            <button label="Nouvel utilisateur"
+                    sclass="btn-primary"
+                    iconSclass="z-icon-user-plus"
+                    onClick="@command('navigateTo', view='/admin/views/utilisateurs/new.zul', section='Utilisateurs', page='Nouveau')" />
+            <div class="user-chip">
+                <div class="user-chip-avatar">A</div>
+                <vlayout>
+                    <label value="Administrateur" sclass="user-chip-title" />
+                    <label value="Super Admin" sclass="user-chip-subtitle" />
+                </vlayout>
+            </div>
+        </div>
+    </div>
+</zk>

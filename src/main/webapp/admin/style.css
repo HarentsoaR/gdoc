@@ -846,3 +846,83 @@ html, body {
     color: var(--text-muted);
     margin-top: 16px;
 }
+
+/* --- Styles pour la page de Gestion des Utilisateurs --- */
+
+/* Cartes de statistiques */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+}
+.stat-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+}
+.stat-card-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+.stat-card-label {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* Avatar utilisateur dans la liste */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.user-details {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* Badges pour Rôle et Statut */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+.badge-admin {
+    background-color: #fef2f2; /* Rouge clair */
+    color: #b91c1c; /* Rouge foncé */
+}
+.badge-user {
+    background-color: #f0f9ff; /* Bleu clair */
+    color: #0284c7; /* Bleu foncé */
+}
+.badge-guest {
+    background-color: #f1f5f9; /* Gris clair */
+    color: #475569; /* Gris foncé */
+}
+.badge-active {
+    background-color: #f0fdf4; /* Vert clair */
+    color: #15803d; /* Vert foncé */
+}
+.badge-inactive {
+    background-color: #f1f5f9; /* Gris clair */
+    color: #475569; /* Gris foncé */
+}

@@ -1,10 +1,5 @@
 <zk>
     <style>
-        .layout { display:flex; height:100%; background:#f7f8fa; }
-        .sidebar { width:240px; background:#ffffff; border-right:1px solid #e5e7eb; padding:16px 0; }
-        .nav-item { display:flex; align-items:center; gap:10px; padding:10px 16px; color:#374151; cursor:pointer; }
-        .nav-item:hover { background:#f3f4f6; }
-        .nav-item--active { background:#e8f0fe; color:#1d4ed8; font-weight:600; border-right:3px solid #1d4ed8; }
         .content { flex:1; padding:24px 28px; overflow:auto; }
         .section { background:#fff; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.06); padding:18px 18px; }
         .section-title { font-size:18px; font-weight:700; color:#111827; margin-bottom:8px; }
@@ -25,24 +20,9 @@
         .toggle--on::after { left:23px; }
     </style>
 
-    <window title="Paramètres et Préférences" border="none" width="100%" height="100%"
-            apply="mg.md2i.gedi.security.SessionFilter,mg.md2i.gedi.control.AdminController">
-        <div sclass="layout">
-            <!-- Sidebar -->
-            <vlayout sclass="sidebar">
-                <hlayout style="padding:0 16px 12px; align-items:center; gap:10px;">
-                    <image src="/img/logo-gedi.png" width="24px" height="24px"/>
-                    <label value="GEDI" style="font-weight:700;color:#111827"/>
-                </hlayout>
-                <div sclass="nav-item nav-item--active" id="nav-docs">Gestion des documents</div>
-                <div sclass="nav-item" id="nav-share">Partage de fichiers</div>
-                <div sclass="nav-item" id="nav-search">Recherche Avancée</div>
-                <div sclass="nav-item" id="nav-settings">Paramètres</div>
-            </vlayout>
-
-            <!-- Content -->
-            <vlayout sclass="content" spacing="16px">
-                <label value="Paramètres et Préférences" style="font-size:22px;font-weight:700;color:#111827"/>
+    <vlayout sclass="content" spacing="16px"
+             apply="mg.md2i.gedi.security.SessionFilter,mg.md2i.gedi.control.AdminController">
+        <label value="Paramètres et Préférences" style="font-size:22px;font-weight:700;color:#111827"/>
 
                 <!-- User management -->
                 <vlayout sclass="section" spacing="12px">
@@ -128,7 +108,5 @@
                         <div sclass="toggle" id="toggleMFA"/>
                     </vlayout>
                 </vlayout>
-            </vlayout>
-        </div>
-    </window>
+    </vlayout>
 </zk>

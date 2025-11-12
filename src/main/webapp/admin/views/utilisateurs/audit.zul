@@ -1,0 +1,25 @@
+<zk>
+    <style src="/css/admin.css"/>
+    
+    <vlayout sclass="section" spacing="16px">
+        <vlayout spacing="4px">
+            <label value="Audit et Journalisation" style="font-size:22px;font-weight:700;color:#111827"/>
+            <label value="Consulter les logs et activités du système." sclass="muted"/>
+        </vlayout>
+
+        <vlayout spacing="16px">
+            <hlayout style="justify-content:space-between; align-items:center;">
+                <label value="Journal des activités" style="font-weight:700; font-size:16px;"/>
+                <hlayout spacing="8px">
+                    <datebox placeholder="De" format="dd/MM/yyyy"/>
+                    <datebox placeholder="À" format="dd/MM/yyyy"/>
+                    <button label="Filtrer" sclass="btn btn-primary"/>
+                </hlayout>
+            </hlayout>
+            
+            <div class="divider"/>
+            
+            <label value="Interface audit à implémenter avec vos entités AuditTrail"/>
+        </vlayout>
+    </vlayout>
+</zk>

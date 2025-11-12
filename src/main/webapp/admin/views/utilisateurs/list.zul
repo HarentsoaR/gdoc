@@ -1,0 +1,89 @@
+<?page title="Gestion des Utilisateurs" contentType="text/html;charset=UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <div hflex="1" vflex="1" sclass="page-container"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.UserListViewModel')">
+        
+        <vlayout hflex="1" vflex="1" sclass="z-flex z-flex-col" style="gap: 16px;">
+
+            <div sclass="page-header">
+                <div>
+                    <label value="Gestion des Utilisateurs" sclass="page-title"/>
+                    <label value="Administrez les comptes, rôles et permissions d'accès" sclass="page-subtitle"/>
+                </div>
+            </div>
+
+            <div sclass="stats-grid">
+                <div sclass="stat-card">
+                    <label sclass="stat-card-number" value="@load(vm.usersCount)"/>
+                    <label sclass="stat-card-label" value="Utilisateurs totaux"/>
+                </div>
+                <div sclass="stat-card">
+                    <label sclass="stat-card-number" value="@load(vm.activeUsersCount)"/>
+                    <label sclass="stat-card-label" value="Utilisateurs actifs"/>
+                </div>
+                <div class="stat-card">
+                    <label class="stat-card-number" value="3"/>
+                    <label class="stat-card-label" value="Rôles disponibles"/>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <div class="search-box" hflex="1">
+                    <n:i class="z-icon-search search-icon" />
+                    <textbox value="@bind(vm.searchQuery)" placeholder="Rechercher par nom, prénom ou email..."
+                             hflex="1" onOK="@command('searchUsers')" instant="true"/>
+                </div>
+                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" onClick="@command('loadUsers')"/>
+                <button label="Nouvel utilisateur" sclass="btn-primary" iconSclass="z-icon-plus"
+                        onClick="@global-command('navigateToAdmin', view='/admin/views/utilisateurs/new.zul', section='Utilisateurs', page='Nouveau')"/>
+            </div>
+
+            <div class="panel" vflex="1">
+                <listbox model="@load(vm.users)" emptyMessage="Aucun utilisateur trouvé."
+                         vflex="1" mold="paging" pageSize="10">
+                    <listhead sizable="true">
+                        <listheader label="Utilisateur" sort="auto(nom)"/>
+                        <listheader label="Email" sort="auto(mail)"/>
+                        <listheader label="Rôle" width="15%" sort="auto(profilId)"/>
+                        <listheader label="Statut" width="15%" align="center" sort="auto(actif)"/>
+                        <listheader label="Actions" width="10%" align="center"/>
+                    </listhead>
+                    <template name="model" var="user">
+                        <listitem>
+                            <listcell>
+                                <hlayout spacing="12px" valign="center">
+                                    <div sclass="user-avatar">
+                                        <label value="@load(vm.getInitials(user))"/>
+                                    </div>
+                                    <vlayout>
+                                        <label value="@load(vm.getNomComplet(user))" sclass="user-name"/>
+                                        <label value="@load(user.service)" sclass="user-details"/>
+                                    </vlayout>
+                                </hlayout>
+                            </listcell>
+                            <listcell label="@load(user.mail)"/>
+                            <listcell>
+                                <div sclass="badge @load(vm.getRoleClass(user.profilId))">
+                                    <label value="@load(vm.getRoleLabel(user.profilId))"/>
+                                </div>
+                            </listcell>
+                            <listcell>
+                                <div sclass="badge @load(vm.isActif(user) ? 'badge-active' : 'badge-inactive')" style="margin: auto;">
+                                    <label value="@load(vm.isActif(user) ? 'Actif' : 'Inactif')"/>
+                                </div>
+                            </listcell>
+                            <listcell sclass="actions-cell">
+                                <div hflex="1" align="center" style="display: flex; gap: 16px; justify-content: center;">
+                                    <a iconSclass="z-icon-pencil" tooltiptext="Modifier"
+                                       onClick="@command('editUser', user=user)"/>
+                                    <a iconSclass="z-icon-trash-o" tooltiptext="Supprimer" sclass="text-danger"
+                                       onClick="@command('deleteUser', userId=user.utilisateurId)"/>
+                                </div>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+        </vlayout>
+    </div>
+</zk>

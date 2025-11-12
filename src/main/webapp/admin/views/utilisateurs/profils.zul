@@ -1,6 +1,6 @@
 <zk xmlns="http://www.zkoss.org/2005/zul"
     xmlns:n="native"
-    viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.ProfilViewModel')">
+    viewModel="@id('profilVm') @init('mg.md2i.gedi.control.viewmodel.ProfilViewModel')">
     
     <style>
         .page-container {
@@ -18,7 +18,7 @@
             <button label="➕ Nouveau Profil" onClick="@command('newProfil')"/>
         </div>
 
-        <listbox model="@load(vm.profils)" selectedItem="@bind(vm.selectedProfil)"
+        <listbox model="@load(profilVm.profils)" selectedItem="@bind(profilVm.selectedProfil)"
                  mold="paging" pageSize="10" width="100%">
             <listhead>
                 <listheader label="ID" width="80px"/>
