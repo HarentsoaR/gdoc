@@ -11,10 +11,7 @@
         <div sclass="topbar-right">
             <textbox placeholder="Rechercher..."
                      sclass="topbar-search" />
-            <button label="Nouvel utilisateur"
-                    sclass="btn-primary"
-                    iconSclass="z-icon-user-plus"
-                    onClick="@command('navigateTo', view='/admin/views/utilisateurs/new.zul', section='Utilisateurs', page='Nouveau')" />
+            
             <div class="user-chip">
                 <div class="user-chip-avatar">A</div>
                 <vlayout>

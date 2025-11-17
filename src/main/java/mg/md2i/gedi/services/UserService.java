@@ -11,4 +11,5 @@ public interface UserService {
     Utilisateur toggleUserStatus(Integer userId);
     List<Utilisateur> searchUsers(String query);
     Utilisateur updateUserRole(Integer userId, Integer profilId);
+    List<String> findDistinctServices();
 }

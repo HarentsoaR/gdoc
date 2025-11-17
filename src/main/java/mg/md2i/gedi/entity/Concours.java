@@ -15,12 +15,6 @@ import javax.persistence.Table;
 
 import org.zkoss.bind.annotation.Transient;
 
-/**
- * Entite(concours) avec mapping pour les tables de la BDD pour l'ENMG
- * http://www.md2i.eu en collaboration avec ENMG
- * 
- * @author toky@md2i.eu ou t.rakotonirina@gmail.com
- */
 
 @Entity
 //@Audited

@@ -1,0 +1,120 @@
+<?page title="Validation des dossiers" contentType="text/html;charset=UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <div hflex="1" vflex="1" sclass="page-container"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.DocumentValidationViewModel')">
+
+        <vlayout hflex="1" vflex="1" style="gap:16px;">
+            <div sclass="page-header">
+                <div>
+                    <label value="Validation des dossiers" sclass="page-title"/>
+                    <label value="Contrôler et valider les documents de concours" sclass="page-subtitle"/>
+                </div>
+                <hlayout spacing="8px">
+                    <button label="Effacer" sclass="btn" iconSclass="z-icon-eraser"
+                            onClick="@command('clearFilters')"/>
+                    <button label="Rafraîchir" sclass="btn-primary" iconSclass="z-icon-refresh"
+                            onClick="@command('applyFilters')"/>
+                </hlayout>
+            </div>
+
+            <div class="panel panel-filters">
+                <vlayout hflex="1" spacing="8px">
+                    <hlayout spacing="16px">
+                        <vlayout hflex="1">
+                            <label value="Concours"/>
+                            <combobox model="@load(vm.concoursList)" selectedItem="@bind(vm.selectedConcours)"
+                                      hflex="1" autodrop="true" readonly="true"
+                                      placeholder="Tous les concours"/>
+                        </vlayout>
+                        <vlayout hflex="1">
+                            <label value="Centre d'examen"/>
+                            <combobox model="@load(vm.centreList)" selectedItem="@bind(vm.selectedCentre)"
+                                      hflex="1" autodrop="true" readonly="true"
+                                      placeholder="Tous les centres"/>
+                        </vlayout>
+                        <vlayout hflex="1">
+                            <label value="Type de document"/>
+                            <combobox model="@load(vm.documentTypes)" selectedItem="@bind(vm.selectedDocumentType)"
+                                      hflex="1" autodrop="true" readonly="true"
+                                      placeholder="Tous les documents"/>
+                        </vlayout>
+                    </hlayout>
+                    <hlayout spacing="16px">
+                        <vlayout hflex="1">
+                            <label value="État"/>
+                            <combobox model="@load(vm.etatFilterOptions)" selectedItem="@bind(vm.selectedEtatFilter)"
+                                      hflex="1" autodrop="true" readonly="true"/>
+                        </vlayout>
+                        <vlayout hflex="2">
+                            <label value="Nom du candidat"/>
+                            <textbox value="@bind(vm.searchNomCandidat)" hflex="1"
+                                     placeholder="Rechercher un candidat" onOK="@command('applyFilters')"/>
+                        </vlayout>
+                        <hlayout valign="end" spacing="8px">
+                            <button label="Appliquer" sclass="btn-primary" iconSclass="z-icon-search"
+                                    onClick="@command('applyFilters')"/>
+                            <button label="Réinitialiser" sclass="btn" iconSclass="z-icon-undo"
+                                    onClick="@command('clearFilters')"/>
+                        </hlayout>
+                    </hlayout>
+                </vlayout>
+            </div>
+
+            <div class="panel" vflex="1">
+                <listbox model="@load(vm.dossiers)" vflex="1" hflex="1" mold="paging" pageSize="12"
+                         emptyMessage="Aucun dossier à valider avec ces filtres.">
+                    <listhead>
+                        <listheader label="Candidat" width="180px"/>
+                        <listheader label="Document" hflex="2"/>
+                        <listheader label="Centre" width="200px"/>
+                        <listheader label="Statut" width="140px"/>
+                        <listheader label="Remarque" hflex="2"/>
+                        <listheader label="Actions" width="230px" align="center"/>
+                    </listhead>
+                    <template name="model" var="item">
+                        <listitem>
+                            <listcell>
+                                <vlayout>
+                                    <label value="@load(item.candidatLabel)" sclass="explorer-item-title"/>
+                                    <label value="@load(item.concoursLabel)" sclass="explorer-item-subtitle"/>
+                                </vlayout>
+                            </listcell>
+                            <listcell>
+                                <vlayout>
+                                    <label value="@load(item.documentLabel)"/>
+                                    <label value="@load(item.fileName)" sclass="explorer-item-subtitle"/>
+                                </vlayout>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(item.centreLabel)"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(item.etatLabel)" sclass="@load('status-label ' + item.etatSclass)"/>
+                            </listcell>
+                            <listcell>
+                                <textbox value="@bind(item.commentaire)" hflex="1" rows="1"
+                                         maxlength="255" sclass="validation-remark"
+                                         placeholder="Saisir une remarque" />
+                            </listcell>
+                            <listcell>
+                <div sclass="validation-actions">
+                    <button iconSclass="z-icon-download" sclass="btn"
+                            tooltiptext="Télécharger" onClick="@command('download', item=item)"/>
+                    <button label="Valider" sclass="btn-primary"
+                            disabled="@load(item.valide)"
+                            onClick="@command('changeEtat', item=item, etat=1)"/>
+                    <button label="Rejeter" sclass="btn"
+                            disabled="@load(item.rejete)"
+                            onClick="@command('changeEtat', item=item, etat=0)"/>
+                    <button label="Revoir" sclass="btn"
+                            disabled="@load(item.enCours)"
+                            onClick="@command('changeEtat', item=item, etat=2)"/>
+                </div>
+            </listcell>
+        </listitem>
+                    </template>
+                </listbox>
+            </div>
+        </vlayout>
+    </div>
+</zk>

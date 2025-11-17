@@ -1,0 +1,65 @@
+<?page title="Gestion des Fonctionnalités" contentType="text/html;charset=UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <div hflex="1" vflex="1" sclass="page-container"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.FonctionnaliteListViewModel')">
+        
+        <vlayout hflex="1" vflex="1" sclass="z-flex z-flex-col" style="gap: 16px;">
+            <div sclass="page-header">
+                <div>
+                    <label value="Gestion des Fonctionnalités" sclass="page-title"/>
+                    <label value="Administrez les fonctionnalités de l'application" sclass="page-subtitle"/>
+                </div>
+                <div sclass="header-actions">
+                    <button label="Nouvelle Fonctionnalité" sclass="btn-primary" iconSclass="z-icon-plus"
+                            onClick="@command('openNewFonctionnaliteModal')"/>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <div class="search-box" hflex="1">
+                    <n:i class="z-icon-search search-icon" />
+                    <textbox value="@bind(vm.searchQuery)" placeholder="Rechercher par libellé..."
+                             hflex="1" onOK="@command('searchFonctionnalites')" instant="true"/>
+                </div>
+                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" onClick="@command('loadFonctionnalites')"/>
+            </div>
+
+            <div class="panel" vflex="1">
+                <listbox model="@load(vm.fonctionnalites)" emptyMessage="Aucune fonctionnalité trouvée."
+                         vflex="1" mold="paging" pageSize="10">
+                    <listhead sizable="true">
+                        <listheader label="ID" width="60px" sort="auto(fonctionnaliteId)"/>
+                        <listheader label="Libellé" sort="auto(libelle)"/>
+                        <listheader label="Nom Table" sort="auto(nomTable)"/>
+                        <listheader label="Niveau" width="80px" align="center" sort="auto(niveau)"/>
+                        <listheader label="Statut" width="100px" align="center" sort="auto(actif)"/>
+                        <listheader label="Actions" width="100px" align="center"/>
+                    </listhead>
+                    <template name="model" var="func">
+                        <listitem>
+                            <listcell label="@load(func.fonctionnaliteId)"/>
+                            <listcell>
+                                <label value="@load(func.libelle)" sclass="user-name" />
+                            </listcell>
+                            <listcell label="@load(func.nomTable)"/>
+                            <listcell label="@load(func.niveau)"/>
+                            <listcell>
+                                <div sclass="badge @load(func.actif eq 1 ? 'badge-active' : 'badge-inactive')" style="margin: auto;">
+                                    <label value="@load(func.actif eq 1 ? 'Actif' : 'Inactif')"/>
+                                </div>
+                            </listcell>
+                            <listcell sclass="actions-cell">
+                                <div hflex="1" align="center" style="display: flex; gap: 16px; justify-content: center;">
+                                    <a iconSclass="z-icon-pencil" tooltiptext="Modifier"
+                                       onClick="@command('openEditFonctionnaliteModal', fonctionnalite=func)"/>
+                                    <a iconSclass="z-icon-trash-o" tooltiptext="Supprimer" sclass="text-danger"
+                                       onClick="@command('deleteFonctionnalite', fonctionnaliteId=func.fonctionnaliteId)"/>
+                                </div>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+        </vlayout>
+    </div>
+</zk>

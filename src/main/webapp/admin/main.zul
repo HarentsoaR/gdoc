@@ -14,7 +14,9 @@
                 <include src="/admin/components/topbar.zul"/>
 
                 <div sclass="content-area admin-content-area">
-                    <include src="@load(vm.currentView)" mode="defer" />
+                    <include src="@load(vm.currentView)"
+                             userToEdit="@load(vm.navigationArgs.userToEdit)"
+                             mode="defer" />
                 </div>
             </div>
         </div>

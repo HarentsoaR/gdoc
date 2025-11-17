@@ -4,6 +4,7 @@ package mg.md2i.gedi.control.viewmodel;
 import mg.md2i.enmg.utils.Breadcrumb;
 import mg.md2i.enmg.utils.DisplayItem;
 import mg.md2i.gedi.entity.*;
+import mg.md2i.gedi.enums.DocumentValidationEtat;
 import mg.md2i.gedi.gestionmetier.*;
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zul.Filedownload;
@@ -81,13 +82,8 @@ public class ListeDossierConcoursCandidatViewModel {
                 for (ListeDossierConcoursCandidat file : files) {
                     // Logique pour obtenir le libellé de l'état si 'etatDoc' n'est pas déjà rempli
                     if (file.getEtatDoc() == null || file.getEtatDoc().isEmpty()) {
-                        // Adaptez cette logique à votre application (ex: 1=Validé, 2=En attente)
-                        switch(file.getEtatDocument()) {
-                            case 1: file.setEtatDoc("Validé"); break;
-                            case 2: file.setEtatDoc("En attente"); break;
-                            case 0: file.setEtatDoc("Rejeté"); break;
-                            default: file.setEtatDoc("Inconnu");
-                        }
+                        DocumentValidationEtat etat = DocumentValidationEtat.fromCode(file.getEtatDocument());
+                        file.setEtatDoc(etat.getLabel());
                     }
                     String fileName = getFileName(file);
                     String subtitle = "Candidat: " + getCandidatFullName(file.getCandidat());

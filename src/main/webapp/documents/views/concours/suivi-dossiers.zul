@@ -1,0 +1,131 @@
+<?page title="Suivi des dossiers" contentType="text/html;charset=UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <div hflex="1" vflex="1" sclass="page-container"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.DocumentSuiviViewModel')">
+
+        <vlayout hflex="1" vflex="1" style="gap:16px;">
+            <div sclass="page-header">
+                <div>
+                    <label value="Suivi des dossiers" sclass="page-title"/>
+                    <label value="Visualiser l'état d'avancement des documents" sclass="page-subtitle"/>
+                </div>
+                <hlayout spacing="8px">
+                    <button label="Effacer" sclass="btn" iconSclass="z-icon-eraser"
+                            onClick="@command('clearFilters')"/>
+                    <button label="Rafraîchir" sclass="btn-primary" iconSclass="z-icon-refresh"
+                            onClick="@command('applyFilters')"/>
+                </hlayout>
+            </div>
+
+            <div class="panel panel-filters">
+                <vlayout hflex="1" spacing="8px">
+                    <hlayout spacing="16px">
+                        <vlayout hflex="1">
+                            <label value="Concours"/>
+                            <combobox model="@load(vm.concoursList)" selectedItem="@bind(vm.selectedConcours)"
+                                      hflex="1" autodrop="true" readonly="true"
+                                      placeholder="Tous les concours"/>
+                        </vlayout>
+                        <vlayout hflex="1">
+                            <label value="Centre d'examen"/>
+                            <combobox model="@load(vm.centreList)" selectedItem="@bind(vm.selectedCentre)"
+                                      hflex="1" autodrop="true" readonly="true"
+                                      placeholder="Tous les centres"/>
+                        </vlayout>
+                        <vlayout hflex="1">
+                            <label value="Type de document"/>
+                            <combobox model="@load(vm.documentTypes)" selectedItem="@bind(vm.selectedDocumentType)"
+                                      hflex="1" autodrop="true" readonly="true"
+                                      placeholder="Tous les documents"/>
+                        </vlayout>
+                    </hlayout>
+                    <hlayout spacing="16px">
+                        <vlayout hflex="1">
+                            <label value="État"/>
+                            <combobox model="@load(vm.etatFilterOptions)" selectedItem="@bind(vm.selectedEtatFilter)"
+                                      hflex="1" autodrop="true" readonly="true"/>
+                        </vlayout>
+                        <vlayout hflex="2">
+                            <label value="Nom du candidat"/>
+                            <textbox value="@bind(vm.searchNomCandidat)" hflex="1"
+                                     placeholder="Rechercher un candidat" onOK="@command('applyFilters')"/>
+                        </vlayout>
+                        <hlayout valign="end" spacing="8px">
+                            <button label="Appliquer" sclass="btn-primary" iconSclass="z-icon-search"
+                                    onClick="@command('applyFilters')"/>
+                            <button label="Réinitialiser" sclass="btn" iconSclass="z-icon-undo"
+                                    onClick="@command('clearFilters')"/>
+                        </hlayout>
+                    </hlayout>
+                </vlayout>
+            </div>
+
+            <hlayout spacing="16px">
+                <div class="panel" hflex="1">
+                    <label value="Total" sclass="dashboard-card-title"/>
+                    <label value="@load(vm.summaryStats.total)" sclass="dashboard-card-value"/>
+                </div>
+                <div class="panel" hflex="1">
+                    <label value="Validés" sclass="dashboard-card-title"/>
+                    <label value="@load(vm.summaryStats.valides)" sclass="status-label status-success"/>
+                </div>
+                <div class="panel" hflex="1">
+                    <label value="En cours" sclass="dashboard-card-title"/>
+                    <label value="@load(vm.summaryStats.enCours)" sclass="status-label status-warning"/>
+                </div>
+                <div class="panel" hflex="1">
+                    <label value="Rejetés" sclass="dashboard-card-title"/>
+                    <label value="@load(vm.summaryStats.rejetes)" sclass="status-label status-danger"/>
+                </div>
+            </hlayout>
+
+            <div class="panel" vflex="1">
+                <listbox model="@load(vm.dossiers)" vflex="1" hflex="1" mold="paging" pageSize="15"
+                         emptyMessage="Aucun dossier trouvé pour ce suivi.">
+                    <listhead>
+                        <listheader label="Candidat" width="180px"/>
+                        <listheader label="Document" hflex="2"/>
+                        <listheader label="Concours" width="200px"/>
+                        <listheader label="Centre" width="200px"/>
+                        <listheader label="Statut" width="140px"/>
+                        <listheader label="Remarque" hflex="2"/>
+                        <listheader label="Version" width="90px"/>
+                        <listheader label="Actions" width="100px"/>
+                    </listhead>
+                    <template name="model" var="row">
+                        <listitem>
+                            <listcell>
+                                <label value="@load(row.candidatLabel)" sclass="explorer-item-title"/>
+                            </listcell>
+                            <listcell>
+                                <vlayout>
+                                    <label value="@load(row.documentLabel)"/>
+                                    <label value="@load(row.fileName)" sclass="explorer-item-subtitle"/>
+                                </vlayout>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(row.concoursLabel)"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(row.centreLabel)"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(row.etatLabel)" sclass="@load('status-label ' + row.etatSclass)"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(row.remarque)"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(row.version)"/>
+                            </listcell>
+                            <listcell>
+                                <button iconSclass="z-icon-download" sclass="btn"
+                                        tooltiptext="Télécharger" onClick="@command('download', item=row)"/>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+        </vlayout>
+    </div>
+</zk>

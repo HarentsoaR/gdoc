@@ -1,0 +1,107 @@
+<?page title="Modifier Utilisateur" contentType="text/html;charset=UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+
+    <div hflex="1" vflex="1" class="page-container"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.UserViewModel')">
+
+        <vlayout hflex="1" vflex="1" style="gap:16px;">
+
+            <div class="page-header">
+                <div>
+                    <label class="page-title" value="Modifier l'utilisateur"/>
+                    <label class="page-subtitle" value="Mettre à jour les informations du compte"/>
+                </div>
+
+                <hlayout spacing="10px">
+                    <button label="Annuler"
+                            sclass="btn"
+                            onClick='@global-command("navigateToAdmin", view="/admin/views/utilisateurs/list.zul", section="Utilisateurs", page="Liste")'/>
+
+                    <button label="Enregistrer"
+                            sclass="btn-primary"
+                            onClick="@command('saveUser')"/>
+                </hlayout>
+            </div>
+
+            <div class="form-panel">
+
+                <label class="form-section-title">Informations personnelles</label>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Nom *</label>
+                        <textbox value="@bind(vm.currentUtilisateur.nom)" hflex="1"/>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Prénom *</label>
+                        <textbox value="@bind(vm.currentUtilisateur.prenom)" hflex="1"/>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Email *</label>
+                        <textbox value="@bind(vm.currentUtilisateur.mail)" hflex="1"/>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Service *</label>
+                        <combobox model="@load(vm.availableServices)"
+                                  selectedItem="@bind(vm.selectedService)"
+                                  onSelect="@command('onServiceChange')" hflex="1">
+                            <template name="model" var="s">
+                                <comboitem label="@load(s.libelle)" value="@load(s)"/>
+                            </template>
+                        </combobox>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Profil *</label>
+                        <combobox model="@load(vm.availableProfils)"
+                                  selectedItem="@bind(vm.selectedProfil)" hflex="1">
+                            <template name="model" var="p">
+                                <comboitem label="@load(p.libelle)" value="@load(p)"/>
+                            </template>
+                        </combobox>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Adresse</label>
+                        <textbox value="@bind(vm.currentUtilisateur.adresse)" hflex="1"/>
+                    </div>
+                </div>
+
+                <label class="form-section-title">Compte et Accès</label>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Identifiant *</label>
+                        <textbox value="@bind(vm.currentUtilisateur.login)" hflex="1"/>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Mot de passe (laisser vide pour ne pas modifier)</label>
+                        <textbox type="password" value="@bind(vm.passwordInput)" hflex="1"/>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Statut</label>
+                        <radiogroup selectedItem="@bind(vm.currentUtilisateur.actif)">
+                            <hlayout spacing="12px">
+                                <radio label="Actif" value="1"/>
+                                <radio label="Inactif" value="0"/>
+                            </hlayout>
+                        </radiogroup>
+                    </div>
+                </div>
+
+            </div>
+
+        </vlayout>
+    </div>
+</zk>

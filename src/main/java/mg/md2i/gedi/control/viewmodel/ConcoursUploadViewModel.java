@@ -4,6 +4,7 @@ import mg.md2i.gedi.entity.ListeDossierConcoursCandidat;
 import mg.md2i.gedi.entity.ListeDossierConcours;
 import mg.md2i.gedi.entity.DocumentConcours;
 import mg.md2i.gedi.entity.Candidat;
+import mg.md2i.gedi.enums.DocumentValidationEtat;
 import mg.md2i.gedi.gestionmetier.ListeDossierConcoursCandidatGestion;
 import mg.md2i.gedi.gestionmetier.ListeDossierConcoursGestion;
 import mg.md2i.gedi.gestionmetier.DocumentConcoursGestion;
@@ -121,8 +122,8 @@ public class ConcoursUploadViewModel {
             ListeDossierConcoursCandidat entity = new ListeDossierConcoursCandidat();
             entity.setCandidatId(selectedCandidat.getCandidatId());
             entity.setDocumentConcoursId(selectedDocumentConcours.getDocumentConcoursId());
-            entity.setEtatDocument(1);
-            entity.setRemarque("");
+            entity.setEtatDocument(DocumentValidationEtat.EN_COURS.getCode());
+            entity.setRemarque("En attente de validation");
             entity.setRemarqueFacultatif(targetPath.toString());
             entity.setActif(1);
             entity.setVersion(1);
@@ -152,5 +153,3 @@ public class ConcoursUploadViewModel {
         return t;
     }
 }
-
-

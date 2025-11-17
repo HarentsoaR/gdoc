@@ -1,184 +1,110 @@
 <?page title="Nouvel Utilisateur" contentType="text/html;charset=UTF-8"?>
-<zk xmlns="http://www.zkoss.org/2005/zul">
-    <style>
-        .user-form-wrapper {
-            border: none;
-            background: transparent;
-        }
-        .user-form-wrapper > .z-groupbox-header {
-            display: none;
-        }
-        .user-form-wrapper > .z-groupbox-content {
-            padding: 0;
-            background: transparent;
-        }
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
 
-        .user-form-page {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            height: 100%;
-            padding: 24px 32px;
-            background: var(--bg);
-        }
+    <div hflex="1" vflex="1" class="page-container"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.UserViewModel')">
 
-        .user-form-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
-            padding: 8px 24px 32px;
-        }
+        <vlayout hflex="1" vflex="1" style="gap:16px;">
 
-        .user-form-grid {
-            width: 100%;
-        }
+            <div class="page-header">
+                <div>
+                    <label class="page-title" value="Nouvel utilisateur"/>
+                    <label class="page-subtitle" value="Créer un nouveau compte utilisateur"/>
+                </div>
 
-        .form-section-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 24px 0 8px 0;
-        }
+                <hlayout spacing="10px">
+                    <button label="Annuler"
+                            sclass="btn"
+                            onClick='@global-command("navigateToAdmin", view="/admin/views/utilisateurs/list.zul", section="Utilisateurs", page="Liste")'/>
 
-        .user-form-grid .z-row .z-cell {
-            padding: 12px 8px;
-        }
-
-        .field-label {
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .validation-message {
-            color: #ef4444;
-            font-size: 12px;
-            margin-top: 4px;
-            display: block;
-        }
-
-        @media (max-width: 960px) {
-            .user-form-page {
-                padding: 16px;
-            }
-            .user-form-grid .z-row .z-cell {
-                display: block !important;
-                width: 100% !important;
-            }
-        }
-    </style>
-
-    <window border="none" width="100%" height="100%" sclass="user-form-wrapper">
-        <div sclass="content-area admin-content-area user-form-page">
-
-        <div sclass="page-header">
-            <div>
-                <label value="@load(vm.userFormTitle)" sclass="page-title"/>
-                <label value="@load(vm.userFormSubtitle)" sclass="page-subtitle"/>
+                    <button label="Créer"
+                            sclass="btn-primary"
+                            onClick="@command('saveUser')"/>
+                </hlayout>
             </div>
-            <div sclass="header-actions">
-                <button label="Annuler" sclass="btn-secondary" iconSclass="z-icon-times"
-                        onClick="@command('cancelUserForm')"/>
-                <button label="@load(vm.userFormEditing ? 'Mettre à jour' : 'Créer l''utilisateur')"
-                        sclass="btn-primary" iconSclass="z-icon-save"
-                        onClick="@command('saveUserForm')"/>
-            </div>
-        </div>
 
-        <div class="user-form-card">
-            <grid sclass="user-form-grid">
-                <columns>
-                    <column width="200px"/>
-                    <column/>
-                    <column width="200px"/>
-                    <column/>
-                </columns>
-                <rows>
-                    <row>
-                        <cell colspan="4" sclass="form-section-title">
-                            <label value="Informations personnelles"/>
-                        </cell>
-                    </row>
+            <div class="form-panel" vflex="1">
 
-                    <row>
-                        <cell><label value="Nom *" sclass="field-label"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.userForm.nom) @validator(vm.userFormValidator, field='nom')"
-                                     placeholder="Nom de famille" width="100%"/>
-                        </cell>
-                        <cell><label value="Prénom *" sclass="field-label"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.userForm.prenom) @validator(vm.userFormValidator, field='prenom')"
-                                     placeholder="Prénom" width="100%"/>
-                        </cell>
-                    </row>
+                <label class="form-section-title">Informations personnelles</label>
 
-                    <row>
-                        <cell><label value="Email *" sclass="field-label"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.userForm.mail) @validator(vm.userFormValidator, field='mail')"
-                                     placeholder="exemple@gedi.com" width="100%"/>
-                        </cell>
-                        <cell><label value="Service" sclass="field-label"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.userForm.service)" placeholder="Service de rattachement" width="100%"/>
-                        </cell>
-                    </row>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Nom *</label>
+                        <textbox value="@bind(vm.currentUtilisateur.nom)" constraint="no empty" hflex="1"/>
+                    </div>
 
-                    <row>
-                        <cell><label value="Fonction" sclass="field-label"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.userForm.fonction)" placeholder="Fonction ou rôle" width="100%"/>
-                        </cell>
-                        <cell><label value="Adresse" sclass="field-label"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.userForm.adresse)" placeholder="Adresse professionnelle" width="100%"/>
-                        </cell>
-                    </row>
+                    <div class="form-field">
+                        <label class="form-label">Prénom *</label>
+                        <textbox value="@bind(vm.currentUtilisateur.prenom)" constraint="no empty" hflex="1"/>
+                    </div>
+                </div>
 
-                    <row>
-                        <cell colspan="4" sclass="form-section-title">
-                            <label value="Compte &amp; accès"/>
-                        </cell>
-                    </row>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Email *</label>
+                        <textbox value="@bind(vm.currentUtilisateur.mail)"
+                                 constraint="/.+@.+\\..+/" hflex="1"/>
+                    </div>
 
-                    <row>
-                        <cell><label value="Identifiant *" sclass="field-label"/></cell>
-                        <cell>
-                            <textbox value="@bind(vm.userForm.login) @validator(vm.userFormValidator, field='login')"
-                                     placeholder="Identifiant de connexion" width="100%"/>
-                        </cell>
-                        <cell><label value="@load(vm.userFormEditing ? 'Mot de passe' : 'Mot de passe *')" sclass="field-label"/></cell>
-                        <cell>
-                            <textbox type="password"
-                                     value="@bind(vm.userFormPassword) @validator(vm.userFormValidator, field='password')"
-                                     placeholder="@load(vm.userFormPasswordPlaceholder)" width="100%"/>
-                        </cell>
-                    </row>
+                    <div class="form-field">
+                        <label class="form-label">Service</label>
+                        <combobox model="@load(vm.availableServices)"
+                                  selectedItem="@bind(vm.selectedService)"
+                                  onSelect="@command('onServiceChange')" hflex="1">
+                            <template name="model" var="s">
+                                <comboitem label="@load(s.libelle)" value="@load(s)"/>
+                            </template>
+                        </combobox>
+                    </div>
+                </div>
 
-                    <row>
-                        <cell><label value="Rôle" sclass="field-label"/></cell>
-                        <cell>
-                            <radiogroup selectedValue="@bind(vm.userFormRoleId)">
-                                <hlayout spacing="12px">
-                                    <radio forEach="@load(vm.roleOptions.entrySet())"
-                                           label="@load(each.value)" value="@load(each.key)"/>
-                                </hlayout>
-                            </radiogroup>
-                        </cell>
-                        <cell><label value="Statut" sclass="field-label"/></cell>
-                        <cell>
-                            <radiogroup selectedValue="@bind(vm.userForm.actif)">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Profil *</label>
+                        <combobox model="@load(vm.availableProfils)"
+                                  selectedItem="@bind(vm.selectedProfil)" hflex="1">
+                            <template name="model" var="p">
+                                <comboitem label="@load(p.libelle)" value="@load(p)"/>
+                            </template>
+                        </combobox>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Adresse</label>
+                        <textbox value="@bind(vm.currentUtilisateur.adresse)" hflex="1"/>
+                    </div>
+                </div>
+
+                <label class="form-section-title">Compte et Accès</label>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Identifiant *</label>
+                        <textbox value="@bind(vm.currentUtilisateur.login)" constraint="no empty" hflex="1"/>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Mot de passe *</label>
+                        <textbox type="password"
+                                 value="@bind(vm.passwordInput)"
+                                 constraint="no empty" hflex="1"/>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Statut</label>
+                        <radiogroup selectedItem="@bind(vm.currentUtilisateur.actif)">
+                            <hlayout spacing="12px">
                                 <radio label="Actif" value="1"/>
                                 <radio label="Inactif" value="0"/>
-                            </radiogroup>
-                        </cell>
-                    </row>
-                </rows>
-            </grid>
-        </div>
-        </div>
-    </window>
+                            </hlayout>
+                        </radiogroup>
+                    </div>
+                </div>
+
+            </div>
+
+        </vlayout>
+    </div>
 </zk>

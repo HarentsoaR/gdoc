@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@Service("profilServiceImpl")
 public class ProfilServiceImpl implements ProfilService {
 
     private static final Logger log = LoggerFactory.getLogger(ProfilServiceImpl.class);
@@ -46,5 +46,11 @@ public class ProfilServiceImpl implements ProfilService {
     public List<Profil> searchProfils(String query) {
         log.info("🔎 Recherche des profils contenant '{}'", query);
         return profilRepository.findByLibelleContainingIgnoreCase(query);
+    }
+
+    @Override
+    public List<Profil> findProfilsByServiceId(Integer serviceId) {
+        log.info("🔎 Recherche des profils pour le service ID={}", serviceId);
+        return profilRepository.findByServiceId(serviceId);
     }
 }

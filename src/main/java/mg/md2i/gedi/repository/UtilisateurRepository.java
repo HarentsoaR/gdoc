@@ -19,4 +19,7 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Intege
         List<Utilisateur> findActiveUsers();
         
         List<Utilisateur> findByProfilId(Integer profilId);
+
+        @Query("SELECT DISTINCT u.service FROM Utilisateur u WHERE u.service IS NOT NULL")
+        List<String> findDistinctServices();
 }

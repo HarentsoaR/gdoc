@@ -1,4 +1,4 @@
-<zk xmlns:n="native"> <!-- This is the required fix -->
+<zk xmlns:n="native">
     <div hflex="1" vflex="1" sclass="page-container"
          viewModel="@id('cv') @init('mg.md2i.gedi.control.viewmodel.ConcoursViewModel')">
 

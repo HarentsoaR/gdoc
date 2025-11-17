@@ -791,6 +791,38 @@ html, body {
 .status-label.status-warning, .status-label .z-icon-times-circle {
     color: #f97316; /* Orange */
 }
+.status-label.status-danger {
+    color: #dc2626; /* Rouge */
+}
+
+.dashboard-card-title {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.dashboard-card-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.validation-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.validation-actions .btn {
+    min-width: 80px;
+    padding: 6px 10px !important;
+}
+
+.validation-remark {
+    resize: none !important;
+    height: 36px !important;
+}
 
 /* --- Zone de Glisser-Déposer (Upload) --- */
 .upload-panel {

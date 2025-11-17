@@ -11,5 +11,10 @@
     <listener>
         <listener-class>org.zkoss.zkplus.spring.DelegatingVariableResolver</listener-class>
     </listener>
+    
+    <listener>
+    <listener-class>mg.md2i.gedi.security.PageAccessFilter</listener-class>
+</listener>
+    
 	
 </zk>

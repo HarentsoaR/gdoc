@@ -926,3 +926,124 @@ html, body {
     background-color: #f1f5f9; /* Gris clair */
     color: #475569; /* Gris foncé */
 }
+
+
+/* --- Styles pour les Formulaires --- */
+.form-panel {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 32px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.form-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-bottom: 8px;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+.form-section-title:first-child {
+    margin-top: 0;
+}
+.form-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+}
+.form-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.form-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+.form-label .required-star {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+/* Responsive pour les formulaires */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 0;
+    }
+    .form-field {
+        margin-bottom: 16px; /* Ajoute de l'espace entre les champs empilés */
+    }
+}
+
+/* Custom styles for read-only textboxes */
+.read-only-textbox .z-textbox-input {
+    background-color: #e9ecef !important; /* Light gray background */
+    color: #6c757d !important; /* Muted text color */
+    cursor: not-allowed !important;
+}
+
+/* Style for the form footer actions */
+.form-footer-actions {
+    background-color: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* --- Modal Window Styles --- */
+.form-modal.z-window {
+    border-radius: var(--radius);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.modal-title.z-window-header {
+    background: var(--primary-color);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 20px !important;
+    border-bottom: none;
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
+}
+
+.form-modal .z-window-close {
+    color: white;
+    opacity: 0.7;
+    font-size: 16px;
+    top: 14px;
+    right: 16px;
+}
+.form-modal .z-window-close:hover {
+    opacity: 1;
+}
+
+.modal-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    background-color: var(--bg);
+    border-bottom-left-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+}

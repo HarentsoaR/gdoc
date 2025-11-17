@@ -1,0 +1,50 @@
+<?page title="Formulaire Fonctionnalité" contentType="text/html;charset=UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <window border="normal" closable="true" width="650px" sclass="form-modal"
+            viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.FonctionnaliteFormViewModel', fonctionnaliteToEdit=arg.fonctionnaliteToEdit)">
+
+        <caption label="@load(vm.formTitle)" sclass="modal-title"/>
+        
+        <div sclass="modal-content">
+            <div class="form-row">
+                <div class="form-field">
+                    <hlayout sclass="form-label" valign="middle" spacing="4px">
+                        <label value="Libellé"/>
+                        <n:span class="required-star">*</n:span>
+                    </hlayout>
+                    <textbox value="@bind(vm.currentFonctionnalite.libelle)" hflex="1"
+                             constraint="no empty:Le libellé est requis."/>
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Nom de la table (technique)</label>
+                    <textbox value="@bind(vm.currentFonctionnalite.nomTable)" hflex="1"/>
+                </div>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label">Remarque</label>
+                <textbox value="@bind(vm.currentFonctionnalite.remarque)" hflex="1" multiline="true" rows="2"/>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="form-label">Style CSS (sclass)</label>
+                    <textbox value="@bind(vm.currentFonctionnalite.sclass)" hflex="1"/>
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Statut</label>
+                    <radiogroup selectedItem="@bind(vm.currentFonctionnalite.actif)">
+                        <radio label="Actif" value="@load(1)"/>
+                        <radio label="Inactif" value="@load(0)"/>
+                    </radiogroup>
+                </div>
+            </div>
+        </div>
+
+        <div sclass="form-footer-actions">
+            <button label="Annuler" sclass="btn" onClick="@command('cancelFonctionnaliteForm')"/>
+            <button label="@load(vm.saveActionLabel)" sclass="btn-primary" iconSclass="z-icon-check"
+                    onClick="@command('saveFonctionnalite')"/>
+        </div>
+    </window>
+</zk>

@@ -1,0 +1,47 @@
+<?page title="Modifier Profil" contentType="text/html;charset=UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+
+    <div hflex="1" vflex="1" class="page-container"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.ProfilViewModel')">
+
+        <vlayout hflex="1" vflex="1" style="gap:16px;">
+
+            <!-- HEADER -->
+            <div class="page-header">
+                <div>
+                    <label class="page-title" value="Modifier Profil"/>
+                    <label class="page-subtitle" value="Mettre à jour le rôle utilisateur"/>
+                </div>
+
+                <hlayout spacing="10px">
+                    <button label="Annuler"
+                            sclass="btn"
+                            onClick='@global-command("navigateToAdmin", view="/admin/views/profils/list.zul", section="Profils", page="Liste")'/>
+
+                    <button label="Enregistrer"
+                            sclass="btn-primary"
+                            onClick="@command('saveProfil')"/>
+                </hlayout>
+            </div>
+
+            <!-- FORM PANEL -->
+            <div class="form-panel" vflex="1">
+
+                <label class="form-section-title">Informations du profil</label>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Libellé *</label>
+                        <textbox value="@bind(vm.currentProfil.libelle)"
+                                 constraint="no empty"
+                                 placeholder="Ex : Administrateur, Agent..."
+                                 hflex="1"/>
+                    </div>
+                </div>
+
+            </div>
+
+        </vlayout>
+    </div>
+
+</zk>

@@ -11,4 +11,5 @@ public interface ProfilService {
     void saveProfil(Profil profil);
     void deleteProfil(Integer id);
     List<Profil> searchProfils(String query);
+    List<Profil> findProfilsByServiceId(Integer serviceId);
 }

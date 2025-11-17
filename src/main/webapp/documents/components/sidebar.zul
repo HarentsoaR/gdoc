@@ -36,6 +36,8 @@
                     <button label="Doc. Concours" sclass="sidebar-button" iconSclass="z-icon-file-text" onClick="@command('navigateTo', view='/documents/views/concours/documents-concours/list.zul', section='Concours', page='Documents')" />
                     <button label="Candidats" sclass="sidebar-button" iconSclass="z-icon-user-plus" onClick="@command('navigateTo', view='/documents/views/candidats/list.zul', section='Concours', page='Candidats')" />
                     <button label="Dossiers Candidats" sclass="sidebar-button" iconSclass="z-icon-folder-open" onClick="@command('navigateTo', view='/documents/views/candidats/dossiers.zul', section='Concours', page='Dossiers Candidats')" />
+                    <button label="Validation dossiers" sclass="sidebar-button" iconSclass="z-icon-check-circle" onClick="@command('navigateTo', view='/documents/views/concours/validation-dossiers.zul', section='Concours', page='Validation dossiers')" />
+                    <button label="Suivi dossiers" sclass="sidebar-button" iconSclass="z-icon-line-chart" onClick="@command('navigateTo', view='/documents/views/concours/suivi-dossiers.zul', section='Concours', page='Suivi dossiers')" />
                     <button label="Filières" sclass="sidebar-button" iconSclass="z-icon-sitemap" onClick="@command('navigateTo', view='/documents/views/filiere/list.zul', section='Concours', page='Filières')" />
                     <button label="Promotions" sclass="sidebar-button" iconSclass="z-icon-bookmark" onClick="@command('navigateTo', view='/documents/views/promotion/list.zul', section='Concours', page='Promotions')" />
                 </vlayout>
@@ -59,6 +61,8 @@
         <menuitem label="Doc. Concours" iconSclass="z-icon-file-text" onClick="@command('navigateTo', view='/documents/views/concours/documents-concours/list.zul')" />
         <menuitem label="Candidats" iconSclass="z-icon-user-plus" onClick="@command('navigateTo', view='/documents/views/candidats/list.zul')" />
         <menuitem label="Dossiers Candidats" iconSclass="z-icon-folder-open" onClick="@command('navigateTo', view='/documents/views/candidats/dossiers.zul')" />
+        <menuitem label="Validation dossiers" iconSclass="z-icon-check-circle" onClick="@command('navigateTo', view='/documents/views/concours/validation-dossiers.zul')" />
+        <menuitem label="Suivi dossiers" iconSclass="z-icon-line-chart" onClick="@command('navigateTo', view='/documents/views/concours/suivi-dossiers.zul')" />
         <menuseparator/>
         <menuitem label="Filières" iconSclass="z-icon-sitemap" onClick="@command('navigateTo', view='/documents/views/filiere/list.zul')" />
         <menuitem label="Promotions" iconSclass="z-icon-bookmark" onClick="@command('navigateTo', view='/documents/views/promotion/list.zul')" />

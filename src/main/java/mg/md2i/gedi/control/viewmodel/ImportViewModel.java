@@ -1,6 +1,7 @@
 package mg.md2i.gedi.control.viewmodel;
 
 import mg.md2i.gedi.entity.*;
+import mg.md2i.gedi.enums.DocumentValidationEtat;
 import mg.md2i.gedi.gestionmetier.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,7 +213,8 @@ public class ImportViewModel {
             
             existing.setVersion(newVersion);
             existing.setRemarqueFacultatif(newPath.toString());
-            existing.setRemarque("Mis à jour le " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date()));
+            existing.setEtatDocument(DocumentValidationEtat.EN_COURS.getCode());
+            existing.setRemarque("Mis à jour le " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date()) + " - En attente de validation");
             
             ListeDossierConcoursCandidatGestion.updateAndIndex(existing);
             
@@ -232,8 +234,8 @@ public class ImportViewModel {
             ListeDossierConcoursCandidat entity = new ListeDossierConcoursCandidat();
             entity.setCandidatId(selectedCandidat.getCandidatId());
             entity.setDocumentConcoursId(targetDocumentTypeForUpload.getDocumentConcoursId());
-            entity.setEtatDocument(1);
-            entity.setRemarque("Importé le " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date()));
+            entity.setEtatDocument(DocumentValidationEtat.EN_COURS.getCode());
+            entity.setRemarque("Importé le " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date()) + " - En attente de validation");
             entity.setRemarqueFacultatif(newPath.toString());
             entity.setActif(1);
             entity.setVersion(1);

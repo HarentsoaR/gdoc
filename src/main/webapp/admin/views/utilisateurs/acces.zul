@@ -1,32 +1,103 @@
-<zk>
-    <style src="/css/admin.css"/>
-    
-    <vlayout sclass="section" spacing="16px">
-        <vlayout spacing="4px">
-            <label value="Gestion des Accès" style="font-size:22px;font-weight:700;color:#111827"/>
-            <label value="Configurer les permissions et droits d'accès." sclass="muted"/>
+<?page title="Gestion des Accès" contentType="text/html;charset=UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <div hflex="1" vflex="1" sclass="page-container"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.AccessManagementViewModel')">
+
+        <vlayout hflex="1" vflex="1" style="gap:16px;">
+
+            <!-- HEADER -->
+            <div sclass="page-header">
+                <div>
+                    <label value="Gestion des Accès" sclass="page-title"/>
+                    <label value="Configurer les permissions des profils sur les fonctionnalités"
+                           sclass="page-subtitle"/>
+                </div>
+                <div sclass="header-actions">
+                    <button label="Annuler les changements"
+                            sclass="btn"
+                            iconSclass="z-icon-undo"
+                            onClick="@command('loadPermissionsForProfil', profil=vm.selectedProfil)"
+                            disabled="@load(vm.selectedProfil eq null)"/>
+                    <button label="Sauvegarder"
+                            sclass="btn-primary"
+                            iconSclass="z-icon-save"
+                            onClick="@command('savePermissions')"
+                            disabled="@load(vm.selectedProfil eq null)"/>
+                </div>
+            </div>
+
+            <hlayout hflex="1" vflex="1" style="gap:24px;">
+
+                <!-- COLONNE GAUCHE : PROFILS -->
+                <div width="300px" vflex="1" sclass="panel">
+                    <div class="panel-header">
+                        <label class="panel-title" value="Profils"/>
+                    </div>
+
+                    <listbox model="@load(vm.profils)"
+                             selectedItem="@bind(vm.selectedProfil)"
+                             onSelect="@command('loadPermissionsForProfil', profil=vm.selectedProfil)"
+                             emptyMessage="Aucun profil trouvé."
+                             vflex="1"
+                             sclass="sidebar-listbox">
+                        <template name="model">
+                            <listitem>
+                                <listcell label="@load(each.libelle)"/>
+                            </listitem>
+                        </template>
+                    </listbox>
+                </div>
+
+                <!-- COLONNE DROITE : PERMISSIONS -->
+                <div hflex="1" vflex="1" sclass="panel">
+                    <div class="panel-header">
+                        <label class="panel-title" value="Permissions du profil : "/>
+                        <label class="panel-title-highlight"
+                               value="@load(vm.selectedProfil ne null ? vm.selectedProfil.libelle : '...')"/>
+                    </div>
+
+                    <div vflex="1" style="overflow:auto;">
+
+                        <!-- Message quand aucun profil sélectionné -->
+                        <div if="@load(vm.selectedProfil eq null)" sclass="placeholder-message">
+                            <n:i class="z-icon-hand-o-left placeholder-message-icon"/>
+                            <label sclass="placeholder-message-text"
+                                   value="Veuillez sélectionner un profil pour voir les permissions."/>
+                        </div>
+
+                        <!-- Grille des permissions -->
+                        <grid model="@bind(vm.permissionItems)"
+                              if="@load(vm.selectedProfil ne null)"
+                              vflex="1"
+                              sclass="permission-grid"
+                              emptyMessage="Aucune fonctionnalité à configurer.">
+                            <columns sizable="true">
+                                <column label="Fonctionnalité" hflex="3"/>
+                                <column label="Lire" align="center" width="80px"/>
+                                <column label="Créer" align="center" width="80px"/>
+                                <column label="Modifier" align="center" width="80px"/>
+                                <column label="Supprimer" align="center" width="80px"/>
+                                <column label="Exporter" align="center" width="80px"/>
+                                <column label="Dupliquer" align="center" width="80px"/>
+                            </columns>
+                            <rows>
+                                <template name="model" var="item">
+                                    <row>
+                                        <label value="@load(item.f.libelle)"/>
+                                        <checkbox checked="@bind(item.canRead)"/>
+                                        <checkbox checked="@bind(item.canCreate)"/>
+                                        <checkbox checked="@bind(item.canUpdate)"/>
+                                        <checkbox checked="@bind(item.canDelete)"/>
+                                        <checkbox checked="@bind(item.canExport)"/>
+                                        <checkbox checked="@bind(item.canDuplicate)"/>
+                                    </row>
+                                </template>
+                            </rows>
+                        </grid>
+                    </div>
+                </div>
+
+            </hlayout>
         </vlayout>
-        
-        <vlayout spacing="16px">
-            <label value="Politiques de sécurité" style="font-weight:700; font-size:16px;"/>
-            <div class="divider"/>
-            
-            <vlayout spacing="12px">
-                <hlayout style="justify-content:space-between; align-items:center;">
-                    <label value="Chiffrement de bout en bout"/>
-                    <div sclass="toggle toggle--on"/>
-                </hlayout>
-                
-                <hlayout style="justify-content:space-between; align-items:center;">
-                    <label value="Authentification multifacteur (MFA)"/>
-                    <div sclass="toggle"/>
-                </hlayout>
-                
-                <hlayout style="justify-content:space-between; align-items:center;">
-                    <label value="Expiration des sessions (30 min)"/>
-                    <div sclass="toggle toggle--on"/>
-                </hlayout>
-            </vlayout>
-        </vlayout>
-    </vlayout>
+    </div>
 </zk>

@@ -33,15 +33,18 @@ public class UtilisateurGestion {
         return getService().getUserById(utilisateurId);
     }
 
-    public static void updateUtilisateur(Utilisateur utilisateur) {
-        getService().saveUser(utilisateur);
-    }
-    
-    public static void saveUtilisateur(Utilisateur utilisateur) {
+    public static void save(Utilisateur utilisateur) { // Renamed from updateUtilisateur and saveUtilisateur
         getService().saveUser(utilisateur);
     }
 
     public static List<Utilisateur> searchUsers(String query) {
         return getService().searchUsers(query);
+    }
+
+    public static List<String> findDistinctServices() {
+        log.info("↘️ [Gestion] Appel de la couche Service (UserService.findDistinctServices())...");
+        List<String> services = getService().findDistinctServices();
+        log.info("✅ [Gestion] La couche Service a retourné {} services distincts.", (services != null ? services.size() : "NULL"));
+        return services;
     }
 }

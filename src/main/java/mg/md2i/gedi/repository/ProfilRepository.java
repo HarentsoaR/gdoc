@@ -17,4 +17,6 @@ public interface ProfilRepository extends JpaRepository<Profil, Integer> {
 
     // 🔍 Recherche par actif
     List<Profil> findByActif(Integer actif);
+
+    List<Profil> findByServiceId(Integer serviceId);
 }
