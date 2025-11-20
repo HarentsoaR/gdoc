@@ -1,18 +1,39 @@
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
-    <div viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.ImportViewModel')" hflex="1" vflex="1" sclass="page-container">
-        
-        <vlayout hflex="1" vflex="1" sclass="z-flex z-flex-col" style="gap: 16px;">
+    <style>
+        .import-wizard {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .step-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .step-actions .left {
+            margin-right: auto;
+        }
+        .import-placeholder {
+            text-align: center;
+            padding: 32px;
+        }
+    </style>
 
-            <div sclass="page-header">
+    <div viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.ImportViewModel')" hflex="1" vflex="1" sclass="page-container">
+        <div class="import-wizard">
+            <div class="page-header">
                 <div>
                     <label value="Centre d'Importation" sclass="page-title"/>
                     <label value="@load(vm.candidatDossierTitle)" sclass="page-subtitle"/>
                 </div>
             </div>
 
-            <groupbox mold="3d" open="true">
-                <caption label="1. Sélection du Contexte" />
-                <div sclass="panel-filters">
+            <groupbox mold="3d" open="@load(vm.importStep eq 1)">
+                <caption label="1. Sélection du contexte"/>
+                <div class="panel-filters">
                     <hlayout hflex="1" spacing="16px">
                         <vlayout hflex="1">
                             <label value="Concours"/>
@@ -20,8 +41,8 @@
                                       placeholder="Rechercher un concours..." hflex="1" autodrop="true"
                                       onChanging="@command('filterConcours', text=event.value)"
                                       onSelect="@command('onSelectConcours')">
-                                <template name="model" var="c">
-                                    <comboitem label="@load(c.displayInfo)" />
+                                <template name="model" var="concours">
+                                    <comboitem label="@load(concours.displayInfo)" value="@load(concours)"/>
                                 </template>
                             </combobox>
                         </vlayout>
@@ -32,8 +53,8 @@
                                       onChanging="@command('filterCandidats', text=event.value)"
                                       onSelect="@command('onSelectCandidat')"
                                       disabled="@load(empty vm.selectedConcours)">
-                                <template name="model" var="c">
-                                    <comboitem label="@load(c.nom.concat(' ').concat(c.prenom))"/>
+                                <template name="model" var="cand">
+                                    <comboitem label="@load(cand.nom.concat(' ').concat(cand.prenom))" value="@load(cand)"/>
                                 </template>
                             </combobox>
                         </vlayout>
@@ -43,14 +64,24 @@
                         <label value="Aucun candidat trouvé pour ce concours."/>
                     </div>
                 </div>
+                <div class="step-actions">
+                    <button label="Étape suivante" sclass="enmg-btn enmg-btn-primary"
+                            disabled="@load(empty vm.selectedCandidat)"
+                            onClick="@command('goToImportStep', step=2)"/>
+                </div>
             </groupbox>
-            
-            <groupbox mold="3d" vflex="1" visible="@load(not empty vm.selectedCandidat)"
-                      disabled="@load(not empty vm.targetDocumentTypeForUpload)">
-                <caption label="2. Documents Requis pour le Dossier" />
-                <div class="panel" vflex="1">
-                    <!-- MISE À JOUR : Ajout de la classe sclass="listbox-light" -->
-                    <listbox model="@load(vm.candidatDocumentStatusList)" vflex="1" sclass="listbox-light"
+
+            <groupbox mold="3d" open="@load(vm.importStep eq 2)" disabled="@load(empty vm.selectedCandidat)">
+                <caption label="2. Documents requis pour le dossier"/>
+                <div class="panel">
+                    <div class="placeholder-message"
+                         visible="@load(empty vm.candidatDocumentStatusList)">
+                        <n:i sclass="z-icon-info-circle placeholder-message-icon"/>
+                        <label value="Aucun type de document requis n'est configuré pour ce concours."
+                               sclass="placeholder-message-text"/>
+                    </div>
+                    <listbox model="@load(vm.candidatDocumentStatusList)" sclass="listbox-light"
+                             visible="@load(not empty vm.candidatDocumentStatusList)"
                              emptyMessage="Aucun type de document requis n'est configuré pour ce concours.">
                         <listhead>
                             <listheader label="Type de Document"/>
@@ -65,72 +96,88 @@
                                 </listcell>
                                 <listcell>
                                     <hlayout sclass="status-label @load(docStatus.missing ? 'status-warning' : 'status-success')">
-                                        <label iconSclass="@load(docStatus.statusIconSclass)" />
-                                        <label value="@load(docStatus.statusLabel)" />
+                                        <n:i sclass="@load(docStatus.statusIconSclass)"/>
+                                        <label value="@load(docStatus.statusLabel)"/>
                                     </hlayout>
                                 </listcell>
                                 <listcell>
-                                    <label value="@load(docStatus.versionInfo)" />
+                                    <label value="@load(docStatus.versionInfo)"/>
                                 </listcell>
                                 <listcell sclass="actions-cell">
-                                     <div hflex="1" align="center">
-                                         <!-- MISE À JOUR : Utilisation des nouvelles classes de boutons -->
-                                         <button label="Importer" sclass="btn-import-primary" iconSclass="z-icon-plus"
+                                    <div hflex="1" align="center">
+                                        <button label="Importer" sclass="btn-import-primary" iconSclass="z-icon-plus"
                                                 visible="@load(docStatus.missing)"
-                                                onClick="@command('prepareUploadForDocument', doc=docStatus.documentType)" />
-                                         <button label="Mettre à jour" sclass="btn-update-secondary" iconSclass="z-icon-upload"
+                                                onClick="@command('prepareUploadForDocument', doc=docStatus.documentType)"/>
+                                        <button label="Mettre à jour" sclass="btn-update-secondary" iconSclass="z-icon-upload"
                                                 visible="@load(not docStatus.missing)"
-                                                onClick="@command('prepareUploadForDocument', doc=docStatus.documentType)" />
+                                                onClick="@command('prepareUploadForDocument', doc=docStatus.documentType)"/>
                                     </div>
                                 </listcell>
                             </listitem>
                         </template>
                     </listbox>
                 </div>
+                <div class="step-actions">
+                    <button label="Revenir" sclass="enmg-btn enmg-btn-ghost left"
+                            onClick="@command('goToImportStep', step=1)"/>
+                </div>
             </groupbox>
-            
-            <groupbox mold="3d" open="true" visible="@load(not empty vm.targetDocumentTypeForUpload)">
-                <caption label="@load('3. Importer : '.concat(vm.targetDocumentTypeForUpload.libelle))" />
-                <div class="panel-body">
-                    <div visible="@load(vm.uploading)">
-                        <label value="Importation en cours, veuillez patienter..."/>
-                        <progressmeter value="@load(vm.uploadProgress)" hflex="1" style="margin-top: 8px;"/>
-                    </div>
 
-                    <div visible="@load(!vm.uploading)">
-                         <vlayout droppable="true" hflex="1" sclass="upload-dropzone">
-                            <attribute name="onDrop"><![CDATA[
-                                import org.zkoss.util.media.Media;
-                                Media[] medias = event.getMedias();
-                                if (medias != null && medias.length > 0) {
-                                    org.zkoss.bind.BindUtils.postCommand(null, null, "handleFileUpload",
-                                        java.util.Collections.singletonMap("file", medias[0]));
-                                }
-                            ]]></attribute>
-                            <label value="Glissez-déposez le fichier ici" sclass="upload-dropzone-label"/>
-                            <label value="ou" sclass="text-muted" style="margin: 8px 0;"/>
-                            <fileupload label="Parcourir les fichiers..." upload="true,maxsize=20480"
-                                        onUpload="@command('handleFileUpload', file=event.media)" sclass="btn-secondary"/>
-                        </vlayout>
-                        <div sclass="upload-pending-file" visible="@load(not empty vm.pendingFileName)">
-                            <label value="@load(vm.pendingFileName)" sclass="upload-pending-file-info"/>
-                            <hlayout>
-                                <button label="Confirmer l'Import" sclass="btn-primary" iconSclass="z-icon-check"
-                                        onClick="@command('executeImport')" />
-                                <button label="Annuler" sclass="btn" iconSclass="z-icon-times"
-                                        onClick="@command('cancelUpload')" />
-                            </hlayout>
+            <groupbox mold="3d" open="@load(vm.importStep eq 3)" disabled="@load(empty vm.targetDocumentTypeForUpload)">
+                <caption>
+                    <label value="3. Importer un document" visible="@load(empty vm.targetDocumentTypeForUpload)"/>
+                    <label value="@load('3. Importer : '.concat(vm.targetDocumentTypeForUpload.libelle))"
+                           visible="@load(not empty vm.targetDocumentTypeForUpload)"/>
+                </caption>
+                <div class="panel-body">
+                    <div visible="@load(empty vm.targetDocumentTypeForUpload)" class="import-placeholder">
+                        <label value="Sélectionnez un type de document à l'étape précédente pour poursuivre."/>
+                    </div>
+                    <div visible="@load(not empty vm.targetDocumentTypeForUpload)">
+                        <div visible="@load(vm.uploading)">
+                            <label value="Importation en cours, veuillez patienter..."/>
+                            <progressmeter value="@load(vm.uploadProgress)" hflex="1" style="margin-top: 8px;"/>
+                        </div>
+
+                        <div visible="@load(!vm.uploading)">
+                            <vlayout droppable="true" hflex="1" sclass="upload-dropzone">
+                                <attribute name="onDrop"><![CDATA[
+                                    import org.zkoss.util.media.Media;
+                                    Media[] medias = event.getMedias();
+                                    if (medias != null && medias.length > 0) {
+                                        org.zkoss.bind.BindUtils.postCommand(null, null, "handleFileUpload",
+                                            java.util.Collections.singletonMap("file", medias[0]));
+                                    }
+                                ]]></attribute>
+                                <label value="Glissez-déposez le fichier ici" sclass="upload-dropzone-label"/>
+                                <label value="ou" sclass="text-muted" style="margin: 8px 0;"/>
+                                <fileupload label="Parcourir les fichiers..." upload="true,maxsize=20480"
+                                            onUpload="@command('handleFileUpload', file=event.media)" sclass="btn-secondary"/>
+                            </vlayout>
+                            <div sclass="upload-pending-file" visible="@load(not empty vm.pendingFileName)">
+                                <label value="@load(vm.pendingFileName)" sclass="upload-pending-file-info"/>
+                                <hlayout>
+                                    <button label="Confirmer l'Import" sclass="btn-primary" iconSclass="z-icon-check"
+                                            onClick="@command('executeImport')"/>
+                                    <button label="Annuler" sclass="btn" iconSclass="z-icon-times"
+                                            onClick="@command('cancelUpload')"/>
+                                </hlayout>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="step-actions">
+                    <button label="Revenir" sclass="enmg-btn enmg-btn-ghost left"
+                            onClick="@command('goToImportStep', step=2)"/>
+                </div>
             </groupbox>
-            
-            <div vflex="1" hflex="1" sclass="placeholder-message" visible="@load(empty vm.selectedCandidat)">
-                 <label iconSclass="z-icon-info-circle" sclass="placeholder-message-icon" />
-                 <label value="Veuillez sélectionner un concours puis un candidat pour voir son dossier." 
-                        sclass="placeholder-message-text" />
-            </div>
 
-        </vlayout>
+            <div vflex="1" hflex="1" sclass="placeholder-message"
+                 visible="@load(empty vm.selectedCandidat)">
+                <n:i sclass="z-icon-info-circle placeholder-message-icon"/>
+                <label value="Veuillez sélectionner un concours puis un candidat pour voir son dossier." 
+                       sclass="placeholder-message-text"/>
+           </div>
+        </div>
     </div>
 </zk>

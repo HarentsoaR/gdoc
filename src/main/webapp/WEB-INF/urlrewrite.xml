@@ -29,11 +29,83 @@
         <to last="true">/documents/documents.zul</to>
     </rule>
 
-    <!-- Map deeper pretty paths if needed e.g. /documents/candidats/dossiers -->
+    <!-- Documents sub sections -->
+    <rule>
+        <name>documents-concours-list</name>
+        <from>^/documents/concours/list$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/concours/list.zul&amp;section=Concours&amp;page=Liste</to>
+    </rule>
+    <rule>
+        <name>documents-concours-new</name>
+        <from>^/documents/concours/new$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/concours/new.zul&amp;section=Concours&amp;page=Nouveau</to>
+    </rule>
+    <rule>
+        <name>documents-concours-edit</name>
+        <from>^/documents/concours/edit$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/concours/edit.zul&amp;section=Concours&amp;page=Modification</to>
+    </rule>
+    <rule>
+        <name>documents-concours-documents-list</name>
+        <from>^/documents/concours/documents$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/concours/documents-concours/list.zul&amp;section=Concours&amp;page=Documents</to>
+    </rule>
+    <rule>
+        <name>documents-concours-documents-new</name>
+        <from>^/documents/concours/documents/new$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/concours/documents-concours/new.zul&amp;section=Concours&amp;page=Nouveau%20document</to>
+    </rule>
+    <rule>
+        <name>documents-concours-documents-edit</name>
+        <from>^/documents/concours/documents/edit$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/concours/documents-concours/edit.zul&amp;section=Concours&amp;page=Modification%20document</to>
+    </rule>
+    <rule>
+        <name>documents-concours-suivi</name>
+        <from>^/documents/concours/suivi$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/concours/suivi-dossiers.zul&amp;section=Concours&amp;page=Suivi%20des%20dossiers</to>
+    </rule>
+    <rule>
+        <name>documents-concours-validation</name>
+        <from>^/documents/concours/validation$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/concours/validation-dossiers.zul&amp;section=Concours&amp;page=Validation%20des%20dossiers</to>
+    </rule>
+
+    <rule>
+        <name>documents-filiere-list</name>
+        <from>^/documents/filieres/list$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/filiere/list.zul&amp;section=Filières&amp;page=Liste</to>
+    </rule>
+    <rule>
+        <name>documents-filiere-new</name>
+        <from>^/documents/filieres/new$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/filiere/new.zul&amp;section=Filières&amp;page=Nouveau</to>
+    </rule>
+    <rule>
+        <name>documents-filiere-edit</name>
+        <from>^/documents/filieres/edit$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/filiere/edit.zul&amp;section=Filières&amp;page=Modification</to>
+    </rule>
+
+    <rule>
+        <name>documents-candidats-list</name>
+        <from>^/documents/candidats/list$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/candidats/list.zul&amp;section=Candidats&amp;page=Liste</to>
+    </rule>
+    <rule>
+        <name>documents-candidats-new</name>
+        <from>^/documents/candidats/new$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/candidats/new.zul&amp;section=Candidats&amp;page=Nouveau</to>
+    </rule>
+    <rule>
+        <name>documents-candidats-edit</name>
+        <from>^/documents/candidats/edit$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/candidats/edit.zul&amp;section=Candidats&amp;page=Modification</to>
+    </rule>
     <rule>
         <name>documents-candidats-dossiers</name>
         <from>^/documents/candidats/dossiers$</from>
-        <to last="true">/documents/views/candidats/dossiers.zul</to>
+        <to last="true">/documents/documents.zul?view=/documents/views/candidats/dossiers.zul&amp;section=Candidats&amp;page=Dossiers</to>
     </rule>
 
     <!-- Biblio module: /biblio -> /biblio/biblio.zul (landing) -->

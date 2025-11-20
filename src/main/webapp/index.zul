@@ -1,5 +1,6 @@
 <?page title="GEDI" contentType="text/html;charset=UTF-8"?>
 <zk xmlns:n="native">
+    <style src="/css/enmg-theme.css" />
 
     <!-- ✅ Styles pour la bannière et les boutons -->
     <style>
@@ -7,17 +8,19 @@
             position: fixed; top: 24px; left: 50%;
             transform: translateX(-50%);
             padding: 12px 18px;
-            border-radius: 8px;
-            box-shadow: 0 6px 18px rgba(0,0,0,.08);
+            border-radius: var(--enmg-radius-md);
+            box-shadow: var(--enmg-shadow-md);
             z-index: 1000;
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
+            background: var(--enmg-color-surface);
+            border: 1px solid var(--enmg-color-border);
         }
-        .banner--success { background: #e6ffed; color: #1e7e34; border: 1px solid #c3e6cb; }
-        .banner--warn    { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        .banner--error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .banner--success { background: #ecfdf3; color: #166534; border: 1px solid #bbf7d0; }
+        .banner--warn    { background: #fffbeb; color: #92400e; border: 1px solid #fef3c7; }
+        .banner--error   { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
         .z-button:hover  { filter: brightness(0.95); }
         .z-button:active { transform: translateY(1px); }
         .z-button-content { font-size: 16px; font-weight: 600; }
@@ -47,19 +50,21 @@
             sizable="false"
             mode="modal"
             position="center"
-            style="background:#FFFFFF;border-radius:14px;box-shadow:0 14px 44px rgba(0,0,0,.12)">
+            style="background:var(--enmg-color-surface);border-radius:14px;box-shadow:var(--enmg-shadow-md)">
             
             <vbox hflex="1" spacing="22px" align="center" style="padding:28px 56px">
                 <image src="/img/logo-gedi.png" width="72px" height="72px"/>
-                <label value="GEDI" style="font-size:30px;font-weight:700;color:#005A9E"/>
-                <label value="Bienvenue dans votre espace GEDI" style="color:#6b7280"/>
+                <label value="GEDI" style="font-size:30px;font-weight:700;color:var(--enmg-color-primary)"/>
+                <label value="Bienvenue dans votre espace GEDI" style="color:var(--enmg-color-text-soft)"/>
 
              
                 <vbox spacing="14px" hflex="1" style="width:100%">
                     <button label="Documents" hflex="1"
+                            sclass="enmg-btn enmg-btn-primary"
+                            style="height:48px;"
                             iconSclass="z-icon-folder-o"
                             onClick="@command('goDocs')"
-                            style="height:48px;background:#1976D2;color:#fff;border:none;border-radius:8px"/>
+                            />
 
                    <!-- <button label="Bibliothèque" hflex="1"
                             iconSclass="z-icon-book"
@@ -67,15 +72,18 @@
                             style="height:48px;background:#2E7D32;color:#fff;border:none;border-radius:8px"/> -->
 
                     <button label="Administration" hflex="1"
+                            sclass="enmg-btn enmg-btn-primary"
+                            style="height:48px;"
                             iconSclass="z-icon-cog"
                             visible="@load(vm.adminVisible)"
                             onClick="@command('goAdmin')"
-                            style="height:48px;background:#7B1FA2;color:#fff;border:none;border-radius:8px"/>
+                            />
 
                     <button label="Déconnexion" hflex="1"
+                            sclass="enmg-btn enmg-btn-danger"
+                            style="height:48px;"
                             iconSclass="z-icon-sign-out"
-                            onClick="@command('logout')"
-                            style="height:48px;background:#f44336;color:#fff;border:none;border-radius:8px"/>
+                            onClick="@command('logout')"/>
                 </vbox>
 
                 <hlayout spacing="12px">

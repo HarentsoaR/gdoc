@@ -3,129 +3,171 @@
     <div hflex="1" vflex="1" sclass="page-container"
          viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.DocumentSuiviViewModel')">
 
-        <vlayout hflex="1" vflex="1" style="gap:16px;">
+        <vlayout hflex="1" vflex="1" style="gap: 12px;">
             <div sclass="page-header">
                 <div>
                     <label value="Suivi des dossiers" sclass="page-title"/>
                     <label value="Visualiser l'état d'avancement des documents" sclass="page-subtitle"/>
                 </div>
-                <hlayout spacing="8px">
-                    <button label="Effacer" sclass="btn" iconSclass="z-icon-eraser"
+                <div class="header-actions">
+                    <button label="@load(vm.filtersVisible ? 'Masquer les filtres' : 'Afficher les filtres')"
+                            sclass="btn"
+                            iconSclass="@load(vm.filtersVisible ? 'z-icon-chevron-up' : 'z-icon-chevron-down')"
+                            onClick="@command('toggleFilters')"/>
+                    <button label="Réinitialiser" sclass="btn" iconSclass="z-icon-undo"
                             onClick="@command('clearFilters')"/>
-                    <button label="Rafraîchir" sclass="btn-primary" iconSclass="z-icon-refresh"
-                            onClick="@command('applyFilters')"/>
-                </hlayout>
+                </div>
             </div>
 
-            <div class="panel panel-filters">
-                <vlayout hflex="1" spacing="8px">
-                    <hlayout spacing="16px">
-                        <vlayout hflex="1">
-                            <label value="Concours"/>
+            <div class="panel summary-inline">
+                <div class="mini-card">
+                    <label value="Total dossiers" class="mini-card-title"/>
+                    <label value="@load(vm.summaryStats.total)" class="mini-card-value"/>
+                    <label value="@load(vm.summaryStats.progressLabel)" class="mini-card-sub"/>
+                    <div class="progress-shell mini">
+                        <div class="progress-bar" style="@load(vm.summaryStats.progressStyle)"></div>
+                    </div>
+                </div>
+                <div class="mini-card">
+                    <label value="Validés" class="mini-card-title"/>
+                    <label value="@load(vm.summaryStats.valides)" class="status-label status-success"/>
+                </div>
+                <div class="mini-card">
+                    <label value="En cours" class="mini-card-title"/>
+                    <label value="@load(vm.summaryStats.enCours)" class="status-label status-warning"/>
+                </div>
+                <div class="mini-card">
+                    <label value="Rejetés" class="mini-card-title"/>
+                    <label value="@load(vm.summaryStats.rejetes)" class="status-label status-danger"/>
+                </div>
+            </div>
+
+            <div class="filter-stack panel" visible="@load(vm.filtersVisible)">
+                <vlayout hflex="1" style="gap: 10px;">
+                    <hlayout hflex="1" style="gap: 10px;">
+                        <div sclass="filter-pill flex-pill">
                             <combobox model="@load(vm.concoursList)" selectedItem="@bind(vm.selectedConcours)"
-                                      hflex="1" autodrop="true" readonly="true"
-                                      placeholder="Tous les concours"/>
-                        </vlayout>
-                        <vlayout hflex="1">
-                            <label value="Centre d'examen"/>
-                            <combobox model="@load(vm.centreList)" selectedItem="@bind(vm.selectedCentre)"
-                                      hflex="1" autodrop="true" readonly="true"
-                                      placeholder="Tous les centres"/>
-                        </vlayout>
-                        <vlayout hflex="1">
-                            <label value="Type de document"/>
-                            <combobox model="@load(vm.documentTypes)" selectedItem="@bind(vm.selectedDocumentType)"
-                                      hflex="1" autodrop="true" readonly="true"
-                                      placeholder="Tous les documents"/>
-                        </vlayout>
-                    </hlayout>
-                    <hlayout spacing="16px">
-                        <vlayout hflex="1">
-                            <label value="État"/>
+                                      autodrop="true" placeholder="Tous les concours"
+                                      sclass="pill-input"
+                                      onSelect="@command('applyFilters')"/>
+                    </div>
+                    <div sclass="filter-pill flex-pill">
+                        <combobox model="@load(vm.centreList)" selectedItem="@bind(vm.selectedCentre)"
+                                  autodrop="true" placeholder="Tous les centres"
+                                  sclass="pill-input"
+                                  onSelect="@command('applyFilters')"/>
+                    </div>
+                    <div sclass="filter-pill flex-pill">
+                        <combobox model="@load(vm.documentTypes)" selectedItem="@bind(vm.selectedDocumentType)"
+                                  autodrop="true" placeholder="Tous les documents"
+                                  sclass="pill-input"
+                                  onSelect="@command('applyFilters')"/>
+                    </div>
+                        <div sclass="filter-pill flex-pill">
                             <combobox model="@load(vm.etatFilterOptions)" selectedItem="@bind(vm.selectedEtatFilter)"
-                                      hflex="1" autodrop="true" readonly="true"/>
-                        </vlayout>
-                        <vlayout hflex="2">
-                            <label value="Nom du candidat"/>
-                            <textbox value="@bind(vm.searchNomCandidat)" hflex="1"
-                                     placeholder="Rechercher un candidat" onOK="@command('applyFilters')"/>
-                        </vlayout>
-                        <hlayout valign="end" spacing="8px">
-                            <button label="Appliquer" sclass="btn-primary" iconSclass="z-icon-search"
-                                    onClick="@command('applyFilters')"/>
-                            <button label="Réinitialiser" sclass="btn" iconSclass="z-icon-undo"
-                                    onClick="@command('clearFilters')"/>
-                        </hlayout>
+                                      autodrop="true" placeholder="Tous les états"
+                                      sclass="pill-input"
+                                      onSelect="@command('applyFilters')"/>
+                        </div>
+                        <button label="Réinitialiser" sclass="btn btn-secondary pill-reset"
+                                iconSclass="z-icon-undo"
+                                onClick="@command('clearFilters')"/>
+                    </hlayout>
+                    <hlayout hflex="1" style="gap: 10px;">
+                        <div sclass="filter-pill flex-pill">
+                            <textbox value="@bind(vm.searchNomCandidat)" placeholder="Rechercher un candidat"
+                                     onChanging="@command('updateSearchNom', keyword=event.value)"
+                                     onOK="@command('applyFilters')" sclass="pill-input pill-input-search"/>
+                        </div>
                     </hlayout>
                 </vlayout>
             </div>
 
-            <hlayout spacing="16px">
-                <div class="panel" hflex="1">
-                    <label value="Total" sclass="dashboard-card-title"/>
-                    <label value="@load(vm.summaryStats.total)" sclass="dashboard-card-value"/>
+            <div class="panel scroll-panel" vflex="1">
+                <label value="Double-cliquez sur un dossier pour consulter le détail" sclass="table-hint"/>
+                <div sclass="table-scroll" vflex="1" hflex="1">
+                    <listbox model="@load(vm.dossiers)" vflex="1" hflex="1" sizedByContent="false"
+                             sclass="listbox-thread data-table" style="min-width: 1100px;"
+                             emptyMessage="Aucun dossier trouvé pour ce suivi.">
+                        <listhead sizable="true">
+                            <listheader label="Dossier" hflex="3"/>
+                            <listheader label="État dossier" width="160px"/>
+                            <listheader label="Synthèse" hflex="2"/>
+                            <listheader label="Pièces / Manque" hflex="2"/>
+                        </listhead>
+                        <template name="model" var="row">
+                            <listitem onDoubleClick="@command('openDossierDetails', row=row)">
+                                <listcell>
+                                    <vlayout sclass="listbox-thread-stack">
+                                        <label value="@load(row.reference)" sclass="list-title text-ellipsis"/>
+                                        <label value="@load(row.candidatLabel)" sclass="list-subtitle text-ellipsis"/>
+                                        <label value="@load(row.concoursLabel)" sclass="list-meta text-ellipsis"/>
+                                        <label value="@load(row.centreLabel)" sclass="list-meta text-ellipsis"/>
+                                    </vlayout>
+                                </listcell>
+                                <listcell>
+                                    <label value="@load(row.globalEtatLabel)" sclass="@load(row.globalEtatSclass)"/>
+                                </listcell>
+                                <listcell>
+                                    <label value="@load(row.documentsResume)" sclass="text-muted"/>
+                                </listcell>
+                                <listcell>
+                                    <label value="@load(row.piecesStateLabel)" sclass="@load(row.piecesStateSclass)"
+                                           tooltiptext="@load(row.missingRequiredDetails)"/>
+                                </listcell>
+                            </listitem>
+                        </template>
+                    </listbox>
                 </div>
-                <div class="panel" hflex="1">
-                    <label value="Validés" sclass="dashboard-card-title"/>
-                    <label value="@load(vm.summaryStats.valides)" sclass="status-label status-success"/>
-                </div>
-                <div class="panel" hflex="1">
-                    <label value="En cours" sclass="dashboard-card-title"/>
-                    <label value="@load(vm.summaryStats.enCours)" sclass="status-label status-warning"/>
-                </div>
-                <div class="panel" hflex="1">
-                    <label value="Rejetés" sclass="dashboard-card-title"/>
-                    <label value="@load(vm.summaryStats.rejetes)" sclass="status-label status-danger"/>
-                </div>
-            </hlayout>
-
-            <div class="panel" vflex="1">
-                <listbox model="@load(vm.dossiers)" vflex="1" hflex="1" mold="paging" pageSize="15"
-                         emptyMessage="Aucun dossier trouvé pour ce suivi.">
-                    <listhead>
-                        <listheader label="Candidat" width="180px"/>
-                        <listheader label="Document" hflex="2"/>
-                        <listheader label="Concours" width="200px"/>
-                        <listheader label="Centre" width="200px"/>
-                        <listheader label="Statut" width="140px"/>
-                        <listheader label="Remarque" hflex="2"/>
-                        <listheader label="Version" width="90px"/>
-                        <listheader label="Actions" width="100px"/>
-                    </listhead>
-                    <template name="model" var="row">
-                        <listitem>
-                            <listcell>
-                                <label value="@load(row.candidatLabel)" sclass="explorer-item-title"/>
-                            </listcell>
-                            <listcell>
-                                <vlayout>
-                                    <label value="@load(row.documentLabel)"/>
-                                    <label value="@load(row.fileName)" sclass="explorer-item-subtitle"/>
-                                </vlayout>
-                            </listcell>
-                            <listcell>
-                                <label value="@load(row.concoursLabel)"/>
-                            </listcell>
-                            <listcell>
-                                <label value="@load(row.centreLabel)"/>
-                            </listcell>
-                            <listcell>
-                                <label value="@load(row.etatLabel)" sclass="@load('status-label ' + row.etatSclass)"/>
-                            </listcell>
-                            <listcell>
-                                <label value="@load(row.remarque)"/>
-                            </listcell>
-                            <listcell>
-                                <label value="@load(row.version)"/>
-                            </listcell>
-                            <listcell>
-                                <button iconSclass="z-icon-download" sclass="btn"
-                                        tooltiptext="Télécharger" onClick="@command('download', item=row)"/>
-                            </listcell>
-                        </listitem>
-                    </template>
-                </listbox>
             </div>
+
+            <window title="Détails du dossier" mode="modal" closable="true" width="720px"
+                    border="normal" position="center" visible="@bind(vm.detailsModalVisible)"
+                    onClose="@command('closeDossierDetails')">
+                <attribute name="onClose"><![CDATA[self.setVisible(false); event.stopPropagation();]]></attribute>
+                <vlayout sclass="detail-modal" visible="@load(vm.selectedDossier ne null)" style="gap: 16px;">
+                    <div class="modal-summary">
+                        <label value="@load(vm.selectedDossier.reference)" sclass="modal-title"/>
+                        <label value="@load(vm.selectedDossier.candidatLabel)" sclass="modal-subtitle"/>
+                        <hlayout style="gap: 12px;" sclass="pill-stack">
+                            <label value="@load(vm.selectedDossier.concoursLabel)" sclass="tag"/>
+                            <label value="@load(vm.selectedDossier.centreLabel)" sclass="tag"/>
+                            <label value="@load(vm.selectedDossier.documentsResume)" sclass="tag"/>
+                        </hlayout>
+                    </div>
+                    <listbox model="@load(vm.selectedDossier.documents)" mold="paging" pageSize="6"
+                             sizedByContent="false" vflex="min" sclass="listbox-thread detail-list">
+                        <listhead sizable="true">
+                            <listheader label="Document" hflex="2"/>
+                            <listheader label="État" width="120px"/>
+                            <listheader label="Remarques" hflex="2"/>
+                            <listheader label="Pièce" hflex="1"/>
+                        </listhead>
+                        <template name="model" var="doc">
+                            <listitem>
+                                <listcell>
+                                    <label value="@load(doc.label)" sclass="text-ellipsis"/>
+                                </listcell>
+                                <listcell>
+                                    <label value="@load(doc.etatLabel)" sclass="@load('status-label '.concat(doc.etatSclass))"/>
+                                </listcell>
+                                <listcell>
+                                    <label value="@load(doc.remarque)" sclass="text-muted text-ellipsis"/>
+                                </listcell>
+                                <listcell>
+                                    <vlayout sclass="listbox-thread-stack">
+                                        <label value="@load(doc.hasAttachment ? doc.fileName : 'Pièce non fournie')"
+                                               sclass="text-muted text-ellipsis"/>
+                                        <a label="Télécharger" sclass="link-pill"
+                                           visible="@load(doc.hasAttachment)"
+                                           onClick="@command('downloadDocument', item=doc)"/>
+                                    </vlayout>
+                                </listcell>
+                            </listitem>
+                        </template>
+                    </listbox>
+                </vlayout>
+            </window>
         </vlayout>
     </div>
 </zk>

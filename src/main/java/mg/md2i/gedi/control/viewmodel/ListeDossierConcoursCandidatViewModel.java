@@ -1,4 +1,3 @@
-// File Path: src/main/java/mg/md2i/gedi/control/viewmodel/ListeDossierConcoursCandidatViewModel.java
 package mg.md2i.gedi.control.viewmodel;
 
 import mg.md2i.enmg.utils.Breadcrumb;
@@ -6,8 +5,12 @@ import mg.md2i.enmg.utils.DisplayItem;
 import mg.md2i.gedi.entity.*;
 import mg.md2i.gedi.enums.DocumentValidationEtat;
 import mg.md2i.gedi.gestionmetier.*;
+import mg.md2i.gedi.trash.TrashManager;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.*;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Filedownload;
+import org.zkoss.zul.Messagebox;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -16,31 +19,24 @@ import java.util.List;
 
 public class ListeDossierConcoursCandidatViewModel {
 
-    // --- State Variables (Navigation) ---
     private DocumentConcours selectedDocumentType;
-
-    // --- NOUVEAUX ÉTATS POUR LES FILTRES ---
     private Concours selectedConcoursFilter;
     private CentreExamen selectedCentreExamenFilter;
     private String filterNomCandidat = "";
 
-    // --- Data Lists ---
     private List<DisplayItem> displayItems;
     private List<Breadcrumb> breadcrumbs;
 
-    // --- NOUVELLES LISTES POUR LES COMBOBOX ---
     private List<Concours> allConcours;
     private List<CentreExamen> allCentresExamen;
 
-    // --- Cached Data ---
     private List<DocumentConcours> allDocumentTypes;
+    private boolean filtersVisible = true;
 
     @Init
     public void init() {
-        // Chargement des données pour les filtres
         allConcours = ConcoursGestion.findAll();
         allCentresExamen = CentreExamenGestion.findAll();
-
         allDocumentTypes = DocumentConcoursGestion.findAll();
         navigateToRoot();
     }
@@ -55,7 +51,6 @@ public class ListeDossierConcoursCandidatViewModel {
         breadcrumbs.add(new Breadcrumb("Dossiers Candidats", this::navigateToRoot));
 
         if (selectedDocumentType != null) {
-            // Le deuxième niveau n'est plus cliquable, c'est la vue actuelle.
             breadcrumbs.add(new Breadcrumb(selectedDocumentType.getLibelle(), null));
         }
     }
@@ -64,12 +59,10 @@ public class ListeDossierConcoursCandidatViewModel {
         displayItems = new ArrayList<>();
 
         if (selectedDocumentType == null) {
-            // Niveau 1 : Affiche les dossiers de type de document (DEMANDE, DIPLOME, etc.)
             for (DocumentConcours docType : allDocumentTypes) {
                 displayItems.add(new DisplayItem(docType.getLibelle(), "z-icon-folder", docType));
             }
         } else {
-            // Niveau 2 : Affiche une liste plate de fichiers basée sur les filtres.
             Integer docId = selectedDocumentType.getDocumentConcoursId();
             Integer concoursId = (selectedConcoursFilter != null) ? selectedConcoursFilter.getConcoursId() : null;
             Integer centreId = (selectedCentreExamenFilter != null) ? selectedCentreExamenFilter.getCentreExamenId() : null;
@@ -80,7 +73,6 @@ public class ListeDossierConcoursCandidatViewModel {
 
             if (files != null) {
                 for (ListeDossierConcoursCandidat file : files) {
-                    // Logique pour obtenir le libellé de l'état si 'etatDoc' n'est pas déjà rempli
                     if (file.getEtatDoc() == null || file.getEtatDoc().isEmpty()) {
                         DocumentValidationEtat etat = DocumentValidationEtat.fromCode(file.getEtatDocument());
                         file.setEtatDoc(etat.getLabel());
@@ -93,30 +85,29 @@ public class ListeDossierConcoursCandidatViewModel {
         }
     }
 
-    // --- Navigation Commands ---
     @Command
     @NotifyChange({"displayItems", "breadcrumbs", "selectedDocumentType"})
     public void navigate(@BindingParam("item") DisplayItem item) {
-        if (!item.isFolder() || !(item.getData() instanceof DocumentConcours)) return;
-        
+        openFolder(item);
+    }
+
+    private void openFolder(DisplayItem item) {
+        if (item == null || !item.isFolder() || !(item.getData() instanceof DocumentConcours)) return;
         this.selectedDocumentType = (DocumentConcours) item.getData();
-        applyFilters(); // Appliquer les filtres (vides au début) dès qu'on entre dans un dossier
+        applyFilters();
     }
 
     @Command
     @NotifyChange({"displayItems", "breadcrumbs", "selectedDocumentType"})
     public void navigateViaBreadcrumb(@BindingParam("crumb") Breadcrumb crumb) {
-        // L'objet Breadcrumb sait déjà s'il a une action (navigate() no-op si null)
         if (crumb != null) crumb.navigate();
     }
 
-    // --- Navigation Helpers ---
     private void navigateToRoot() {
         this.selectedDocumentType = null;
-        clearFilters(); // Efface les filtres et rafraîchit la vue
+        clearFilters();
     }
-    
-    // --- NOUVELLES COMMANDES DE FILTRE ---
+
     @Command
     @NotifyChange("displayItems")
     public void applyFilters() {
@@ -124,7 +115,7 @@ public class ListeDossierConcoursCandidatViewModel {
     }
 
     @Command
-    @NotifyChange({"displayItems", "selectedConcoursFilter", "selectedCentreExamenFilter", "filterNomCandidat"})
+    @NotifyChange({"displayItems", "selectedConcoursFilter", "selectedCentreExamenFilter", "filterNomCandidat", "anyFilterActive"})
     public void clearFilters() {
         this.selectedConcoursFilter = null;
         this.selectedCentreExamenFilter = null;
@@ -132,7 +123,6 @@ public class ListeDossierConcoursCandidatViewModel {
         refresh();
     }
 
-    // --- Action Commands (download, delete) restent les mêmes ---
     @Command
     public void download(@BindingParam("item") DisplayItem item) {
         if (item.isFolder() || !(item.getData() instanceof ListeDossierConcoursCandidat)) return;
@@ -140,7 +130,7 @@ public class ListeDossierConcoursCandidatViewModel {
         if (fileEntity.getRemarqueFacultatif() == null) return;
         try {
             File f = new File(fileEntity.getRemarqueFacultatif());
-            if (!f.exists()) return; // Gérer l'erreur si le fichier n'existe pas
+            if (!f.exists()) return;
             String contentType = Files.probeContentType(f.toPath());
             if (contentType == null) contentType = "application/octet-stream";
             Filedownload.save(f, contentType);
@@ -148,15 +138,36 @@ public class ListeDossierConcoursCandidatViewModel {
     }
 
     @Command
-    @NotifyChange("displayItems")
-    public void delete(@BindingParam("item") DisplayItem item) {
-        if (item.isFolder() || !(item.getData() instanceof ListeDossierConcoursCandidat)) return;
-        ListeDossierConcoursCandidat fileEntity = (ListeDossierConcoursCandidat) item.getData();
-        ListeDossierConcoursCandidatGestion.delete(fileEntity.getListeDossierConcoursCandidatId());
-        refresh(); // Rafraîchir la liste après suppression
+    public void openItem(@BindingParam("item") DisplayItem item) {
+        if (item == null) return;
+        if (item.isFolder()) {
+            openFolder(item);
+            BindUtils.postNotifyChange(null, null, this, "displayItems");
+            BindUtils.postNotifyChange(null, null, this, "breadcrumbs");
+            BindUtils.postNotifyChange(null, null, this, "selectedDocumentType");
+        } else {
+            download(item);
+        }
     }
 
-    // --- Getters & Setters for ZUL ---
+    @Command
+    public void delete(@BindingParam("item") DisplayItem item) {
+        if (item == null || item.isFolder() || !(item.getData() instanceof ListeDossierConcoursCandidat)) return;
+        Messagebox.show("Déplacer ce document dans la corbeille ?", "Suppression sécurisée",
+                Messagebox.YES | Messagebox.NO, Messagebox.QUESTION, (Event evt) -> {
+                    if ("onYes".equals(evt.getName())) {
+                        ListeDossierConcoursCandidat entity = (ListeDossierConcoursCandidat) item.getData();
+                        ListeDossierConcoursCandidatGestion.moveToTrash(entity.getListeDossierConcoursCandidatId());
+                        String documentLabel = selectedDocumentType != null
+                                ? selectedDocumentType.getLibelle()
+                                : (entity.getDocumentConcours() != null ? entity.getDocumentConcours().getLibelle() : "Document");
+                        TrashManager.registerDocument(entity, documentLabel);
+                        refresh();
+                        BindUtils.postNotifyChange(null, null, ListeDossierConcoursCandidatViewModel.this, "displayItems");
+                    }
+                });
+    }
+
     public List<DisplayItem> getDisplayItems() { return displayItems; }
     public List<Breadcrumb> getBreadcrumbs() { return breadcrumbs; }
     public DocumentConcours getSelectedDocumentType() { return selectedDocumentType; }
@@ -168,8 +179,31 @@ public class ListeDossierConcoursCandidatViewModel {
     public void setSelectedCentreExamenFilter(CentreExamen selectedCentreExamenFilter) { this.selectedCentreExamenFilter = selectedCentreExamenFilter; }
     public String getFilterNomCandidat() { return filterNomCandidat; }
     public void setFilterNomCandidat(String filterNomCandidat) { this.filterNomCandidat = filterNomCandidat; }
-    
-    // --- Helper Methods ---
+    public boolean isFiltersVisible() { return filtersVisible; }
+
+    @Command
+    @NotifyChange("filtersVisible")
+    public void toggleFilters() { filtersVisible = !filtersVisible; }
+
+    public boolean isAnyFilterActive() {
+        return selectedConcoursFilter != null
+                || selectedCentreExamenFilter != null
+                || (filterNomCandidat != null && !filterNomCandidat.trim().isEmpty());
+    }
+
+    @Command
+    @NotifyChange({"selectedConcoursFilter","selectedCentreExamenFilter","filterNomCandidat","displayItems", "anyFilterActive"})
+    public void removeFilter(@BindingParam("type") String type) {
+        if ("concours".equals(type)) {
+            selectedConcoursFilter = null;
+        } else if ("centre".equals(type)) {
+            selectedCentreExamenFilter = null;
+        } else if ("nom".equals(type)) {
+            filterNomCandidat = "";
+        }
+        refresh();
+    }
+
     private String getCandidatFullName(Candidat c) {
         if (c == null) return "Candidat Inconnu";
         String nom = c.getNom() != null ? c.getNom() : "";
@@ -192,5 +226,32 @@ public class ListeDossierConcoursCandidatViewModel {
         if (fn.endsWith(".xls") || fn.endsWith(".xlsx")) return "z-icon-file-excel-o";
         if (fn.endsWith(".png") || fn.endsWith(".jpg") || fn.endsWith(".jpeg") || fn.endsWith(".gif")) return "z-icon-file-image-o";
         return "z-icon-file-o";
+    }
+
+    public String getCandidatLabel(DisplayItem item) {
+        ListeDossierConcoursCandidat entity = asEntity(item);
+        return entity == null ? "-" : getCandidatFullName(entity.getCandidat());
+    }
+
+    public String getEtatLabel(DisplayItem item) {
+        ListeDossierConcoursCandidat entity = asEntity(item);
+        if (entity == null) return "-";
+        DocumentValidationEtat etat = DocumentValidationEtat.fromCode(entity.getEtatDocument());
+        entity.setEtatDoc(etat.getLabel());
+        return entity.getEtatDoc();
+    }
+
+    public String getEtatSclass(DisplayItem item) {
+        ListeDossierConcoursCandidat entity = asEntity(item);
+        if (entity == null) return "";
+        DocumentValidationEtat etat = DocumentValidationEtat.fromCode(entity.getEtatDocument());
+        return "status-label " + etat.getChipSclass();
+    }
+
+    private ListeDossierConcoursCandidat asEntity(DisplayItem item) {
+        if (item == null || item.isFolder() || !(item.getData() instanceof ListeDossierConcoursCandidat)) {
+            return null;
+        }
+        return (ListeDossierConcoursCandidat) item.getData();
     }
 }

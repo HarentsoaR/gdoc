@@ -12,7 +12,7 @@
                     <label value="Gérer les types de documents requis pour les concours" sclass="page-subtitle"/>
                 </div>
                 <div sclass="header-actions">
-                    <button label="Nouveau Document" sclass="btn-primary" iconSclass="z-icon-plus"
+                    <button label="Nouveau Document" sclass="enmg-btn enmg-btn-primary" iconSclass="z-icon-plus"
                             onClick="@command('addDocument')"/>
                 </div>
             </div>
@@ -26,19 +26,19 @@
                              onOK="@command('search')"
                              instant="true" />
                 </div>
-                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" onClick="@command('refreshDocumentList')"/>
+                <button label="Rafraîchir" sclass="enmg-btn enmg-btn-secondary" iconSclass="z-icon-refresh" onClick="@command('refreshDocumentList')"/>
             </div>
 
             <!-- Panneau du tableau -->
-            <div sclass="panel" vflex="1">
-                <listbox model="@load(vm.documentList)" emptyMessage="Aucun document trouvé." mold="paging" pageSize="10" vflex="1">
+            <div sclass="panel enmg-card" vflex="1">
+                <listbox model="@load(vm.documentList)" emptyMessage="Aucun document trouvé." mold="paging" pageSize="10" vflex="1" sclass="data-table">
                     <listhead>
                         <listheader label="Libellé" sort="auto(libelle)"/>
                         <listheader label="Remarque" sort="auto(remarque)"/>
                         <listheader label="Actions" width="100px" align="center"/>
                     </listhead>
                     <template name="model" var="doc">
-                        <listitem>
+                        <listitem sclass="data-table-row">
                             <listcell label="@load(doc.libelle)"/>
                             <listcell label="@load(doc.remarque)"/>
                             <listcell sclass="actions-cell">

@@ -3,84 +3,19 @@
         Documents List - Manage all documents in the bibliothèque
         Provides CRUD operations for DocumentBiblio entities
     -->
-    <style>
-        .content-area {
-            padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-        .biblio-section-title {
-            font-size: 24px;
-            font-weight: bold;
-            display: block;
-            margin-bottom: 16px;
-            color: #333;
-        }
-        .z-panel {
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .z-panel-header {
-            font-weight: 600;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-        }
-        .list-header {
-            background-color: #f2f2f2;
-            padding: 12px 16px;
-            font-weight: bold;
-            border-radius: 6px 6px 0 0;
-            border-bottom: 1px solid #ddd;
-        }
-        .list-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            border-bottom: 1px solid #eee;
-        }
-        .list-item:hover {
-            background-color: #f9f9f9;
-        }
-        .item-info {
-            display: flex;
-            flex-direction: column;
-            padding-right: 10px;
-        }
-        .item-title {
-            font-weight: 600;
-            color: #333;
-        }
-        .item-subtitle {
-            font-size: 0.9em;
-            color: #777;
-        }
-        .status-available {
-            color: green;
-            font-weight: bold;
-        }
-        .status-unavailable {
-            color: orange;
-            font-weight: bold;
-        }
-        .item-actions button {
-            margin: 0 4px;
-        }
-        .biblio-list .z-hlayout-inner {
-             align-items: center;
-        }
-    </style>
     
     <div sclass="content-area">
         <label value="📚 Gestion des documents" sclass="biblio-section-title" />
         
         <!-- Toolbar -->
         <div style="margin-bottom: 20px;">
-            <hlayout>
-                <button label="Ajouter" zclass="btn btn-primary" iconSclass="z-icon-plus" />
-                <button label="Importer" zclass="btn" iconSclass="z-icon-upload" />
-                <button label="Exporter" zclass="btn" iconSclass="z-icon-download" />
-                <button label="Rafraîchir" zclass="btn" iconSclass="z-icon-refresh" onClick="@command('loadDocuments')" />
-                <button label="Recherche" zclass="btn" />
-                <button label="Rapports" zclass="btn" />
+            <hlayout spacing="8px">
+                <button label="Ajouter" sclass="enmg-btn enmg-btn-primary" iconSclass="z-icon-plus" />
+                <button label="Importer" sclass="enmg-btn enmg-btn-secondary" iconSclass="z-icon-upload" />
+                <button label="Exporter" sclass="enmg-btn enmg-btn-secondary" iconSclass="z-icon-download" />
+                <button label="Rafraîchir" sclass="enmg-btn enmg-btn-secondary" iconSclass="z-icon-refresh" onClick="@command('loadDocuments')" />
+                <button label="Recherche" sclass="enmg-btn enmg-btn-ghost" />
+                <button label="Rapports" sclass="enmg-btn enmg-btn-secondary" />
             </hlayout>
         </div>
         
@@ -100,95 +35,95 @@
                         <button label="Rechercher" 
                                 iconSclass="z-icon-search"
                                 onClick="@command('searchDocuments')" 
-                                zclass="btn btn-primary"/>
+                                sclass="enmg-btn enmg-btn-primary"/>
                         <button label="Réinitialiser" 
                                 iconSclass="z-icon-refresh"
                                 onClick="@command('resetSearch')" 
-                                zclass="btn"/>
+                                sclass="enmg-btn enmg-btn-secondary"/>
                     </hlayout>
                     
                     <!-- Filter Row -->
                     <hlayout valign="middle">
-                        <label value="Type:" style="width: 80px; font-weight: 500; color: #3c4043;" />
+                        <label value="Type:" style="width: 80px; font-weight: 500; color: var(--enmg-color-text);" />
                         <listbox mold="select" model="@load(vm.documentTypes)" 
                                 selectedItem="@bind(vm.selectedDocumentType)" 
                                 onSelect="@command('filterByType')" 
-                                style="width: 180px; padding: 8px 12px; border-radius: 6px; border: 1px solid #dadce0; margin-right: 20px;" />
+                                style="width: 180px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--enmg-color-border); margin-right: 20px;" />
                         
-                        <label value="Domaine:" style="width: 80px; font-weight: 500; color: #3c4043;" />
+                        <label value="Domaine:" style="width: 80px; font-weight: 500; color: var(--enmg-color-text);" />
                         <listbox mold="select" model="@load(vm.domains)" 
                                 selectedItem="@bind(vm.selectedDomain)" 
                                 onSelect="@command('filterByDomain')" 
-                                style="width: 180px; padding: 8px 12px; border-radius: 6px; border: 1px solid #dadce0; margin-right: 20px;" />
+                                style="width: 180px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--enmg-color-border); margin-right: 20px;" />
                         
-                        <label value="Disponibilité:" style="width: 100px; font-weight: 500; color: #3c4043;" />
+                        <label value="Disponibilité:" style="width: 100px; font-weight: 500; color: var(--enmg-color-text);" />
                         <listbox mold="select" model="@load(vm.availabilityOptions)" 
                                 selectedItem="@bind(vm.selectedAvailability)" 
                                 onSelect="@command('filterByAvailability')" 
-                                style="width: 150px; padding: 8px 12px; border-radius: 6px; border: 1px solid #dadce0;" />
+                                style="width: 150px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--enmg-color-border);" />
                     </hlayout>
                 </vlayout>
             </div>
         </div>
         
         <!-- Documents List -->
-        <div sclass="z-panel">
-            <div sclass="z-panel-body" style="padding: 0;">
-            <div sclass="list-header">
-                <hlayout>
-                    <label value="Titre" hflex="3" />
-                        <label value="Auteur / Editeur" hflex="2" />
-                    <label value="Type" hflex="1" />
-                    <label value="Disponibilité" hflex="1" />
-                        <label value="Actions" style="text-align: center;" hflex="1" />
-                </hlayout>
-            </div>
-            
-                <!-- FIX: Using proper ZK syntax with helper methods -->
-                <apply forEach="@load(vm.pagedDocuments)">
-                <div sclass="list-item">
-                        <hlayout hflex="1">
-                    <div sclass="item-info" hflex="3">
+        <div sclass="panel enmg-card" vflex="1">
+            <listbox model="@load(vm.pagedDocuments)"
+                     emptyMessage="Aucun document trouvé."
+                     mold="paging"
+                     pageSize="10"
+                     sclass="data-table">
+                <listhead>
+                    <listheader label="Titre" />
+                    <listheader label="Auteur / Éditeur" />
+                    <listheader label="Type" width="180px" />
+                    <listheader label="Disponibilité" width="160px" />
+                    <listheader label="Actions" width="160px" align="center"/>
+                </listhead>
+                <template name="model" var="each">
+                    <listitem sclass="data-table-row">
+                        <listcell>
+                            <vlayout spacing="2px">
                                 <label sclass="item-title" value="@load(each.titre)" />
-                                <hlayout>
-                                    <label sclass="item-subtitle" value="ISBN: " />
+                                <hlayout spacing="4px">
+                                    <label sclass="item-subtitle" value="ISBN :" />
                                     <label sclass="item-subtitle" value="@load(each.numeroIsbn != null ? each.numeroIsbn : 'Non spécifié')" />
                                 </hlayout>
-                    </div>
-                    
-                    <div sclass="item-info" hflex="2">
+                            </vlayout>
+                        </listcell>
+                        <listcell>
+                            <vlayout spacing="2px">
                                 <label sclass="item-title" value="@load(vm.getAuthorLabel(each))" />
                                 <label sclass="item-subtitle" value="@load(vm.getPublisherLabel(each))" />
-                    </div>
-                    
-                    <div sclass="item-info" hflex="1">
-                                <label sclass="item-title" value="@load(vm.getDocumentTypeLabel(each))" />
-                    </div>
-                    
-                    <div sclass="item-info" hflex="1">
-                                <label sclass="@load(each.disponibilite eq 1 ? 'status-available' : 'status-unavailable')"
-                                       value="@load(each.disponibilite eq 1 ? 'Disponible' : 'Indisponible')" />
-                    </div>
-                    
-                            <div sclass="item-actions" hflex="1" style="text-align: center;">
-                                <button tooltiptext="Voir" iconSclass="z-icon-eye" zclass="btn-icon" onClick="@command('viewDocument', document=each)" />
-                                <button tooltiptext="Modifier" iconSclass="z-icon-pencil" zclass="btn-icon" onClick="@command('editDocument', document=each)" />
-                                <button tooltiptext="Supprimer" iconSclass="z-icon-trash-o" zclass="btn-icon btn-danger" onClick="@command('deleteDocument', document=each)" />
-                            </div>
-                        </hlayout>
-                    </div>
-                </apply>
-                </div>
+                            </vlayout>
+                        </listcell>
+                        <listcell>
+                            <label sclass="item-title" value="@load(vm.getDocumentTypeLabel(each))" />
+                        </listcell>
+                        <listcell>
+                            <label sclass="@load(each.disponibilite eq 1 ? 'status-available' : 'status-unavailable')"
+                                   value="@load(each.disponibilite eq 1 ? 'Disponible' : 'Indisponible')" />
+                        </listcell>
+                        <listcell align="center">
+                            <hlayout spacing="8px" style="justify-content:center;">
+                                <button tooltiptext="Voir" iconSclass="z-icon-eye" sclass="btn-icon" onClick="@command('viewDocument', document=each)" />
+                                <button tooltiptext="Modifier" iconSclass="z-icon-pencil" sclass="btn-icon" onClick="@command('editDocument', document=each)" />
+                                <button tooltiptext="Supprimer" iconSclass="z-icon-trash-o" sclass="btn-icon btn-danger" onClick="@command('deleteDocument', document=each)" />
+                            </hlayout>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
         </div>
         
         <!-- Pagination -->
         <div style="text-align: center; margin-top: 16px;">
             <hlayout style="display: inline-flex; align-items: center;">
                 <button label="Précédent" onClick="@command('previousPage')" 
-                        disabled="@load(vm.currentPageNumber le 1)" zclass="btn" />
+                        disabled="@load(vm.currentPageNumber le 1)" sclass="enmg-btn enmg-btn-secondary" />
                 <label value="Page @load(vm.currentPageNumber) sur @load(vm.totalPages)" style="margin: 0 15px;" />
                 <button label="Suivant" onClick="@command('nextPage')" 
-                        disabled="@load(vm.currentPageNumber ge vm.totalPages)" zclass="btn" />
+                        disabled="@load(vm.currentPageNumber ge vm.totalPages)" sclass="enmg-btn enmg-btn-secondary" />
             </hlayout>
         </div>
     </div>

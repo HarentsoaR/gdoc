@@ -1,0 +1,42 @@
+<?page title="Corbeille"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <div sclass="page-container" vflex="1" viewModel="@id('tvm') @init('mg.md2i.gedi.control.viewmodel.CorbeilleViewModel')">
+        <vlayout hflex="1" vflex="1" style="gap:16px;">
+            <div class="page-header">
+                <div>
+                    <label value="Corbeille" sclass="page-title"/>
+                    <label value="Retrouvez ici les documents supprimés au cours des 20 derniers jours." sclass="page-subtitle"/>
+                </div>
+                <div class="header-actions">
+                    <button label="Purger les expirés" sclass="btn" iconSclass="z-icon-recycle"
+                            onClick="@command('purgeExpired')"/>
+                </div>
+            </div>
+
+            <div sclass="trash-grid" vflex="1" hflex="1">
+                <forEach items="@load(tvm.documents)" var="item">
+                    <div class="trash-card">
+                        <div class="trash-card-header">
+                            <label value="@load(item.document)" sclass="trash-card-title"/>
+                            <label value="@load(item.deletedAtLabel)" sclass="trash-card-date"/>
+                        </div>
+                        <div class="trash-card-body">
+                            <label value="@load(item.candidate)" sclass="trash-card-subtitle"/>
+                            <label value="@load(item.fileName)" sclass="trash-card-file"/>
+                        </div>
+                        <div class="trash-card-actions">
+                            <button label="Restaurer" sclass="btn btn-secondary"
+                                    iconSclass="z-icon-undo"
+                                    onClick="@command('restore', id=item.id)"/>
+                            <button label="Supprimer" sclass="btn btn-danger"
+                                    iconSclass="z-icon-trash-o"
+                                    onClick="@command('deleteForever', id=item.id)"/>
+                        </div>
+                    </div>
+                </forEach>
+                <label value="Aucun document dans la corbeille." sclass="empty-state"
+                       visible="@load(empty tvm.documents)"/>
+            </div>
+        </vlayout>
+    </div>
+</zk>

@@ -11,7 +11,7 @@
                     <label value="Gérer les filières de formation" sclass="page-subtitle"/>
                 </div>
                 <div sclass="header-actions">
-                    <button label="Nouvelle Filière" sclass="btn-primary" iconSclass="z-icon-plus" onClick="@command('addFiliere')"/>
+                    <button label="Nouvelle Filière" sclass="enmg-btn enmg-btn-primary" iconSclass="z-icon-plus" onClick="@command('addFiliere')"/>
                 </div>
             </div>
 
@@ -21,12 +21,12 @@
                     <n:i class="z-icon-search search-icon" />
                     <textbox hflex="1" placeholder="Rechercher par code ou libellé..." value="@bind(vm.searchQuery)" onOK="@command('search')" instant="true"/>
                 </div>
-                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" onClick="@command('search')"/>
+                <button label="Rafraîchir" sclass="enmg-btn enmg-btn-secondary" iconSclass="z-icon-refresh" onClick="@command('search')"/>
             </div>
 
             <!-- Panneau du tableau -->
-            <div class="panel" vflex="1">
-                <listbox model="@load(vm.filiereList)" emptyMessage="Aucune filière trouvée." mold="paging" pageSize="10" vflex="1">
+            <div class="panel enmg-card" vflex="1">
+                <listbox model="@load(vm.filiereList)" emptyMessage="Aucune filière trouvée." mold="paging" pageSize="10" vflex="1" sclass="data-table">
                     <listhead>
                         <listheader label="Code" width="200px" sort="auto(code)"/>
                         <listheader label="Libellé" sort="auto(libelle)"/>
@@ -34,7 +34,7 @@
                         <listheader label="Actions" width="120px" align="center"/>
                     </listhead>
                     <template name="model" var="f">
-                        <listitem>
+                        <listitem sclass="data-table-row">
                             <listcell label="@load(f.code)"/>
                             <listcell label="@load(f.libelle)"/>
                             <listcell label="@load(f.sysId)"/>

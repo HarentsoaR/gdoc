@@ -6,22 +6,18 @@ import mg.md2i.gedi.entity.Document;
 import mg.md2i.gedi.gestionmetier.DocumentGestion;
 import mg.md2i.gedi.services.LuceneService;
 import mg.md2i.gedi.services.impl.LuceneServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zul.Bandbox;
+import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Combobox;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 public class DocumentViewModel {
-
-    private static final Logger log = LoggerFactory.getLogger(DocumentViewModel.class);
     
     private LuceneService luceneService = new LuceneServiceImpl();
 
@@ -29,26 +25,36 @@ public class DocumentViewModel {
     private Map<String, Object> navigationArgs;
     private CandidatViewModel candidatViewModel = new CandidatViewModel();
     private boolean concoursExpanded = false;
+    private boolean navigationExpanded = true;
+    private boolean fluxExpanded = true;
     
     private List<SearchResult> searchResults = new ArrayList<>();
-    private List<SearchResult> suggestions = new ArrayList<>();
-    private List<SearchResult> filteredSearchResults = new ArrayList<>();
     private String searchQuery = "";
     private String currentPath = "Mes Documents";
     private String currentView = "/documents/views/dashboard.zul";
+    private static final Map<String, String> VIEW_TO_PATH;
+    static {
+        Map<String, String> map = new HashMap<>();
+        map.put("/documents/views/dashboard.zul", "/documents");
+        map.put("/documents/views/concours/list.zul", "/documents/concours/list");
+        map.put("/documents/views/concours/new.zul", "/documents/concours/new");
+        map.put("/documents/views/concours/edit.zul", "/documents/concours/edit");
+        map.put("/documents/views/concours/documents-concours/list.zul", "/documents/concours/documents");
+        map.put("/documents/views/concours/documents-concours/new.zul", "/documents/concours/documents/new");
+        map.put("/documents/views/concours/documents-concours/edit.zul", "/documents/concours/documents/edit");
+        map.put("/documents/views/concours/suivi-dossiers.zul", "/documents/concours/suivi");
+        map.put("/documents/views/concours/validation-dossiers.zul", "/documents/concours/validation");
+        map.put("/documents/views/filiere/list.zul", "/documents/filieres/list");
+        map.put("/documents/views/filiere/new.zul", "/documents/filieres/new");
+        map.put("/documents/views/filiere/edit.zul", "/documents/filieres/edit");
+        map.put("/documents/views/candidats/list.zul", "/documents/candidats/list");
+        map.put("/documents/views/candidats/new.zul", "/documents/candidats/new");
+        map.put("/documents/views/candidats/edit.zul", "/documents/candidats/edit");
+        map.put("/documents/views/candidats/dossiers.zul", "/documents/candidats/dossiers");
+        map.put("/documents/views/candidats/corbeille.zul", "/documents/candidats/corbeille");
+        VIEW_TO_PATH = Collections.unmodifiableMap(map);
+    }
 
-    private List<String> availableConcoursFilters = new ArrayList<>();
-    private List<String> availableDocTypeFilters = new ArrayList<>();
-    private String selectedConcoursFilter = "";
-    private String selectedDocTypeFilter = "";
-    
-    private List<String> availableFilieres = new ArrayList<>();
-    private List<String> availablePromotions = new ArrayList<>();
-    private List<String> availableCentres = new ArrayList<>();
-    private String selectedFiliere = "";
-    private String selectedPromotion = "";
-    private String selectedCentre = "";
-    
     // This is the state for our sidebar
     private boolean sidebarCollapsed = false;
     public boolean isSidebarCollapsed() { return sidebarCollapsed; }
@@ -61,13 +67,9 @@ public class DocumentViewModel {
         sidebarCollapsed = !sidebarCollapsed;
     }
 
-    @Wire("#searchBox") 
-    private Bandbox searchBox;
-
     public List<Document> getDocuments() { return documents; }
     public void setDocuments(List<Document> documents) { this.documents = documents; }
     public List<SearchResult> getSearchResults() { return searchResults; }
-    public List<SearchResult> getSuggestions() { return suggestions; } 
     public String getSearchQuery() { return searchQuery; }
     public void setSearchQuery(String searchQuery) { this.searchQuery = searchQuery; }
     public String getCurrentPath() { return currentPath; }
@@ -80,28 +82,65 @@ public class DocumentViewModel {
     public void setCandidatViewModel(CandidatViewModel candidatViewModel) { this.candidatViewModel = candidatViewModel; }
     public boolean isConcoursExpanded() { return concoursExpanded; }
     public void setConcoursExpanded(boolean concoursExpanded) { this.concoursExpanded = concoursExpanded; }
-    public List<SearchResult> getFilteredSearchResults() { return filteredSearchResults; }
-    public List<String> getAvailableConcoursFilters() { return availableConcoursFilters; }
-    public List<String> getAvailableDocTypeFilters() { return availableDocTypeFilters; }
-    public String getSelectedConcoursFilter() { return selectedConcoursFilter; }
-    public void setSelectedConcoursFilter(String selectedConcoursFilter) { this.selectedConcoursFilter = selectedConcoursFilter; }
-    public String getSelectedDocTypeFilter() { return selectedDocTypeFilter; }
-    public void setSelectedDocTypeFilter(String selectedDocTypeFilter) { this.selectedDocTypeFilter = selectedDocTypeFilter; }
-    public List<String> getAvailableFilieres() { return availableFilieres; }
-    public List<String> getAvailablePromotions() { return availablePromotions; }
-    public List<String> getAvailableCentres() { return availableCentres; }
-    public String getSelectedFiliere() { return selectedFiliere; }
-    public void setSelectedFiliere(String selectedFiliere) { this.selectedFiliere = selectedFiliere; }
-    public String getSelectedPromotion() { return selectedPromotion; }
-    public void setSelectedPromotion(String selectedPromotion) { this.selectedPromotion = selectedPromotion; }
-    public String getSelectedCentre() { return selectedCentre; }
-    public void setSelectedCentre(String selectedCentre) { this.selectedCentre = selectedCentre; }
+    public boolean isNavigationExpanded() { return navigationExpanded; }
+    public void setNavigationExpanded(boolean navigationExpanded) { this.navigationExpanded = navigationExpanded; }
+    public boolean isFluxExpanded() { return fluxExpanded; }
+    public void setFluxExpanded(boolean fluxExpanded) { this.fluxExpanded = fluxExpanded; }
+    
+    @DependsOn("currentView")
+    public String getActiveView() {
+        return currentView;
+    }
+    
+    @DependsOn("currentView")
+    public boolean isConcoursSectionActive() {
+        return currentView != null && currentView.startsWith("/documents/views/concours");
+    }
+
+    @DependsOn({"searchResults", "searchQuery"})
+    public String getSearchResultsHeadline() {
+        if (searchQuery == null || searchQuery.trim().isEmpty()) {
+            return "Recherche avancée";
+        }
+        int count = searchResults != null ? searchResults.size() : 0;
+        return count + " résultat(s) pour \"" + searchQuery + "\"";
+    }
+
+    @DependsOn("searchResults")
+    public boolean isSearchResultEmpty() {
+        return searchResults == null || searchResults.isEmpty();
+    }
+
+    @DependsOn({"searchResults", "searchQuery"})
+    public String getSearchResultsHint() {
+        if (searchQuery == null || searchQuery.trim().isEmpty()) {
+            return "Combinez des mots-clés et des critères comme concours:magistrats centre:Antananarivo";
+        }
+        return "Affinez encore avec concours:, filiere:, promotion:, centre:, etat:, numero:";
+    }
 
     @Init
     public void init() {
         loadDocuments();
         if (candidatViewModel != null) {
             candidatViewModel.init();
+        }
+        String viewParam = Executions.getCurrent().getParameter("view");
+        if (viewParam != null && !viewParam.trim().isEmpty()) {
+            this.currentView = viewParam;
+            String sectionParam = Executions.getCurrent().getParameter("section");
+            String pageParam = Executions.getCurrent().getParameter("page");
+            if (sectionParam != null && !sectionParam.trim().isEmpty() &&
+                    pageParam != null && !pageParam.trim().isEmpty()) {
+                this.currentPath = sectionParam + " \u203A " + pageParam;
+            } else if (pageParam != null && !pageParam.trim().isEmpty()) {
+                this.currentPath = pageParam;
+            } else {
+                this.currentPath = "Mes Documents";
+            }
+            pushPrettyUrl(this.currentView);
+        } else {
+            pushPrettyUrl(this.currentView);
         }
     }
     
@@ -123,6 +162,7 @@ public class DocumentViewModel {
         this.currentView = view;
         this.navigationArgs = (payload instanceof Map) ? (Map<String, Object>) payload : new HashMap<>();
         this.currentPath = (section != null && !section.trim().isEmpty() && page != null && !page.trim().isEmpty()) ? section + " \u203A " + page : (label != null ? label : "");
+        pushPrettyUrl(view);
     }
     
     @Command
@@ -131,6 +171,7 @@ public class DocumentViewModel {
         if (view == null || view.trim().isEmpty()) return;
         this.currentView = view;
         this.currentPath = (section != null && !section.trim().isEmpty() && page != null && !page.trim().isEmpty()) ? section + " \u203A " + page : (label != null ? label : "");
+        pushPrettyUrl(view);
     }
 
     @Command
@@ -138,118 +179,148 @@ public class DocumentViewModel {
     public void toggleConcoursSection() {
         concoursExpanded = !concoursExpanded;
     }
-    
-    @Command
-    @NotifyChange({"suggestions", "searchResults", "filteredSearchResults", "availableConcoursFilters", "availableDocTypeFilters", "availableFilieres", "availablePromotions", "availableCentres"})
-    public void updateDynamicSearch() {
-        if (searchQuery == null || searchQuery.trim().length() < 2) {
-            suggestions.clear();
-            if (searchBox != null) searchBox.close();
-            return;
-        }
 
-        this.suggestions = luceneService.getSuggestions(searchQuery);
-        if (searchBox != null) {
-            if (suggestions.isEmpty()) searchBox.close();
-            else searchBox.open();
-        }
-
-        this.searchResults = luceneService.search(searchQuery);
-        populateFilters();
-        applyFilters();
-    }
-    
     @Command
-    @NotifyChange({"searchQuery", "suggestions"})
-    public void selectSuggestion(@BindingParam("suggestion") SearchResult result) {
-        this.searchQuery = result.getCandidateFullName();
-        this.suggestions.clear();
-        if (searchBox != null) {
-            searchBox.close();
-        }
-        searchDocuments();
+    @NotifyChange("navigationExpanded")
+    public void toggleNavigationSection() {
+        navigationExpanded = !navigationExpanded;
     }
 
     @Command
-    @NotifyChange({"searchResults", "filteredSearchResults", "currentView", "currentPath", "suggestions", "availableConcoursFilters", "availableDocTypeFilters", "availableFilieres", "availablePromotions", "availableCentres", "selectedConcoursFilter", "selectedDocTypeFilter", "selectedFiliere", "selectedPromotion", "selectedCentre"})
+    @NotifyChange("fluxExpanded")
+    public void toggleFluxSection() {
+        fluxExpanded = !fluxExpanded;
+    }
+
+    private void pushPrettyUrl(String view) {
+        String targetPath = VIEW_TO_PATH.getOrDefault(view, "/documents");
+        String context = Executions.getCurrent().getContextPath();
+        if (context == null) {
+            context = "";
+        }
+        String fullPath = (context.endsWith("/") ? context.substring(0, context.length() - 1) : context) + targetPath;
+        String sanitized = fullPath.replace("'", "\\'");
+        Clients.evalJavaScript(String.format("window.history.replaceState(null,'','%s');", sanitized));
+    }
+    
+    @Command
+    @NotifyChange({"searchResults", "currentView", "currentPath", "searchResultsHeadline", "searchResultsHint"})
     public void searchDocuments() {
-        if (searchBox != null) searchBox.close();
-        this.suggestions.clear();
-        
-        if (searchQuery == null || searchQuery.trim().isEmpty()) {
+        String query = searchQuery != null ? searchQuery.trim() : "";
+        if (query.isEmpty()) {
             goHomeSearch();
             return;
         }
-        
-        this.searchResults = luceneService.search(searchQuery);
-        populateFilters();
-        applyFilters();
-        
-        navigateToGlobal("/documents/views/shared/search-results.zul", "Résultats de la recherche", null, null, null);
+        this.searchQuery = query;
+        if (!refreshSearchResults(true)) {
+            return;
+        }
+        navigateTo("/documents/views/shared/search-results.zul",
+                "Résultats de la recherche",
+                "Documents",
+                "Recherche avancée");
+    }
+
+    @GlobalCommand("documentsSearchSubmit")
+    @NotifyChange({"searchResults", "currentView", "currentPath", "searchResultsHeadline", "searchResultsHint"})
+    public void documentsSearchSubmit() {
+        searchDocuments();
     }
     
     @Command
-    @NotifyChange({"searchResults", "filteredSearchResults", "currentView", "currentPath"})
+    @NotifyChange({"searchResults", "currentView", "currentPath", "searchResultsHeadline", "searchResultsHint"})
     public void goHomeSearch() {
+        this.searchQuery = "";
         this.searchResults.clear();
-        this.filteredSearchResults.clear();
-        navigateToGlobal("/documents/views/dashboard.zul", "Mes Documents", null, null, null);
-    }
-    
-    private void populateFilters() {
-        this.availableConcoursFilters = extractDistinctValues(SearchResult::getConcoursDisplayInfo);
-        this.availableDocTypeFilters = extractDistinctValues(SearchResult::getDocTypeName);
-        this.availableFilieres = extractDistinctValues(SearchResult::getFiliere);
-        this.availablePromotions = extractDistinctValues(SearchResult::getPromotion);
-        this.availableCentres = extractDistinctValues(SearchResult::getCentreExamen);
-    }
-
-    private List<String> extractDistinctValues(java.util.function.Function<SearchResult, String> extractor) {
-        return searchResults.stream()
-            .map(extractor)
-            .filter(s -> s != null && !s.isEmpty())
-            .distinct()
-            .sorted()
-            .collect(Collectors.toList());
-    }
-
-    @Command
-    @NotifyChange("filteredSearchResults")
-    public void applyFilters() {
-        this.filteredSearchResults = this.searchResults.stream()
-            .filter(result -> {
-                boolean concoursMatch = selectedConcoursFilter == null || selectedConcoursFilter.isEmpty() || selectedConcoursFilter.equals(result.getConcoursDisplayInfo());
-                boolean docTypeMatch = selectedDocTypeFilter == null || selectedDocTypeFilter.isEmpty() || selectedDocTypeFilter.equals(result.getDocTypeName());
-                boolean filiereMatch = selectedFiliere == null || selectedFiliere.isEmpty() || selectedFiliere.equals(result.getFiliere());
-                boolean promotionMatch = selectedPromotion == null || selectedPromotion.isEmpty() || selectedPromotion.equals(result.getPromotion());
-                boolean centreMatch = selectedCentre == null || selectedCentre.isEmpty() || selectedCentre.equals(result.getCentreExamen());
-                return concoursMatch && docTypeMatch && filiereMatch && promotionMatch && centreMatch;
-            })
-            .collect(Collectors.toList());
+        navigateTo("/documents/views/dashboard.zul", "Mes Documents", null, null);
     }
     
     @Command
-    @NotifyChange({"filteredSearchResults", "selectedConcoursFilter", "selectedDocTypeFilter", "selectedFiliere", "selectedPromotion", "selectedCentre"})
-    public void clearFilters() {
-        this.selectedConcoursFilter = null;
-        this.selectedDocTypeFilter = null;
-        this.selectedFiliere = null;
-        this.selectedPromotion = null;
-        this.selectedCentre = null;
-        applyFilters(); 
+    @NotifyChange("searchQuery")
+    public void handleSearchInput(@BindingParam("term") String rawTerm) {
+        this.searchQuery = rawTerm != null ? rawTerm : "";
+        if (!isSearchResultsView()) {
+            return;
+        }
+        String trimmed = searchQuery.trim();
+        if (trimmed.isEmpty()) {
+            this.searchResults.clear();
+        } else if (trimmed.length() >= 2) {
+            refreshSearchResults(false);
+        }
+        BindUtils.postNotifyChange(null, null, this, "searchResults");
+        BindUtils.postNotifyChange(null, null, this, "searchResultsHeadline");
+        BindUtils.postNotifyChange(null, null, this, "searchResultsHint");
+    }
+
+    @GlobalCommand("documentsHandleSearchInput")
+    @NotifyChange({"searchResults", "currentView", "currentPath", "searchResultsHeadline", "searchResultsHint"})
+    public void handleSearchInputGlobal(@BindingParam("term") String rawTerm) {
+        handleSearchInput(rawTerm);
     }
     
-    @Command @NotifyChange({"selectedConcoursFilter", "filteredSearchResults"}) public void removeConcoursFilter() { this.selectedConcoursFilter = null; applyFilters(); }
-    @Command @NotifyChange({"selectedDocTypeFilter", "filteredSearchResults"}) public void removeDocTypeFilter() { this.selectedDocTypeFilter = null; applyFilters(); }
-    @Command @NotifyChange({"selectedFiliere", "filteredSearchResults"}) public void removeFiliereFilter() { this.selectedFiliere = null; applyFilters(); }
-    @Command @NotifyChange({"selectedPromotion", "filteredSearchResults"}) public void removePromotionFilter() { this.selectedPromotion = null; applyFilters(); }
-    @Command @NotifyChange({"selectedCentre", "filteredSearchResults"}) public void removeCentreFilter() { this.selectedCentre = null; applyFilters(); }
+    @Command
+    public void openSearchResult(@BindingParam("result") SearchResult result) {
+        if (result == null || result.getCandidatId() == null) {
+            Clients.showNotification("Impossible d'ouvrir ce dossier.", "warning", null, "top_center", 2000);
+            return;
+        }
+        Executions.getCurrent().setAttribute("validationCandidateId", result.getCandidatId());
+        Executions.getCurrent().setAttribute("validationCandidateName", result.getCandidateFullName());
+        BindUtils.postGlobalCommand(null, null, "navigateToGlobal", new HashMap<String, Object>() {{
+            put("view", "/documents/views/concours/validation-documents.zul");
+            put("section", "Concours");
+            put("page", "Validation dossiers \u203A Documents du candidat");
+            put("label", "Documents du candidat");
+        }});
+    }
+    
+    private boolean refreshSearchResults(boolean warnIfShort) {
+        String query = searchQuery != null ? searchQuery.trim() : "";
+        if (query.length() < 2) {
+            if (warnIfShort) {
+                Clients.showNotification("Tapez au moins deux caractères pour lancer la recherche.", "info", null, "top_center", 2000);
+            }
+            return false;
+        }
+        List<SearchResult> results = luceneService.search(query);
+        this.searchResults = results != null ? results : new ArrayList<>();
+        return true;
+    }
+
+    private boolean isSearchResultsView() {
+        return "/documents/views/shared/search-results.zul".equals(currentView);
+    }
+
+    @Command
+    public void goToCandidatStep(@BindingParam("step") int step) {
+        candidatViewModel.setCreationStep(step);
+        BindUtils.postNotifyChange(null, null, candidatViewModel, "creationStep");
+    }
+
+    @Command
+    public void updateCandidatConcours(@BindingParam("combobox") Combobox combobox) {
+        candidatViewModel.onConcoursChange(combobox);
+        BindUtils.postNotifyChange(null, null, candidatViewModel, "currentCandidat");
+        BindUtils.postNotifyChange(null, null, candidatViewModel, "nextRangLabel");
+    }
+
+    @Command
+    public void updateCandidatCentre(@BindingParam("combobox") Combobox combobox) {
+        candidatViewModel.onCentreExamenChange(combobox);
+        BindUtils.postNotifyChange(null, null, candidatViewModel, "currentCandidat");
+    }
+
+    
     @Command @NotifyChange("candidatViewModel") public void newCandidat() { candidatViewModel.newCandidat(); }
     @Command @NotifyChange("candidatViewModel") public void editCandidat(@BindingParam("candidat") Candidat c) { candidatViewModel.editCandidat(c); }
     @Command @NotifyChange("candidatViewModel") public void saveCandidat() { candidatViewModel.save(); }
     @Command @NotifyChange("candidatViewModel") public void cancelCandidat() { candidatViewModel.cancel(); }
     @Command @NotifyChange("candidatViewModel") public void deleteCandidat(@BindingParam("id") Integer id) { candidatViewModel.delete(id); }
     @Command @NotifyChange("candidatViewModel") public void viewCandidat(@BindingParam("candidat") Candidat c) { candidatViewModel.viewCandidat(c); }
+    @Command @NotifyChange({"candidatViewModel.detailVisible", "candidatViewModel.detailCandidat", "candidatViewModel.detailSummary", "candidatViewModel.detailDocuments", "candidatViewModel.missingDocuments"})
+    public void closeDetail() { candidatViewModel.closeDetail(); }
+    @Command public void downloadDocument(@BindingParam("doc") CandidatViewModel.DocumentEntry doc) { candidatViewModel.downloadDocument(doc); }
     @Command @NotifyChange("candidatViewModel") public void refreshCandidats() { candidatViewModel.refresh(); }
     @Command @NotifyChange("candidatViewModel") public void searchCandidats() { candidatViewModel.search(); }
     @Command @NotifyChange("candidatViewModel") public void onConcoursChange(@BindingParam("self") org.zkoss.zul.Combobox c) { candidatViewModel.onConcoursChange(c); }

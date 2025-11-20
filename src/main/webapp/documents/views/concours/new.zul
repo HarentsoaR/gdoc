@@ -5,6 +5,9 @@
             overflow-y: auto;
             max-height: 80vh;
             padding: 16px;
+            background: var(--enmg-color-surface);
+            border-radius: var(--enmg-radius-lg);
+            box-shadow: var(--enmg-shadow-sm);
         }
         .concours-form-grid {
             width: 100%;
@@ -36,7 +39,7 @@
                 </columns>
                 <rows>
                     <row>
-                        <cell colspan="2" sclass="fw-bold" style="padding: 16px 0 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <cell colspan="2" sclass="fw-bold" style="padding: 16px 0 8px 0; border-bottom: 1px solid var(--enmg-color-border);">
                             <label value="Informations Générales"/>
                         </cell>
                     </row>
@@ -103,7 +106,7 @@
                         </cell>
                     </row>
                     <row>
-                        <cell colspan="2" sclass="fw-bold" style="padding: 24px 0 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <cell colspan="2" sclass="fw-bold" style="padding: 24px 0 8px 0; border-bottom: 1px solid var(--enmg-color-border);">
                             <label value="Limite d'âge"/>
                         </cell>
                     </row>
@@ -124,7 +127,7 @@
                         </cell>
                     </row>
                     <row>
-                        <cell colspan="2" sclass="fw-bold" style="padding: 24px 0 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <cell colspan="2" sclass="fw-bold" style="padding: 24px 0 8px 0; border-bottom: 1px solid var(--enmg-color-border);">
                             <label value="Autres Informations"/>
                         </cell>
                     </row>

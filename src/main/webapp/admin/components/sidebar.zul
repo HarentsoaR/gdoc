@@ -1,124 +1,131 @@
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
     <div sclass="sidebar admin-sidebar @load(vm.sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded')">
         <div sclass="sidebar-header">
-            <label value="GEDI Admin" sclass="app-title" />
+            <div class="sidebar-brand" visible="@load(not vm.sidebarCollapsed)">
+                <image src="/img/login.png" sclass="sidebar-logo"/>
+                <div class="sidebar-brand-text">
+                    <label value="Console de supervision" sclass="app-subtitle"/>
+                </div>
+            </div>
             <button sclass="sidebar-toggle-btn"
                     iconSclass="@load(vm.sidebarCollapsed ? 'z-icon-angle-double-right' : 'z-icon-angle-double-left')"
                     onClick="@command('toggleSidebar')" />
         </div>
 
-        <div sclass="sidebar-full-content" visible="@load(not vm.sidebarCollapsed)">
-            <div sclass="sidebar-section nav-links">
-                <button label="Retour à l'accueil"
-                        sclass="sidebar-button"
-                        iconSclass="z-icon-home"
-                        onClick="@command('goHome')" />
-                <button label="Tableau de bord"
-                        sclass="sidebar-button"
-                        iconSclass="z-icon-dashboard"
-                        onClick="@command('navigateTo', view='/admin/views/dashboard.zul', label='Tableau de bord')" />
-                <button label="Documents GEDI"
-                        sclass="sidebar-button"
-                        iconSclass="z-icon-folder"
-                        onClick="@command('navigateTo', view='/admin/views/documents.zul', label='Documents')" />
+        <div class="sidebar-scroll">
+            <div class="sidebar-full-content" visible="@load(not vm.sidebarCollapsed)">
+                <div class="sidebar-section nav-links">
+                    <button label="Retour à l'accueil"
+                            sclass="sidebar-button"
+                            iconSclass="z-icon-home"
+                            onClick="@command('goHome')" />
+                    <button label="Tableau de bord"
+                            sclass="sidebar-button"
+                            iconSclass="z-icon-dashboard"
+                            onClick="@command('navigateTo', view='/admin/views/dashboard.zul', label='Tableau de bord')" />
+                   <!-- <button label="Documents GEDI"
+                            sclass="sidebar-button"
+                            iconSclass="z-icon-folder"
+                            onClick="@command('navigateTo', view='/admin/views/documents.zul', label='Documents')" /> -->
+                </div>
+
+                <separator/>
+
+                <div sclass="sidebar-section">
+                    <div sclass="sidebar-accordion @load(vm.usersMenuExpanded ? 'open' : '')"
+                         onClick="@command('toggleUsersMenu')">
+                        <n:i class="z-icon-users sidebar-accordion-icon" />
+                        <label value="Utilisateurs" sclass="sidebar-accordion-label" />
+                        <n:i class="z-icon-caret-right sidebar-accordion-caret" />
+                    </div>
+                    <vlayout sclass="sidebar-subnav" visible="@load(vm.usersMenuExpanded)">
+                        <button label="Liste"
+                                sclass="sidebar-button"
+                                iconSclass="z-icon-list"
+                                onClick="@command('navigateTo', view='/admin/views/utilisateurs/list.zul', section='Utilisateurs', page='Liste')" />
+                        <button label="Accès"
+                                sclass="sidebar-button"
+                                iconSclass="z-icon-lock"
+                                onClick="@command('navigateTo', view='/admin/views/utilisateurs/acces.zul', section='Utilisateurs', page='Gestion des accès')" />
+                        <button label="Audit"
+                                sclass="sidebar-button"
+                                iconSclass="z-icon-eye"
+                                onClick="@command('navigateTo', view='/admin/views/utilisateurs/audit.zul', section='Utilisateurs', page='Audit')" />
+                    </vlayout>
+                </div>
+
+                <separator/>
+
+                <div sclass="sidebar-section">
+                    <div sclass="sidebar-accordion @load(vm.configurationsMenuExpanded ? 'open' : '')"
+                         onClick="@command('toggleConfigurationsMenu')">
+                        <n:i class="z-icon-cogs sidebar-accordion-icon" />
+                        <label value="Configurations" sclass="sidebar-accordion-label" />
+                        <n:i class="z-icon-caret-right sidebar-accordion-caret" />
+                    </div>
+                    <vlayout sclass="sidebar-subnav" visible="@load(vm.configurationsMenuExpanded)">
+                        <button label="Fonctionnalités"
+                                sclass="sidebar-button"
+                                iconSclass="z-icon-cogs"
+                                onClick="@command('navigateTo', view='/admin/views/fonctionnalites/list.zul', section='Configurations', page='Fonctionnalités')" />
+                        <button label="Profils"
+                                sclass="sidebar-button"
+                                iconSclass="z-icon-id-badge"
+                                onClick="@command('navigateTo', view='/admin/views/profils/list.zul', section='Utilisateurs', page='Profils')" />
+                    </vlayout>
+                </div>
+
+                <separator/>
+
+                <!--<div class="sidebar-section nav-links">
+                    <button label="Paramètres"
+                            sclass="sidebar-button"
+                            iconSclass="z-icon-cog"
+                            onClick="@command('navigateTo', view='/admin/views/parametres.zul', label='Paramètres')" />
+                    <button label="Administration avancée"
+                            sclass="sidebar-button"
+                            iconSclass="z-icon-shield"
+                            onClick="@command('navigateTo', view='/admin/views/administration.zul', label='Administration avancée')" />
+                </div>-->
+
+                <div class="sidebar-footer">
+                    <button label="Déconnexion"
+                            sclass="sidebar-button"
+                            iconSclass="z-icon-sign-out"
+                            onClick="@command('doLogout')" />
+                </div>
             </div>
 
-            <separator/>
-
-            <div sclass="sidebar-section">
-                <div sclass="sidebar-accordion @load(vm.usersMenuExpanded ? 'open' : '')"
-                     onClick="@command('toggleUsersMenu')">
-                    <n:i class="z-icon-users sidebar-accordion-icon" />
-                    <label value="Utilisateurs" sclass="sidebar-accordion-label" />
-                    <n:i class="z-icon-caret-right sidebar-accordion-caret" />
-                </div>
-                <vlayout sclass="sidebar-subnav" visible="@load(vm.usersMenuExpanded)">
-                    <button label="Liste"
-                            sclass="sidebar-button"
-                            iconSclass="z-icon-list"
-                            onClick="@command('navigateTo', view='/admin/views/utilisateurs/list.zul', section='Utilisateurs', page='Liste')" />
-                    <button label="Accès"
-                            sclass="sidebar-button"
-                            iconSclass="z-icon-lock"
-                            onClick="@command('navigateTo', view='/admin/views/utilisateurs/acces.zul', section='Utilisateurs', page='Gestion des accès')" />
-                    <button label="Audit"
-                            sclass="sidebar-button"
-                            iconSclass="z-icon-eye"
-                            onClick="@command('navigateTo', view='/admin/views/utilisateurs/audit.zul', section='Utilisateurs', page='Audit')" />
-                </vlayout>
-            </div>
-
-            <separator/>
-
-            <div sclass="sidebar-section">
-                <div sclass="sidebar-accordion @load(vm.configurationsMenuExpanded ? 'open' : '')"
-                     onClick="@command('toggleConfigurationsMenu')">
-                    <n:i class="z-icon-cogs sidebar-accordion-icon" />
-                    <label value="Configurations" sclass="sidebar-accordion-label" />
-                    <n:i class="z-icon-caret-right sidebar-accordion-caret" />
-                </div>
-                <vlayout sclass="sidebar-subnav" visible="@load(vm.configurationsMenuExpanded)">
-                    <button label="Fonctionnalités"
-                            sclass="sidebar-button"
+            <div class="sidebar-collapsed-content" visible="@load(vm.sidebarCollapsed)">
+                <div class="collapsed-icons-top">
+                    <button sclass="icon-btn"
+                            iconSclass="z-icon-home"
+                            tooltiptext="Accueil"
+                            onClick="@command('goHome')" />
+                    <button sclass="icon-btn"
+                            iconSclass="z-icon-dashboard"
+                            tooltiptext="Tableau de bord"
+                            onClick="@command('navigateTo', view='/admin/views/dashboard.zul', label='Tableau de bord')" />
+                    <button sclass="icon-btn"
+                            iconSclass="z-icon-users"
+                            tooltiptext="Utilisateurs"
+                            popup="usersPopup, position=end_center" />
+                    <button sclass="icon-btn"
                             iconSclass="z-icon-cogs"
-                            onClick="@command('navigateTo', view='/admin/views/fonctionnalites/list.zul', section='Configurations', page='Fonctionnalités')" />
-                    <button label="Profils"
-                            sclass="sidebar-button"
-                            iconSclass="z-icon-id-badge"
-                            onClick="@command('navigateTo', view='/admin/views/profils/list.zul', section='Utilisateurs', page='Profils')" />
-                </vlayout>
-            </div>
+                            tooltiptext="Configurations"
+                            popup="configurationsPopup, position=end_center" />
+                    <button sclass="icon-btn"
+                            iconSclass="z-icon-cog"
+                            tooltiptext="Paramètres"
+                            onClick="@command('navigateTo', view='/admin/views/parametres.zul', label='Paramètres')" />
+                </div>
 
-            <separator/>
-
-            <div sclass="sidebar-section nav-links">
-                <button label="Paramètres"
-                        sclass="sidebar-button"
-                        iconSclass="z-icon-cog"
-                        onClick="@command('navigateTo', view='/admin/views/parametres.zul', label='Paramètres')" />
-                <button label="Administration avancée"
-                        sclass="sidebar-button"
-                        iconSclass="z-icon-shield"
-                        onClick="@command('navigateTo', view='/admin/views/administration.zul', label='Administration avancée')" />
-            </div>
-
-            <div class="sidebar-footer">
-                <button label="Déconnexion"
-                        sclass="sidebar-button"
-                        iconSclass="z-icon-sign-out"
-                        onClick="@command('doLogout')" />
-            </div>
-        </div>
-
-        <div sclass="sidebar-collapsed-content" visible="@load(vm.sidebarCollapsed)">
-            <div class="collapsed-icons-top">
-                <button sclass="icon-btn"
-                        iconSclass="z-icon-home"
-                        tooltiptext="Accueil"
-                        onClick="@command('goHome')" />
-                <button sclass="icon-btn"
-                        iconSclass="z-icon-dashboard"
-                        tooltiptext="Tableau de bord"
-                        onClick="@command('navigateTo', view='/admin/views/dashboard.zul', label='Tableau de bord')" />
-                <button sclass="icon-btn"
-                        iconSclass="z-icon-users"
-                        tooltiptext="Utilisateurs"
-                        popup="usersPopup, position=end_center" />
-                <button sclass="icon-btn"
-                        iconSclass="z-icon-cogs"
-                        tooltiptext="Configurations"
-                        popup="configurationsPopup, position=end_center" />
-                <button sclass="icon-btn"
-                        iconSclass="z-icon-cog"
-                        tooltiptext="Paramètres"
-                        onClick="@command('navigateTo', view='/admin/views/parametres.zul', label='Paramètres')" />
-            </div>
-
-            <div class="collapsed-icons-bottom">
-                <button sclass="icon-btn"
-                        iconSclass="z-icon-sign-out"
-                        tooltiptext="Déconnexion"
-                        onClick="@command('doLogout')" />
+                <div class="collapsed-icons-bottom">
+                    <button sclass="icon-btn"
+                            iconSclass="z-icon-sign-out"
+                            tooltiptext="Déconnexion"
+                            onClick="@command('doLogout')" />
+                </div>
             </div>
         </div>
     </div>

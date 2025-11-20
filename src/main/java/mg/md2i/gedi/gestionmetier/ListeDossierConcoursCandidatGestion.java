@@ -41,6 +41,21 @@ public class ListeDossierConcoursCandidatGestion {
     public static ListeDossierConcoursCandidat findById(Integer id) { return getService().getById(id); }
     public static void save(ListeDossierConcoursCandidat e) { getService().save(e); }
     public static void delete(Integer id) { getService().softDelete(id); }
+
+    public static void moveToTrash(Integer id) { deleteAndDeindex(id); }
+
+    public static void restore(Integer id) {
+        getService().restore(id);
+        ListeDossierConcoursCandidat entity = getService().getById(id);
+        if (entity != null) {
+            luceneService.indexDocument(entity);
+        }
+    }
+
+    public static void hardDelete(Integer id) {
+        luceneService.deleteDocument(id.longValue());
+        getService().hardDelete(id);
+    }
     
     // CORRECTION (pour l'erreur 3) : Renommage de findByCandidat en findByCandidatId
     public static List<ListeDossierConcoursCandidat> findByCandidatId(Integer candidatId) { 
@@ -61,5 +76,9 @@ public class ListeDossierConcoursCandidatGestion {
                               ? null
                               : "%" + nomCandidat.trim().toLowerCase() + "%";
         return getService().findWithAdvancedFilters(documentConcoursId, concoursId, centreId, formattedNom);
+    }
+
+    public static List<ListeDossierConcoursCandidat> findDeleted() {
+        return getService().getAllDeleted();
     }
 }

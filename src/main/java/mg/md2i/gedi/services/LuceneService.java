@@ -25,7 +25,4 @@ public interface LuceneService {
      * @return Une liste de SearchResult correspondant à la recherche.
      */
     List<SearchResult> search(String queryStr);
-    List<SearchResult> getSuggestions(String queryStr);
-
-    
 }

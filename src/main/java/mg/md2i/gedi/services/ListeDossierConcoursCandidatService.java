@@ -13,6 +13,10 @@ public interface ListeDossierConcoursCandidatService {
     ListeDossierConcoursCandidat save(ListeDossierConcoursCandidat entity);
     
     void softDelete(Integer id);
+
+    void restore(Integer id);
+
+    void hardDelete(Integer id);
     
     List<ListeDossierConcoursCandidat> getByCandidat(Integer candidatId);
     
@@ -24,4 +28,6 @@ public interface ListeDossierConcoursCandidatService {
     List<ListeDossierConcoursCandidat> getByFilters(Integer documentConcoursId, Integer candidatId);
 
     List<ListeDossierConcoursCandidat> findWithAdvancedFilters(Integer documentConcoursId, Integer concoursId, Integer centreId, String nomCandidat);
+
+    List<ListeDossierConcoursCandidat> getAllDeleted();
 }

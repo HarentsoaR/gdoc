@@ -1,137 +1,131 @@
 <?page title="Tableau de bord | GEDI" contentType="text/html;charset=UTF-8"?>
 <zk xmlns="http://www.zkoss.org/2005/zul">
 
-    <style>
-        .dashboard-container {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            width: 100%;
-        }
+    <div class="enmg-page dashboard-page" hflex="1" vflex="1"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.AdminDashboardViewModel')">
+        <vlayout sclass="dashboard-container" hflex="1" vflex="1">
 
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .dashboard-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .cards-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 8px;
-            transition: transform 0.2s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .stat-title {
-            font-size: 14px;
-            color: #64748b;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #1e293b;
-        }
-
-        .chart-area {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            padding: 16px;
-            flex: 1;
-            min-height: 300px;
-        }
-
-        .table-area {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            padding: 16px;
-            flex: 1;
-        }
-    </style>
-
-    <div sclass="dashboard-container">
-        <div sclass="dashboard-header">
-            <label sclass="dashboard-title" value="📊 Tableau de bord GEDI" />
-            <button label="Actualiser" onClick="@command('refreshDashboard')" sclass="btn btn-primary" />
-        </div>
-
-        <div sclass="cards-row">
-            <div sclass="stat-card">
-                <label sclass="stat-title" value="Documents" />
-                <label sclass="stat-value" value="1 245" />
+            <div class="dashboard-header enmg-page-header">
+                <div>
+                    <label sclass="dashboard-title" value="📊 Tableau de bord GEDI"/>
+                    <label sclass="dashboard-subtitle" value="@load('Actualisé : '.concat(vm.lastRefreshLabel))"/>
+                </div>
+                <button label="Actualiser"
+                        onClick="@command('refreshDashboard')"
+                        iconSclass="z-icon-refresh"
+                        sclass="enmg-btn enmg-btn-primary"/>
             </div>
-            <div sclass="stat-card">
-                <label sclass="stat-title" value="Utilisateurs actifs" />
-                <label sclass="stat-value" value="58" />
-            </div>
-            <div sclass="stat-card">
-                <label sclass="stat-title" value="Stock utilisé" />
-                <label sclass="stat-value" value="72%" />
-            </div>
-            <div sclass="stat-card">
-                <label sclass="stat-title" value="Dernière synchronisation" />
-                <label sclass="stat-value" value="il y a 5 min" />
-            </div>
-        </div>
 
-        <div sclass="cards-row">
-            <div sclass="chart-area">
-                <label value="📈 Activité récente (graphe simulé)" />
-                <separator />
-                <!-- placeholder sample data -->
-                <progressmeter value="60" width="100%" />
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <label class="stat-card-number" value="@load(vm.totalDocuments)"/>
+                    <label class="stat-card-label" value="Documents gérés"/>
+                </div>
+                <div class="stat-card">
+                    <label class="stat-card-number" value="@load(vm.totalDossiers)"/>
+                    <label class="stat-card-label" value="@load(vm.validationRateLabel)"/>
+                </div>
+                <div class="stat-card">
+                    <label class="stat-card-number" value="@load(vm.activeUsers)"/>
+                    <label class="stat-card-label" value="@load(vm.activeUsersLabel)"/>
+                </div>
+                <div class="stat-card">
+                    <label class="stat-card-number" value="@load(vm.storageUsageLabel)"/>
+                    <label class="stat-card-label" value="Stockage consommé"/>
+                </div>
             </div>
-            <div sclass="table-area">
-                <label value="📋 Derniers documents ajoutés" />
-                <separator />
-                <grid mold="paging" pageSize="5" width="100%">
-                    <columns>
-                        <column label="Nom" />
-                        <column label="Auteur" />
-                        <column label="Date" />
-                    </columns>
-                    <rows>
-                        <row>
-                            <label value="Contrat_A2025.pdf" />
-                            <label value="Marie Dupont" />
-                            <label value="09/10/2025" />
-                        </row>
-                        <row>
-                            <label value="Facture_Juillet.pdf" />
-                            <label value="Admin" />
-                            <label value="08/10/2025" />
-                        </row>
-                        <row>
-                            <label value="PV_Réunion.docx" />
-                            <label value="Paul Martin" />
-                            <label value="08/10/2025" />
-                        </row>
-                    </rows>
-                </grid>
+
+            <hlayout sclass="dashboard-grid">
+                <div class="chart-card">
+                    <label class="chart-card-title" value="État des dossiers"/>
+                    <chart type="pie" threeD="true" height="240px" model="@load(vm.dossierPieModel)"
+                           visible="@load(not empty vm.dossierStatusEntries)"/>
+                    <label value="Aucune donnée"
+                           visible="@load(empty vm.dossierStatusEntries)"
+                           sclass="empty-message"/>
+                </div>
+                <div class="chart-card">
+                    <label class="chart-card-title" value="Répartition du stockage par type"/>
+                    <chart type="pie" threeD="true" height="240px" model="@load(vm.storagePieModel)"
+                           visible="@load(not empty vm.storageStats)"/>
+                    <label value="Aucune donnée de stockage"
+                           visible="@load(empty vm.storageStats)"
+                           sclass="empty-message"/>
+                    <div class="storage-meter">
+                        <progressmeter value="@load(vm.storageUsagePercent)" width="100%"/>
+                        <label value="@load(vm.storageUsageText)"/>
+                    </div>
+                </div>
+            </hlayout>
+
+            <hlayout sclass="dashboard-grid">
+                <div class="chart-card chart-card--wide">
+                    <label class="chart-card-title" value="Documents par concours (Top 8)"/>
+                    <chart type="bar" height="300px" model="@load(vm.concoursBarModel)"
+                           visible="@load(not empty vm.concoursStats)"/>
+                    <label value="Aucun concours référencé"
+                           visible="@load(empty vm.concoursStats)"
+                           sclass="empty-message"/>
+                </div>
+                <div class="chart-card">
+                    <label class="chart-card-title" value="Tendance des imports (6 derniers mois)"/>
+                    <chart type="line" height="300px" model="@load(vm.trendLineModel)"
+                           visible="@load(not empty vm.trendStats)"/>
+                    <label value="Aucun import durant cette période"
+                           visible="@load(empty vm.trendStats)"
+                           sclass="empty-message"/>
+                </div>
+            </hlayout>
+
+            <hlayout sclass="dashboard-grid">
+                <div class="chart-card">
+                    <label class="chart-card-title" value="Durée des concours (jours)"/>
+                    <chart type="bar" height="280px" model="@load(vm.timelineModel)"
+                           visible="@load(not empty vm.timelineStats)"/>
+                    <label value="Aucun concours planifié"
+                           visible="@load(empty vm.timelineStats)"
+                           sclass="empty-message"/>
+                </div>
+                <div class="chart-card">
+                    <label class="chart-card-title" value="Activité d'import (35 derniers jours)"/>
+                    <chart type="bar" height="280px" model="@load(vm.heatmapModel)"
+                           visible="@load(not empty vm.heatmapStats)"/>
+                    <label value="Aucun import récent"
+                           visible="@load(empty vm.heatmapStats)"
+                           sclass="empty-message"/>
+                </div>
+            </hlayout>
+
+            <div class="panel enmg-card" hflex="1" vflex="1">
+                <label class="panel-title" value="Derniers documents importés"/>
+                <listbox model="@load(vm.recentDocuments)"
+                         vflex="1"
+                         emptyMessage="Aucun document disponible."
+                         mold="paging"
+                         pageSize="6"
+                         sclass="data-table">
+                    <listhead>
+                        <listheader label="Titre" width="280px"/>
+                        <listheader label="Type" width="130px"/>
+                        <listheader label="Taille"/>
+                        <listheader label="Date d'import"/>
+                    </listhead>
+                    <template name="model" var="doc">
+                        <listitem>
+                            <listcell>
+                                <vlayout>
+                                    <label value="@load(doc.titre)" sclass="list-title"/>
+                                    <label value="@load(doc.resume)" sclass="text-muted" visible="@load(not empty doc.resume)"/>
+                                </vlayout>
+                            </listcell>
+                            <listcell label="@load(doc.type)"/>
+                            <listcell label="@load(vm.formatSize(doc.taille))"/>
+                            <listcell label="@load(vm.formatDate(doc.dateUpload))"/>
+                        </listitem>
+                    </template>
+                </listbox>
             </div>
-        </div>
+
+        </vlayout>
     </div>
 </zk>

@@ -6,39 +6,18 @@
         </div>
 
         <div sclass="topbar-right">
-            <bandbox id="searchBox"
-                     sclass="search-bandbox"
-                     placeholder="Rechercher un candidat..."
-                     value="@bind(vm.searchQuery)"
-                     instant="true" 
-                     onChanging="@command('updateDynamicSearch')"
-                     onOK="@command('searchDocuments')">
-                <bandpopup sclass="suggestion-popup">
-                    <listbox model="@load(vm.suggestions)"
-                             sclass="suggestion-listbox"
-                             emptyMessage="Aucun candidat ne correspond à votre recherche."
-                             onSelect="@command('selectSuggestion', suggestion=self.selectedItem.value)">
-                        <template name="model" var="s">
-                            <listitem value="@load(s)" sclass="suggestion-item">
-                                <listcell>
-                                    <hlayout valign="center">
-                                        <div sclass="z-icon-user suggestion-icon"/>
-                                        <vlayout>
-                                            <label value="@load(s.candidateFullName)" sclass="suggestion-title"/>
-                                            <label value="@load(s.concoursDisplayInfo)" sclass="suggestion-subtitle"/>
-                                        </vlayout>
-                                    </hlayout>
-                                </listcell>
-                            </listitem>
-                        </template>
-                    </listbox>
-                </bandpopup>
-            </bandbox>
+           <hlayout sclass="topbar-right" valign="center">
+    <textbox sclass="topbar-search-input"
+             placeholder="Rechercher ..."
+             value="@bind(vm.searchQuery)" instant="true"
+             onChanging="@global-command('documentsHandleSearchInput', term=event.value)"
+             onOK="@global-command('documentsSearchSubmit')"/>
+    <!--<button iconSclass="z-icon-search" sclass="topbar-search-btn"
+            onClick="@global-command('documentsSearchSubmit')"/>-->
+</hlayout>
 
             <button label="Importer" sclass="btn-import" iconSclass="z-icon-upload"
                     onClick="@global-command('navigateToGlobal', view='/documents/views/import/import-view.zul', label='Centre d\'Importation')" />
-            
-            <image src="/img/user-avatar.png" sclass="user-avatar" />
         </div>
     </div>
 </zk>

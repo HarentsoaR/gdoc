@@ -42,6 +42,21 @@ public class ListeDossierConcoursCandidatServiceImpl implements ListeDossierConc
     }
 
     @Override
+    @Transactional
+    public void restore(Integer id) {
+        repository.findById(id).ifPresent(e -> {
+            e.setActif(1);
+            repository.save(e);
+        });
+    }
+
+    @Override
+    @Transactional
+    public void hardDelete(Integer id) {
+        repository.deleteById(id);
+    }
+
+    @Override
     public List<ListeDossierConcoursCandidat> getByCandidat(Integer candidatId) {
         return repository.findByCandidatId(candidatId);
     }
@@ -65,5 +80,10 @@ public class ListeDossierConcoursCandidatServiceImpl implements ListeDossierConc
     @Override
     public List<ListeDossierConcoursCandidat> findWithAdvancedFilters(Integer documentConcoursId, Integer concoursId, Integer centreId, String nomCandidat) {
         return repository.findWithAdvancedFilters(documentConcoursId, concoursId, centreId, nomCandidat);
+    }
+
+    @Override
+    public List<ListeDossierConcoursCandidat> getAllDeleted() {
+        return repository.findByActif(0);
     }
 }

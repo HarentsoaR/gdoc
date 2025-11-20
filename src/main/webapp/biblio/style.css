@@ -1,3 +1,5 @@
+@import url('../css/enmg-theme.css');
+
 /* Biblio Management System Styles */
 /* Based on documents/style.css with biblio-specific adaptations */
 
@@ -356,6 +358,35 @@
 .status-unavailable {
     color: #ea4335;
     font-weight: 500;
+}
+
+/* Explorer specifics */
+.document-explorer .z-grid-body .z-label {
+    font-weight: 600;
+}
+
+.document-explorer .z-listheader-content {
+    font-weight: 700;
+}
+
+.badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: var(--enmg-color-success);
+}
+
+.badge-warning {
+    background-color: var(--enmg-color-warning);
+}
+
+.badge-danger {
+    background-color: var(--enmg-color-danger);
 }
 
 .status-loaned {

@@ -1,30 +1,5 @@
 <zk xmlns="http://www.zkoss.org/2005/zul"
     xmlns:n="native">
-    
-    <style>
-        .document-explorer .z-grid-body .z-label {
-            font-weight: 600;
-        }
-        .document-explorer .z-listheader-content {
-            font-weight: bold;
-        }
-        .badge {
-            padding: 3px 8px;
-            border-radius: 12px;
-            color: white;
-            font-size: 0.9em;
-            font-weight: 500;
-        }
-        .badge-success {
-            background-color: #18a689; /* Vert */
-        }
-        .badge-warning {
-            background-color: #f8ac59; /* Orange */
-        }
-        .badge-danger {
-            background-color: #ed5565; /* Rouge */
-        }
-    </style>
 
     <div sclass="content-area document-explorer" vflex="1">
         <div sclass="page-header">
@@ -45,32 +20,34 @@
                                  onChanging="@command('searchDocuments')"
                                  onOK="@command('searchDocuments')" 
                                  hflex="1" 
-                                 style="padding: 10px 16px; border-radius: 8px; border: 1px solid #dadce0; font-size: 14px;" />
+                                 style="padding: 10px 16px; border-radius: var(--enmg-radius-sm); border: 1px solid var(--enmg-color-border); font-size: 14px;" />
                         <button label="Rechercher" iconSclass="z-icon-search"
                                 onClick="@command('searchDocuments')" 
-                                style="margin-left: 8px; padding: 10px 20px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-weight: 500;"/>
+                                sclass="enmg-btn enmg-btn-primary"
+                                style="margin-left: 8px;"/>
                         <button label="Réinitialiser" iconSclass="z-icon-refresh"
                                 onClick="@command('resetSearch')" 
-                                style="margin-left: 8px; padding: 10px 20px; background: #f8f9fa; color: #5f6368; border: 1px solid #dadce0; border-radius: 8px;"/>
+                                sclass="enmg-btn enmg-btn-secondary"
+                                style="margin-left: 8px;"/>
                     </hlayout>
                     
                     <!-- Filter Row 1 -->
                     <hlayout valign="middle" style="margin-bottom: 12px;">
-                        <label value="Type de document :" style="width: 150px; font-weight: 500; color: #3c4043;" />
+                        <label value="Type de document :" style="width: 150px; font-weight: 500; color: var(--enmg-color-text);" />
                         <listbox mold="select" model="@load(vm.documentTypes)" 
                                  selectedItem="@bind(vm.selectedDocumentType)"
                                  onSelect="@command('filterByType')"
-                                 style="width: 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid #dadce0;">
+                                 style="width: 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--enmg-color-border);">
                             <template name="model" var="type">
                                 <listitem label="@load(type.libelle)" />
                             </template>
                         </listbox>
                         
-                        <label value="Domaine :" style="width: 100px; font-weight: 500; color: #3c4043; margin-left: 20px;" />
+                        <label value="Domaine :" style="width: 100px; font-weight: 500; color: var(--enmg-color-text); margin-left: 20px;" />
                         <listbox mold="select" model="@load(vm.domains)" 
                                  selectedItem="@bind(vm.selectedDomain)"
                                  onSelect="@command('filterByDomain')"
-                                 style="width: 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid #dadce0;">
+                                 style="width: 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--enmg-color-border);">
                             <template name="model" var="domain">
                                 <listitem label="@load(domain.libelle)" />
                             </template>
@@ -79,11 +56,11 @@
                     
                     <!-- Filter Row 2 -->
                     <hlayout valign="middle">
-                        <label value="Statut :" style="width: 150px; font-weight: 500; color: #3c4043;" />
+                        <label value="Statut :" style="width: 150px; font-weight: 500; color: var(--enmg-color-text);" />
                         <listbox mold="select" model="@load(vm.statusOptions)"
                                  selectedItem="@bind(vm.selectedStatus)"
                                  onSelect="@command('filterByStatus')"
-                                 style="width: 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid #dadce0;">
+                                 style="width: 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--enmg-color-border);">
                             <template name="model" var="status">
                                 <listitem label="@load(status)" value="@load(status)" />
                             </template>

@@ -22,4 +22,6 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Intege
 
         @Query("SELECT DISTINCT u.service FROM Utilisateur u WHERE u.service IS NOT NULL")
         List<String> findDistinctServices();
+
+        long countByActif(Integer actif);
 }

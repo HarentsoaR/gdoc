@@ -10,6 +10,7 @@ import org.zkoss.bind.annotation.*;
 import org.zkoss.util.media.Media;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zk.ui.util.Clients;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,6 +47,7 @@ public class ImportViewModel {
     // NOUVELLES PROPRIÉTÉS POUR LA BARRE DE PROGRESSION
     private boolean uploading = false;
     private int uploadProgress = 0;
+    private int importStep = 1;
 
     @Init
     public void init() {
@@ -85,7 +87,7 @@ public class ImportViewModel {
     }
 
     @Command
-    @NotifyChange({"selectedConcours", "filteredCandidats", "selectedCandidat", "candidatDocumentStatusList", "candidatDossierTitle", "targetDocumentTypeForUpload", "pendingFileName", "uploadStatus"})
+    @NotifyChange({"selectedConcours", "filteredCandidats", "selectedCandidat", "candidatDocumentStatusList", "candidatDossierTitle", "targetDocumentTypeForUpload", "pendingFileName", "uploadStatus", "importStep"})
     public void onSelectConcours() {
         selectedCandidat = null;
         candidatDocumentStatusList = Collections.emptyList();
@@ -93,6 +95,7 @@ public class ImportViewModel {
         pendingFileName = null;
         pendingMedia = null;
         uploadStatus = "idle";
+        importStep = 1;
         if (selectedConcours != null) {
             filteredCandidats = allCandidats.stream()
                     .filter(c -> selectedConcours.getConcoursId().equals(c.getConcoursId()))
@@ -103,7 +106,7 @@ public class ImportViewModel {
     }
 
     @Command
-    @NotifyChange({"selectedCandidat", "candidatDocumentStatusList", "candidatDossierTitle", "targetDocumentTypeForUpload", "pendingFileName", "uploadStatus"})
+    @NotifyChange({"selectedCandidat", "candidatDocumentStatusList", "candidatDossierTitle", "targetDocumentTypeForUpload", "pendingFileName", "uploadStatus", "importStep"})
     public void onSelectCandidat() {
         targetDocumentTypeForUpload = null;
         pendingFileName = null;
@@ -111,13 +114,15 @@ public class ImportViewModel {
         uploadStatus = "idle";
         if (selectedCandidat != null) {
             loadCandidatDossier();
+            importStep = 2;
         } else {
             candidatDocumentStatusList = Collections.emptyList();
+            importStep = 1;
         }
     }
     
     @Command
-    @NotifyChange({"targetDocumentTypeForUpload", "pendingFileName", "pendingMedia"})
+    @NotifyChange({"targetDocumentTypeForUpload", "pendingFileName", "pendingMedia", "importStep"})
     public void prepareUploadForDocument(@BindingParam("doc") DocumentConcours docType) {
         if (docType.equals(this.targetDocumentTypeForUpload)) {
             this.targetDocumentTypeForUpload = null; 
@@ -126,6 +131,7 @@ public class ImportViewModel {
         }
         this.pendingMedia = null;
         this.pendingFileName = null;
+        this.importStep = (this.targetDocumentTypeForUpload != null) ? 3 : (selectedCandidat != null ? 2 : 1);
     }
 
     @Command
@@ -140,13 +146,30 @@ public class ImportViewModel {
     }
     
     @Command
-    @NotifyChange({"pendingFileName", "pendingMedia", "uploadStatus", "targetDocumentTypeForUpload"})
+    @NotifyChange({"pendingFileName", "pendingMedia", "uploadStatus", "targetDocumentTypeForUpload", "importStep"})
     public void cancelUpload(){
         pendingMedia = null;
         pendingFileName = null;
         pendingFileSize = 0;
         uploadStatus = "idle";
         targetDocumentTypeForUpload = null; // Permet de revenir à la liste
+        importStep = selectedCandidat != null ? 2 : 1;
+    }
+
+    @Command
+    @NotifyChange("importStep")
+    public void goToImportStep(@BindingParam("step") int step) {
+        if (step <= 1) {
+            importStep = 1;
+            return;
+        }
+        if (step == 2) {
+            if (selectedCandidat == null) return;
+            importStep = 2;
+        } else if (step == 3) {
+            if (targetDocumentTypeForUpload == null) return;
+            importStep = 3;
+        }
     }
 
     @Command
@@ -157,6 +180,7 @@ public class ImportViewModel {
             return;
         }
 
+        Clients.showBusy("Importation en cours...");
         this.uploading = true;
         this.uploadProgress = 10;
         BindUtils.postNotifyChange(null, null, this, "uploading");
@@ -177,6 +201,7 @@ public class ImportViewModel {
                 } else {
                     this.uploading = false;
                     BindUtils.postNotifyChange(null, null, this, "uploading");
+                    Clients.clearBusy();
                 }
             });
         } else {
@@ -217,12 +242,14 @@ public class ImportViewModel {
             existing.setRemarque("Mis à jour le " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date()) + " - En attente de validation");
             
             ListeDossierConcoursCandidatGestion.updateAndIndex(existing);
+            registerDocumentRecord(newPath, newVersion);
             
             postImportSuccess();
         } catch (IOException e) {
             log.error("Erreur lors de la mise à jour du fichier", e);
             this.uploading = false;
             BindUtils.postNotifyChange(null, null, this, "uploading");
+            Clients.clearBusy();
             Messagebox.show("Erreur technique lors de la mise à jour du fichier.", "Erreur", Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -241,12 +268,14 @@ public class ImportViewModel {
             entity.setVersion(1);
 
             ListeDossierConcoursCandidatGestion.saveAndIndex(entity);
+            registerDocumentRecord(newPath, 1);
             
             postImportSuccess();
         } catch (IOException e) {
             log.error("Erreur lors de la création du fichier", e);
             this.uploading = false;
             BindUtils.postNotifyChange(null, null, this, "uploading");
+            Clients.clearBusy();
             Messagebox.show("Erreur technique lors de la création du fichier.", "Erreur", Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -281,8 +310,32 @@ public class ImportViewModel {
         this.pendingFileName = null;
         this.pendingFileSize = 0;
         this.targetDocumentTypeForUpload = null;
+        this.importStep = 2;
+        Clients.clearBusy();
         loadCandidatDossier();
         BindUtils.postNotifyChange(null, null, this, "candidatDocumentStatusList");
+        BindUtils.postNotifyChange(null, null, this, "importStep");
+    }
+
+    private void registerDocumentRecord(Path storedPath, int version) {
+        try {
+            if (storedPath == null) return;
+            Document doc = new Document();
+            String candidateName = selectedCandidat != null ? (selectedCandidat.getNom() + " " + selectedCandidat.getPrenom()).trim() : "";
+            String concoursLibelle = selectedConcours != null ? selectedConcours.getDisplayInfo() : "";
+            String typeLabel = targetDocumentTypeForUpload != null ? targetDocumentTypeForUpload.getLibelle() : "Document";
+
+            doc.setTitre(String.format("%s - %s", typeLabel, candidateName).trim());
+            doc.setPath(storedPath.toString());
+            doc.setType(typeLabel);
+            doc.setTaille(Files.size(storedPath));
+            doc.setVersion(version);
+            doc.setRemarque("Import automatique via GEDI");
+            doc.setResume(String.format("Candidat: %s | Concours: %s | Type: %s", candidateName, concoursLibelle, typeLabel));
+            DocumentGestion.save(doc);
+        } catch (Exception e) {
+            log.warn("Impossible d'enregistrer le document global : {}", e.getMessage());
+        }
     }
 
     private void loadCandidatDossier() {
@@ -326,6 +379,7 @@ public class ImportViewModel {
     // NOUVEAUX GETTERS
     public boolean isUploading() { return uploading; }
     public int getUploadProgress() { return uploadProgress; }
+    public int getImportStep() { return importStep; }
 
     public String getCandidatDossierTitle() {
         if (selectedCandidat != null) {

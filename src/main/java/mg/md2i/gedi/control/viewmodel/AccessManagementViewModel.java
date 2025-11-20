@@ -16,11 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * VM pour /admin/views/utilisateurs/acces.zul
- * Permet de configurer les droits (lire / créer / modifier / supprimer / exporter / dupliquer)
- * par profil et par fonctionnalité.
- */
+
 public class AccessManagementViewModel {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccessManagementViewModel.class);
@@ -31,6 +27,10 @@ public class AccessManagementViewModel {
     private List<Profil> profils = new ArrayList<>();
     private Profil selectedProfil;
     private List<FonctionnalitePermissionItem> permissionItems = new ArrayList<>();
+    private List<FonctionnalitePermissionItem> allPermissionItems = new ArrayList<>();
+    private boolean filtersVisible = true;
+    private String profilFilter = "";
+    private String permissionFilter = "";
 
     // --------------------------------------------------------------------
     // DTO pour la grille (une ligne = une fonctionnalité)
@@ -42,7 +42,7 @@ public class AccessManagementViewModel {
         private boolean canCreate;
         private boolean canUpdate;
         private boolean canDelete;
-        private boolean canExport;
+        private boolean canImport;
         private boolean canDuplicate;
 
         public FonctionnalitePermissionItem(Fonctionnalite f, FonctionnaliteProfil fp) {
@@ -52,12 +52,12 @@ public class AccessManagementViewModel {
             this.canCreate    = fp != null && fp.getNouveau()   != null && fp.getNouveau()   == 1;
             this.canUpdate    = fp != null && fp.getModifier()  != null && fp.getModifier()  == 1;
             this.canDelete    = fp != null && fp.getSupprimer() != null && fp.getSupprimer() == 1;
-            this.canExport    = fp != null && fp.getExporter()  != null && fp.getExporter()  == 1;
+            this.canImport    = fp != null && fp.getExporter()  != null && fp.getExporter()  == 1;
             this.canDuplicate = fp != null && fp.getDupliquer() != null && fp.getDupliquer() == 1;
         }
 
         public boolean hasAnyPermission() {
-            return canRead || canCreate || canUpdate || canDelete || canExport || canDuplicate;
+            return canRead || canCreate || canUpdate || canDelete || canImport || canDuplicate;
         }
 
         public Fonctionnalite getF() { return f; }
@@ -77,8 +77,8 @@ public class AccessManagementViewModel {
         public boolean isCanDelete() { return canDelete; }
         public void setCanDelete(boolean v) { this.canDelete = v; }
 
-        public boolean isCanExport() { return canExport; }
-        public void setCanExport(boolean v) { this.canExport = v; }
+        public boolean isCanImport() { return canImport; }
+        public void setCanImport(boolean v) { this.canImport = v; }
 
         public boolean isCanDuplicate() { return canDuplicate; }
         public void setCanDuplicate(boolean v) { this.canDuplicate = v; }
@@ -100,7 +100,16 @@ public class AccessManagementViewModel {
     private void loadProfils() {
         try {
             List<Profil> result = ProfilGestion.findAllProfils();
-            profils = (result != null) ? result : new ArrayList<Profil>();
+            if (result == null) {
+                result = new ArrayList<Profil>();
+            }
+            if (profilFilter != null && !profilFilter.trim().isEmpty()) {
+                String lower = profilFilter.toLowerCase();
+                result = result.stream()
+                        .filter(p -> p.getLibelle() != null && p.getLibelle().toLowerCase().contains(lower))
+                        .collect(Collectors.toList());
+            }
+            profils = result;
         } catch (Exception e) {
             LOG.error("Erreur lors du chargement des profils", e);
             profils = new ArrayList<Profil>();
@@ -112,9 +121,10 @@ public class AccessManagementViewModel {
     // CHARGER LES PERMISSIONS POUR UN PROFIL
     // --------------------------------------------------------------------
     @Command
-    @NotifyChange("permissionItems")
+    @NotifyChange({"selectedProfil","permissionItems"})
     public void loadPermissionsForProfil(@BindingParam("profil") Profil profil) {
         if (profil == null) {
+            allPermissionItems = new ArrayList<>();
             permissionItems = new ArrayList<FonctionnalitePermissionItem>();
             return;
         }
@@ -145,11 +155,12 @@ public class AccessManagementViewModel {
                             java.util.LinkedHashMap::new
                     ));
 
-            permissionItems = new ArrayList<FonctionnalitePermissionItem>();
+            allPermissionItems = new ArrayList<>();
             for (Fonctionnalite f : allFuncs) {
                 FonctionnaliteProfil fp = existingPermissions.get(f.getFonctionnaliteId());
-                permissionItems.add(new FonctionnalitePermissionItem(f, fp));
+                allPermissionItems.add(new FonctionnalitePermissionItem(f, fp));
             }
+            applyPermissionFilter();
 
             LOG.info("Profil {} → {} fonctionnalités, {} permissions existantes, {} items en grille",
                     profil.getProfilId(), allFuncs.size(), profilPermissions.size(), permissionItems.size());
@@ -172,7 +183,8 @@ public class AccessManagementViewModel {
         }
 
         try {
-            for (FonctionnalitePermissionItem item : permissionItems) {
+            List<FonctionnalitePermissionItem> target = allPermissionItems != null ? allPermissionItems : permissionItems;
+            for (FonctionnalitePermissionItem item : target) {
                 FonctionnaliteProfil fp = item.getFp();
                 boolean existsInDb = fp != null && fp.getFonctionnaliteProfilId() != null;
 
@@ -187,7 +199,7 @@ public class AccessManagementViewModel {
                     fp.setNouveau(item.isCanCreate() ? 1 : 0);
                     fp.setModifier(item.isCanUpdate() ? 1 : 0);
                     fp.setSupprimer(item.isCanDelete() ? 1 : 0);
-                    fp.setExporter(item.isCanExport() ? 1 : 0);
+                    fp.setExporter(item.isCanImport() ? 1 : 0);
                     fp.setDupliquer(item.isCanDuplicate() ? 1 : 0);
                     fp.setActif(1);
                     FonctionnaliteProfilGestion.saveFonctionnaliteProfil(fp);
@@ -220,6 +232,68 @@ public class AccessManagementViewModel {
 
     public List<FonctionnalitePermissionItem> getPermissionItems() {
         return permissionItems;
+    }
+
+    @Command
+    @NotifyChange("filtersVisible")
+    public void toggleFilters() {
+        filtersVisible = !filtersVisible;
+    }
+
+    @Command
+    @NotifyChange({"profils", "selectedProfil", "permissionItems"})
+    public void filterProfils(@BindingParam("query") String query) {
+        profilFilter = query != null ? query.trim() : "";
+        loadProfils();
+        if (!profils.isEmpty()) {
+            selectedProfil = profils.get(0);
+            loadPermissionsForProfil(selectedProfil);
+        } else {
+            selectedProfil = null;
+            permissionItems = new ArrayList<FonctionnalitePermissionItem>();
+        }
+    }
+
+    @Command
+    @NotifyChange("permissionItems")
+    public void filterPermissions(@BindingParam("query") String query) {
+        permissionFilter = query != null ? query.trim() : "";
+        applyPermissionFilter();
+    }
+
+    public boolean isFiltersVisible() {
+        return filtersVisible;
+    }
+
+    public String getProfilFilter() {
+        return profilFilter;
+    }
+
+    public String getPermissionFilter() {
+        return permissionFilter;
+    }
+
+    public void setPermissionFilter(String permissionFilter) {
+        this.permissionFilter = permissionFilter;
+    }
+
+    private void applyPermissionFilter() {
+        if (allPermissionItems == null) {
+            permissionItems = new ArrayList<>();
+            return;
+        }
+        String filter = permissionFilter != null ? permissionFilter.trim().toLowerCase() : "";
+        if (filter.isEmpty()) {
+            permissionItems = new ArrayList<>(allPermissionItems);
+            return;
+        }
+        permissionItems = allPermissionItems.stream()
+                .filter(item -> {
+                    String libelle = item.getF().getLibelle() != null ? item.getF().getLibelle().toLowerCase() : "";
+                    String table = item.getF().getNomTable() != null ? item.getF().getNomTable().toLowerCase() : "";
+                    return libelle.contains(filter) || table.contains(filter);
+                })
+                .collect(Collectors.toList());
     }
 
     // --------------------------------------------------------------------

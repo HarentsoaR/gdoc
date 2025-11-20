@@ -39,19 +39,19 @@
                              onOK="@command('searchUsers')"/>
                 </div>
 
-                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh"
+                <button label="Rafraîchir" sclass="enmg-btn enmg-btn-secondary" iconSclass="z-icon-refresh"
                         onClick="@command('loadUsers')"/>
 
                 <button label="Nouvel utilisateur"
-                        sclass="btn-primary"
+                        sclass="enmg-btn enmg-btn-primary"
                         iconSclass="z-icon-plus"
                         onClick='@global-command("navigateToAdmin", view="/admin/views/utilisateurs/new.zul", section="Utilisateurs", page="Nouveau")'/>
             </div>
 
             <!-- LIST -->
-            <div class="panel" vflex="1">
+            <div class="panel enmg-card" vflex="1">
                 <listbox model="@load(vm.users)" emptyMessage="Aucun utilisateur trouvé."
-                         vflex="1" mold="paging" pageSize="10">
+                         vflex="1" mold="paging" pageSize="10" sclass="data-table">
 
                     <listhead sizable="true">
                         <listheader label="Utilisateur"/>
@@ -61,7 +61,7 @@
                     </listhead>
 
                     <template name="model" var="user">
-                        <listitem>
+                        <listitem sclass="data-table-row">
                             <listcell>
                                 <hlayout spacing="12px" valign="center">
                                     <div sclass="user-avatar">

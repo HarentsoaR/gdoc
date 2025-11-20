@@ -1,19 +1,10 @@
-<!-- File Path: src/main/webapp/documents/views/candidats/dossiers.zul -->
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
-    
-    <!-- NO MORE INLINE STYLE! -->
-
-    <div hflex="1" vflex="1" sclass="page-container" 
-         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.ListeDossierConcoursCandidatViewModel')">
-        
-        <!-- Main page layout using vlayout for flexibility -->
-        <vlayout hflex="1" vflex="1" sclass="z-flex z-flex-col" style="gap: 16px;">
-
-            <!-- Header with Breadcrumbs and Actions -->
-            <div sclass="page-header">
-                <!-- Breadcrumbs -->
+    <div sclass="page-container" vflex="1"
+         viewModel="@id('dvm') @init('mg.md2i.gedi.control.viewmodel.ListeDossierConcoursCandidatViewModel')">
+        <vlayout hflex="1" vflex="1" style="gap:16px;">
+            <div class="page-header">
                 <hlayout sclass="breadcrumb">
-                    <forEach items="@load(vm.breadcrumbs)" var="crumb" varStatus="status">
+                    <forEach items="@load(dvm.breadcrumbs)" var="crumb" varStatus="status">
                         <a label="@load(crumb.label)" sclass="breadcrumb-link"
                            onClick="@command('navigateViaBreadcrumb', crumb=crumb)"
                            if="${!status.last}"/>
@@ -21,86 +12,102 @@
                         <label value="›" sclass="breadcrumb-separator" if="${!status.last}"/>
                     </forEach>
                 </hlayout>
-
-                <!-- Actions -->
-                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" onClick="@command('applyFilters')"/>
+                <div class="header-actions">
+                    <button label="@load(dvm.filtersVisible ? 'Masquer les filtres' : 'Afficher les filtres')"
+                            sclass="btn"
+                            iconSclass="@load(dvm.filtersVisible ? 'z-icon-chevron-up' : 'z-icon-chevron-down')"
+                            onClick="@command('toggleFilters')"/>
+                    <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh"
+                            onClick="@command('applyFilters')"/>
+                </div>
             </div>
 
-            <!-- Advanced Filter Bar (Conditional) -->
-            <div sclass="panel-filters" visible="@load(vm.selectedDocumentType ne null)">
-                <!-- Filters -->
-                <hlayout hflex="1" spacing="16px">
-                    <vlayout hflex="1">
-                        <label value="Concours"/>
-                        <combobox model="@load(vm.allConcours)" selectedItem="@bind(vm.selectedConcoursFilter)"
-                                  hflex="1" placeholder="Tous les concours" autodrop="true" readonly="true"/>
-                    </vlayout>
-                    <vlayout hflex="1">
-                        <label value="Centre d'examen"/>
-                        <combobox model="@load(vm.allCentresExamen)" selectedItem="@bind(vm.selectedCentreExamenFilter)"
-                                  hflex="1" placeholder="Tous les centres" autodrop="true" readonly="true"/>
-                    </vlayout>
-                    <vlayout hflex="1">
-                        <label value="Nom du candidat"/>
-                        <textbox value="@bind(vm.filterNomCandidat)" hflex="1" placeholder="Rechercher..."
-                                 instant="true" onOK="@command('applyFilters')"/>
-                    </vlayout>
-                    <hlayout hflex="min" spacing="8px" style="padding-bottom: 2px;">
-                        <button label="Rechercher" sclass="btn-primary" iconSclass="z-icon-search" onClick="@command('applyFilters')"/>
-                        <button label="Effacer" sclass="btn" iconSclass="z-icon-eraser" onClick="@command('clearFilters')"/>
+            <div class="panel filter-stack" visible="@load(dvm.filtersVisible and dvm.selectedDocumentType ne null)">
+                <vlayout hflex="1" style="gap:12px;">
+                    <hlayout hflex="1" spacing="12px">
+                        <div sclass="filter-pill flex-pill">
+                            <label value="Concours" sclass="filter-label"/>
+                            <combobox model="@load(dvm.allConcours)" selectedItem="@bind(dvm.selectedConcoursFilter)"
+                                      autodrop="true" placeholder="Tous les concours" readonly="true" hflex="1"/>
+                        </div>
+                        <div sclass="filter-pill flex-pill">
+                            <label value="Centre" sclass="filter-label"/>
+                            <combobox model="@load(dvm.allCentresExamen)" selectedItem="@bind(dvm.selectedCentreExamenFilter)"
+                                      autodrop="true" placeholder="Tous les centres" readonly="true" hflex="1"/>
+                        </div>
+                        <div sclass="filter-pill flex-pill">
+                            <label value="Nom du candidat" sclass="filter-label"/>
+                            <textbox value="@bind(dvm.filterNomCandidat)" placeholder="Rechercher..."
+                                     instant="true" hflex="1" onOK="@command('applyFilters')"/>
+                        </div>
+                        <hlayout spacing="8px">
+                            <button label="Rechercher" sclass="btn btn-primary" iconSclass="z-icon-search"
+                                    onClick="@command('applyFilters')"/>
+                            <button label="Effacer" sclass="btn" iconSclass="z-icon-eraser"
+                                    onClick="@command('clearFilters')"/>
+                        </hlayout>
                     </hlayout>
-                </hlayout>
-
-                <!-- Active Filter Pills -->
-                <hlayout valign="middle" spacing="8px" style="margin-top: 12px;"
-                         visible="@load(vm.selectedConcoursFilter ne null or vm.selectedCentreExamenFilter ne null or not empty vm.filterNomCandidat)">
-                    <label value="Filtres actifs :" style="font-size: 13px; color: var(--text-muted);"/>
-                    <div sclass="filter-pill" visible="@load(vm.selectedConcoursFilter ne null)">
-                        <label value="@load(vm.selectedConcoursFilter.toString())"/>
-                    </div>
-                    <div sclass="filter-pill" visible="@load(vm.selectedCentreExamenFilter ne null)">
-                        <label value="@load(vm.selectedCentreExamenFilter.libelle)"/>
-                    </div>
-                    <div sclass="filter-pill" visible="@load(not empty vm.filterNomCandidat)">
-                        <label value="@load(vm.filterNomCandidat)"/>
-                    </div>
-                </hlayout>
+                    <hlayout sclass="active-filters" visible="@load(dvm.anyFilterActive)">
+                        <label value="Filtres actifs :" class="text-muted"/>
+                        <div sclass="filter-pill" visible="@load(dvm.selectedConcoursFilter ne null)">
+                            <label value="@load(dvm.selectedConcoursFilter.toString())"/>
+                            <button iconSclass="z-icon-times" onClick="@command('removeFilter', type='concours')"/>
+                        </div>
+                        <div sclass="filter-pill" visible="@load(dvm.selectedCentreExamenFilter ne null)">
+                            <label value="@load(dvm.selectedCentreExamenFilter.libelle)"/>
+                            <button iconSclass="z-icon-times" onClick="@command('removeFilter', type='centre')"/>
+                        </div>
+                        <div sclass="filter-pill" visible="@load(not empty dvm.filterNomCandidat)">
+                            <label value="@load(dvm.filterNomCandidat)"/>
+                            <button iconSclass="z-icon-times" onClick="@command('removeFilter', type='nom')"/>
+                        </div>
+                    </hlayout>
+                </vlayout>
             </div>
 
-            <!-- Main Content Panel (vflex=1 to take all remaining space) -->
             <div class="panel" vflex="1">
-                <listbox model="@load(vm.displayItems)" vflex="1" hflex="1" 
-                         emptyMessage="Aucun élément à afficher. Essayez de sélectionner un type de document ou de modifier vos filtres."
-                         mold="paging" pageSize="15">
+                <listbox model="@load(dvm.displayItems)" vflex="1" hflex="1"
+                         sizedByContent="false" sclass="listbox-thread data-table"
+                         emptyMessage="Aucun document à afficher.">
                     <listhead>
-                        <listheader label="Nom" />
-                        <listheader label="Propriétaire" visible="@load(vm.selectedDocumentType ne null)" />
-                        <listheader label="État" visible="@load(vm.selectedDocumentType ne null)" width="150px"/>
-                        <listheader label="Actions" width="120px" align="center"/>
+                        <listheader label="Document" hflex="2"/>
+                        <listheader label="Candidat" hflex="1"/>
+                        <listheader label="Statut" width="140px" visible="@load(dvm.selectedDocumentType ne null)"/>
+                        <listheader label="Actions" width="140px"/>
                     </listhead>
-                    <template name="model" var="d">
-                        <listitem onDoubleClick="@command(d.folder ? 'navigate' : 'download', item=d)" sclass="explorer-item">
-                            <!-- Cell: Name (Folder or File) -->
+                    <template name="model" var="row">
+                        <listitem onDoubleClick="@command('openItem', item=row)">
                             <listcell>
                                 <hlayout spacing="12px" valign="center">
-                                    <n:i class="${d.iconSclass} explorer-item-icon"/>
-                                    <vlayout>
-                                        <label value="@load(d.name)" sclass="explorer-item-title"/>
-                                        <label value="@load(d.subtitle)" sclass="explorer-item-subtitle" visible="@load(not empty d.subtitle)"/>
+                                    <n:i sclass="@load(row.iconSclass)" class="explorer-item-icon"/>
+                                    <vlayout style="gap:2px;">
+                                        <label value="@load(row.name)" sclass="explorer-item-title"/>
+                                        <label value="@load(row.subtitle)" sclass="explorer-item-subtitle"
+                                               visible="@load(not empty row.subtitle)"/>
                                     </vlayout>
                                 </hlayout>
                             </listcell>
-
-                            <!-- Cells visible only for files -->
-                            <listcell label="@load(d.folder ? '' : d.data.candidat.nom.concat(' ').concat(d.data.candidat.prenom))"/>
-                            <listcell label="@load(d.folder ? '' : d.data.etatDoc)"/>
-                            
-                            <!-- Cell: Actions -->
-                            <listcell sclass="actions-cell">
-                                <div hflex="1" if="${!d.folder}">
+                            <listcell>
+                                <label value="@load(dvm.getCandidatLabel(row))" sclass="text-muted"/>
+                            </listcell>
+                            <listcell visible="@load(dvm.selectedDocumentType ne null)">
+                                <label value="@load(dvm.getEtatLabel(row))"
+                                       sclass="@load(dvm.getEtatSclass(row))"
+                                       visible="@load(not row.folder)"/>
+                            </listcell>
+                            <listcell>
+                                <hlayout spacing="10px">
+                                    <a iconSclass="z-icon-folder-open" tooltiptext="Ouvrir"
+                                       visible="@load(row.folder)"
+                                       onClick="@command('navigate', item=row)"/>
                                     <a iconSclass="z-icon-download" tooltiptext="Télécharger"
-                                            onClick="@command('download', item=d)"/>
-                                </div>
+                                       visible="@load(not row.folder)"
+                                       onClick="@command('download', item=row)"/>
+                                    <a iconSclass="z-icon-trash-o" sclass="text-danger"
+                                       tooltiptext="Supprimer"
+                                       visible="@load(not row.folder)"
+                                       onClick="@command('delete', item=row)"/>
+                                </hlayout>
                             </listcell>
                         </listitem>
                     </template>

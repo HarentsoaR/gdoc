@@ -1,61 +1,115 @@
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
     <div sclass="sidebar @load(vm.sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded')">
-        <div sclass="sidebar-header">
-            <label value="GEDI" sclass="app-title" />
-            <button sclass="sidebar-toggle-btn"
-                    iconSclass="@load(vm.sidebarCollapsed ? 'z-icon-angle-double-right' : 'z-icon-angle-double-left')"
-                    onClick="@command('toggleSidebar')" />
-        </div>
-
-        <!-- FULL SIDEBAR CONTENT (Visible when NOT collapsed) -->
-        <div sclass="sidebar-full-content" visible="@load(not vm.sidebarCollapsed)">
-            <!--<div sclass="sidebar-section">
-                <button label="Nouveau" sclass="btn-new" iconSclass="z-icon-plus"
-                        onClick="@command('openUploadModal')" />
-            </div>-->
-
-            <div sclass="sidebar-section nav-links">
-                <button label="Retour à l'accueil" sclass="sidebar-button" iconSclass="z-icon-home"
-                        onClick="@command('goHome')" />
-                <button label="Tous les documents" sclass="sidebar-button active" iconSclass="z-icon-files-o"
-                        onClick="@command('navigateTo', view='/documents/views/dashboard.zul', label='Mes Documents')" />
-                <button label="Corbeille" sclass="sidebar-button" iconSclass="z-icon-trash-o" />
-            </div>
-
-            <separator/>
-
-            <div sclass="sidebar-section">
-                <div sclass="concours-toggle @load(vm.concoursExpanded ? 'open' : '')"
-                     onClick="@command('toggleConcoursSection')">
-                    <n:i class="z-icon-graduation-cap concours-toggle-icon" />
-                    <label value="Concours" sclass="concours-toggle-label" />
-                    <n:i class="z-icon-caret-right concours-toggle-caret" />
-                </div>
-                <vlayout sclass="concours-subnav" visible="@load(vm.concoursExpanded)">
-                    <button label="Liste Concours" sclass="sidebar-button" iconSclass="z-icon-list" onClick="@command('navigateTo', view='/documents/views/concours/list.zul', section='Concours', page='Liste Concours')" />
-                    <button label="Doc. Concours" sclass="sidebar-button" iconSclass="z-icon-file-text" onClick="@command('navigateTo', view='/documents/views/concours/documents-concours/list.zul', section='Concours', page='Documents')" />
-                    <button label="Candidats" sclass="sidebar-button" iconSclass="z-icon-user-plus" onClick="@command('navigateTo', view='/documents/views/candidats/list.zul', section='Concours', page='Candidats')" />
-                    <button label="Dossiers Candidats" sclass="sidebar-button" iconSclass="z-icon-folder-open" onClick="@command('navigateTo', view='/documents/views/candidats/dossiers.zul', section='Concours', page='Dossiers Candidats')" />
-                    <button label="Validation dossiers" sclass="sidebar-button" iconSclass="z-icon-check-circle" onClick="@command('navigateTo', view='/documents/views/concours/validation-dossiers.zul', section='Concours', page='Validation dossiers')" />
-                    <button label="Suivi dossiers" sclass="sidebar-button" iconSclass="z-icon-line-chart" onClick="@command('navigateTo', view='/documents/views/concours/suivi-dossiers.zul', section='Concours', page='Suivi dossiers')" />
-                    <button label="Filières" sclass="sidebar-button" iconSclass="z-icon-sitemap" onClick="@command('navigateTo', view='/documents/views/filiere/list.zul', section='Concours', page='Filières')" />
-                    <button label="Promotions" sclass="sidebar-button" iconSclass="z-icon-bookmark" onClick="@command('navigateTo', view='/documents/views/promotion/list.zul', section='Concours', page='Promotions')" />
+        <div class="sidebar-header">
+            <div class="sidebar-branding">
+                <image src="/img/login.png" sclass="sidebar-logo"/>
+                <vlayout spacing="0" visible="@load(not vm.sidebarCollapsed)">
+                    <label value="Concours" sclass="sidebar-brand-subtitle"/>
                 </vlayout>
             </div>
+            <button sclass="sidebar-toggle-btn"
+                    iconSclass="@load(vm.sidebarCollapsed ? 'z-icon-angle-double-right' : 'z-icon-angle-double-left')"
+                    onClick="@command('toggleSidebar')"/>
         </div>
 
-        <!-- COLLAPSED ICON BAR (Visible ONLY when collapsed) -->
-        <div sclass="sidebar-collapsed-content" visible="@load(vm.sidebarCollapsed)">
-            <div class="collapsed-icons-top">
-                <button sclass="icon-btn" iconSclass="z-icon-home" tooltiptext="Accueil" onClick="@command('goHome')" />
-                <button sclass="icon-btn active" iconSclass="z-icon-files-o" tooltiptext="Tous les documents" onClick="@command('navigateTo', view='/documents/views/dashboard.zul', label='Mes Documents')" />
-                <button sclass="icon-btn" iconSclass="z-icon-trash-o" tooltiptext="Corbeille" />
-                <button sclass="icon-btn" iconSclass="z-icon-graduation-cap" tooltiptext="Concours" popup="concoursPopup, position=end_center" />
+        <div class="sidebar-scroll">
+            <div class="sidebar-full-content" visible="@load(not vm.sidebarCollapsed)">
+                <div class="sidebar-section">
+                    <label value="Navigation" class="sidebar-nav-title"/>
+                    <button label="Accueil"
+                            sclass="sidebar-button"
+                            iconSclass="z-icon-home"
+                            onClick="@command('goHome')"/>
+                    <button label="Tous les documents"
+                            sclass="@load(vm.activeView eq '/documents/views/dashboard.zul' ? 'sidebar-button active' : 'sidebar-button')"
+                            iconSclass="z-icon-files-o"
+                            onClick="@command('navigateTo', view='/documents/views/dashboard.zul', label='Mes Documents')"/>
+                </div>
+
+                <div class="sidebar-section">
+                    <label value="Dossiers" class="sidebar-nav-title"/>
+                    <button label="Validation dossiers"
+                            sclass="@load(vm.activeView eq '/documents/views/concours/validation-dossiers.zul' ? 'sidebar-button active' : 'sidebar-button')"
+                            iconSclass="z-icon-check-circle"
+                            onClick="@command('navigateTo', view='/documents/views/concours/validation-dossiers.zul', section='Concours', page='Validation dossiers')"/>
+                    <button label="Suivi dossiers"
+                            sclass="@load(vm.activeView eq '/documents/views/concours/suivi-dossiers.zul' ? 'sidebar-button active' : 'sidebar-button')"
+                            iconSclass="z-icon-line-chart"
+                            onClick="@command('navigateTo', view='/documents/views/concours/suivi-dossiers.zul', section='Concours', page='Suivi dossiers')"/>
+                    <button label="Dossiers candidats"
+                            sclass="@load(vm.activeView eq '/documents/views/candidats/dossiers.zul' ? 'sidebar-button active' : 'sidebar-button')"
+                            iconSclass="z-icon-folder-open"
+                            onClick="@command('navigateTo', view='/documents/views/candidats/dossiers.zul', section='Concours', page='Dossiers Candidats')"/>
+                    <button label="Corbeille"
+                            sclass="@load(vm.activeView eq '/documents/views/candidats/corbeille.zul' ? 'sidebar-button active' : 'sidebar-button')"
+                            iconSclass="z-icon-trash-o"
+                            onClick="@command('navigateTo', view='/documents/views/candidats/corbeille.zul', section='Concours', page='Corbeille')"/>
+                </div>
+
+                <div class="sidebar-section">
+                    <label value="Référentiel concours" class="sidebar-nav-title"/>
+                    <button label="Liste Concours"
+                            sclass="@load(vm.activeView eq '/documents/views/concours/list.zul' ? 'sidebar-button active' : 'sidebar-button')"
+                            iconSclass="z-icon-list"
+                            onClick="@command('navigateTo', view='/documents/views/concours/list.zul', section='Concours', page='Liste Concours')"/>
+                    <button label="Doc. Concours"
+                            sclass="@load(vm.activeView eq '/documents/views/concours/documents-concours/list.zul' ? 'sidebar-button active' : 'sidebar-button')"
+                            iconSclass="z-icon-file-text"
+                            onClick="@command('navigateTo', view='/documents/views/concours/documents-concours/list.zul', section='Concours', page='Documents')"/>
+                    <button label="Candidats"
+                            sclass="@load(vm.activeView eq '/documents/views/candidats/list.zul' ? 'sidebar-button active' : 'sidebar-button')"
+                            iconSclass="z-icon-users"
+                            onClick="@command('navigateTo', view='/documents/views/candidats/list.zul', section='Concours', page='Candidats')"/>
+                    <button label="Filières"
+                            sclass="@load(vm.activeView eq '/documents/views/filiere/list.zul' ? 'sidebar-button active' : 'sidebar-button')"
+                            iconSclass="z-icon-sitemap"
+                            onClick="@command('navigateTo', view='/documents/views/filiere/list.zul', section='Concours', page='Filières')"/>
+                    <button label="Promotions"
+                            sclass="@load(vm.activeView eq '/documents/views/promotion/list.zul' ? 'sidebar-button active' : 'sidebar-button')"
+                            iconSclass="z-icon-graduation-cap"
+                            onClick="@command('navigateTo', view='/documents/views/promotion/list.zul', section='Concours', page='Promotions')"/>
+                </div>
+
+           
+            </div>
+
+            <div sclass="sidebar-collapsed-content" visible="@load(vm.sidebarCollapsed)">
+                <div class="collapsed-icons-top">
+                    <button sclass="icon-btn" iconSclass="z-icon-home" tooltiptext="Accueil" onClick="@command('goHome')" />
+                    <button sclass="@load(vm.activeView eq '/documents/views/dashboard.zul' ? 'icon-btn active' : 'icon-btn')"
+                            iconSclass="z-icon-files-o"
+                            tooltiptext="Tous les documents"
+                            onClick="@command('navigateTo', view='/documents/views/dashboard.zul', label='Mes Documents')" />
+                    <button sclass="@load(vm.activeView eq '/documents/views/candidats/corbeille.zul' ? 'icon-btn active' : 'icon-btn')"
+                            iconSclass="z-icon-trash-o"
+                            tooltiptext="Corbeille"
+                            onClick="@command('navigateTo', view='/documents/views/candidats/corbeille.zul', section='Concours', page='Corbeille')"/>
+                    <button sclass="@load(vm.concoursSectionActive ? 'icon-btn active' : 'icon-btn')"
+                            iconSclass="z-icon-graduation-cap"
+                            tooltiptext="Concours"
+                            popup="concoursPopup, position=end_center" />
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- This popup is now only used by the collapsed bar -->
+    <div class="sidebar-mobile-nav">
+        <button label="Accueil" sclass="mobile-nav-btn" iconSclass="z-icon-home"
+                onClick="@command('goHome')"/>
+        <button label="Documents"
+                sclass="@load(vm.activeView eq '/documents/views/dashboard.zul' ? 'mobile-nav-btn active' : 'mobile-nav-btn')"
+                iconSclass="z-icon-files-o"
+                onClick="@command('navigateTo', view='/documents/views/dashboard.zul', label='Mes Documents')"/>
+        <button label="Concours"
+                sclass="@load(vm.concoursSectionActive ? 'mobile-nav-btn active' : 'mobile-nav-btn')"
+                iconSclass="z-icon-graduation-cap"
+                popup="concoursPopup, position=after_center"/>
+        <button label="Corbeille"
+                sclass="@load(vm.activeView eq '/documents/views/candidats/corbeille.zul' ? 'mobile-nav-btn active' : 'mobile-nav-btn')"
+                iconSclass="z-icon-trash-o"
+                onClick="@command('navigateTo', view='/documents/views/candidats/corbeille.zul', section='Concours', page='Corbeille')"/>
+    </div>
+
     <menupopup id="concoursPopup">
         <menuitem label="Liste Concours" iconSclass="z-icon-list" onClick="@command('navigateTo', view='/documents/views/concours/list.zul')" />
         <menuitem label="Doc. Concours" iconSclass="z-icon-file-text" onClick="@command('navigateTo', view='/documents/views/concours/documents-concours/list.zul')" />
@@ -64,6 +118,7 @@
         <menuitem label="Validation dossiers" iconSclass="z-icon-check-circle" onClick="@command('navigateTo', view='/documents/views/concours/validation-dossiers.zul')" />
         <menuitem label="Suivi dossiers" iconSclass="z-icon-line-chart" onClick="@command('navigateTo', view='/documents/views/concours/suivi-dossiers.zul')" />
         <menuseparator/>
+        <menuitem label="Corbeille" iconSclass="z-icon-trash-o" onClick="@command('navigateTo', view='/documents/views/candidats/corbeille.zul')" />
         <menuitem label="Filières" iconSclass="z-icon-sitemap" onClick="@command('navigateTo', view='/documents/views/filiere/list.zul')" />
         <menuitem label="Promotions" iconSclass="z-icon-bookmark" onClick="@command('navigateTo', view='/documents/views/promotion/list.zul')" />
     </menupopup>

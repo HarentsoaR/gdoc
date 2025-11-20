@@ -9,7 +9,7 @@
                 <label value="Gérer les concours existants" sclass="page-title"/>
             </div>
             <div sclass="header-actions">
-                <button label="Nouveau Concours" sclass="btn-primary" iconSclass="z-icon-plus"
+                <button label="Nouveau Concours" sclass="enmg-btn enmg-btn-primary" iconSclass="z-icon-plus"
                         onClick="@command('addConcours')"/>
             </div>
         </div>
@@ -24,28 +24,27 @@
                          onOK="@command('search')"
                          instant="true" />
             </div>
-            <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" 
+            <button label="Rafraîchir" sclass="enmg-btn enmg-btn-secondary" iconSclass="z-icon-refresh" 
                     onClick="@command('refreshConcoursList')"/>
         </div>
 
         <!-- DATA TABLE -->
-        <div class="panel" style="margin-top: 16px;">
-            <listbox model="@load(cv.concoursList)" emptyMessage="Aucun concours trouvé." mold="paging" pageSize="6">
+        <div class="panel enmg-card" style="margin-top: 16px;">
+            <listbox model="@load(cv.concoursList)" emptyMessage="Aucun concours trouvé."
+                     mold="paging" pageSize="6" sclass="data-table">
                 <listhead>
                     <listheader label="Avis de Concours" sort="auto(avisConcours)"/>
                     <listheader label="N° Arrêté" sort="auto(numeroArrete)" width="150px"/>
                     <listheader label="Date Arrêté" sort="auto(dateArrete)" width="150px"/>
-                    <listheader label="Promotion" sort="auto(promotion.libelle)"/>
                     <listheader label="Actions" width="100px" align="center"/>
                 </listhead>
                 <template name="model" var="concours">
-                    <listitem>
+                    <listitem sclass="data-table-row">
                         <listcell label="@load(concours.avisConcours)"/>
                         <listcell label="@load(concours.numeroArrete)"/>
                         <listcell>
                             <label value="@load(concours.dateArrete) @converter('formatedDate', format='dd/MM/yyyy')"/>
                         </listcell>
-                        <listcell label="@load(concours.promotion.libelle)"/>
                         <listcell sclass="actions-cell">
                             <div hflex="1" align="center" style="display: flex; gap: 16px; justify-content: center;">
                                 <a iconSclass="z-icon-pencil" tooltiptext="Modifier"

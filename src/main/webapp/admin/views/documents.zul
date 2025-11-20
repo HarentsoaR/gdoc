@@ -1,31 +1,15 @@
 <?page title="Documents | GEDI" contentType="text/html;charset=UTF-8"?>
 <zk xmlns="http://www.zkoss.org/2005/zul">
-    <style>
-        .docs-container {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .docs-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .docs-table {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            padding: 16px;
-        }
-    </style>
 
-    <div sclass="docs-container">
-        <div sclass="docs-header">
+    <div sclass="docs-container enmg-page">
+        <div sclass="docs-header enmg-page-header">
             <label value="📄 Gestion des Documents" sclass="dashboard-title"/>
-            <button label="Nouveau document" iconSclass="z-icon-plus" onClick="@command('newDocument')" />
+            <button label="Nouveau document" iconSclass="z-icon-plus"
+                    sclass="enmg-btn enmg-btn-primary"
+                    onClick="@command('newDocument')" />
         </div>
 
-        <div sclass="docs-table">
+        <div sclass="docs-table enmg-card">
             <grid mold="paging" pageSize="10" width="100%">
                 <columns>
                     <column label="Nom du fichier" />

@@ -11,7 +11,7 @@
                     <label value="Gérer les promotions existantes" sclass="page-subtitle"/>
                 </div>
                 <div sclass="header-actions">
-                    <button label="Nouvelle Promotion" sclass="btn-primary" iconSclass="z-icon-plus"
+                    <button label="Nouvelle Promotion" sclass="enmg-btn enmg-btn-primary" iconSclass="z-icon-plus"
                             onClick="@command('addPromotion')"/>
                 </div>
             </div>
@@ -24,22 +24,20 @@
                              value="@bind(vm.searchQuery)"
                              onOK="@command('search')" instant="true"/>
                 </div>
-                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" onClick="@command('search')"/>
+                <button label="Rafraîchir" sclass="enmg-btn enmg-btn-secondary" iconSclass="z-icon-refresh" onClick="@command('search')"/>
             </div>
 
             <!-- Panneau du tableau -->
-            <div class="panel" vflex="1">
-                <listbox model="@load(vm.promotionList)" emptyMessage="Aucune promotion trouvée." mold="paging" pageSize="10" vflex="1">
+            <div class="panel enmg-card" vflex="1">
+                <listbox model="@load(vm.promotionList)" emptyMessage="Aucune promotion trouvée." mold="paging" pageSize="10" vflex="1" sclass="data-table">
                     <listhead>
-                        <listheader label="Libellé" sort="auto(libelle)"/>
                         <listheader label="N° Promotion" sort="auto(numeroPromotion)"/>
                         <listheader label="Filière" sort="auto(filiere.libelle)"/>
                         <listheader label="Année Concours" sort="auto(anneeConcours)"/>
                         <listheader label="Actions" width="120px" align="center"/>
                     </listhead>
                     <template name="model" var="promo">
-                        <listitem>
-                            <listcell label="@load(promo.libelle)"/>
+                        <listitem sclass="data-table-row">
                             <listcell label="@load(promo.numeroPromotion)"/>
                             <listcell label="@load(promo.filiere.libelle)"/>
                             <listcell label="@load(promo.anneeConcours)"/>

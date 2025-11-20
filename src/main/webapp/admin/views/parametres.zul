@@ -1,26 +1,8 @@
 <?page title="Paramètres | GEDI" contentType="text/html;charset=UTF-8"?>
 <zk xmlns="http://www.zkoss.org/2005/zul">
-    <style>
-        .settings-container {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-        .settings-section {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            padding: 24px;
-        }
-        .settings-section h3 {
-            margin: 0 0 16px 0;
-            font-size: 18px;
-        }
-    </style>
-
-    <div sclass="settings-container">
-        <div sclass="settings-section">
-            <label>⚙️ Paramètres Généraux</label>
+    <div sclass="settings-container enmg-page">
+        <div sclass="settings-section enmg-card">
+            <label sclass="enmg-card-title">⚙️ Paramètres Généraux</label>
             <grid width="100%">
                 <rows>
                     <row>
@@ -35,14 +17,14 @@
                         </combobox>
                     </row>
                     <row>
-                        <button label="Sauvegarder" />
+                        <button label="Sauvegarder" sclass="enmg-btn enmg-btn-primary" />
                     </row>
                 </rows>
             </grid>
         </div>
 
-        <div sclass="settings-section">
-            <label>🔒 Sécurité</label>
+        <div sclass="settings-section enmg-card">
+            <label sclass="enmg-card-title">🔒 Sécurité</label>
             <label value="Changer le mot de passe administrateur" />
             <grid>
                 <rows>
@@ -55,7 +37,7 @@
                         <textbox type="password" />
                     </row>
                     <row>
-                        <button label="Mettre à jour" />
+                        <button label="Mettre à jour" sclass="enmg-btn enmg-btn-primary" />
                     </row>
                 </rows>
             </grid>

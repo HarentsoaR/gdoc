@@ -1,12 +1,12 @@
 <?page title="Gestion des Accès" contentType="text/html;charset=UTF-8"?>
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
-    <div hflex="1" vflex="1" sclass="page-container"
+    <div hflex="1" vflex="1" sclass="page-container access-page"
          viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.AccessManagementViewModel')">
 
-        <vlayout hflex="1" vflex="1" style="gap:16px;">
+        <vlayout hflex="1" vflex="1" style="gap:12px;">
 
             <!-- HEADER -->
-            <div sclass="page-header">
+            <div sclass="page-header access-header">
                 <div>
                     <label value="Gestion des Accès" sclass="page-title"/>
                     <label value="Configurer les permissions des profils sur les fonctionnalités"
@@ -26,48 +26,61 @@
                 </div>
             </div>
 
-            <hlayout hflex="1" vflex="1" style="gap:24px;">
+            <div class="filters-bar">
+                <div class="search-group" visible="@load(vm.filtersVisible)">
+                    <textbox value="@bind(vm.profilFilter)" instant="true"
+                             placeholder="Rechercher un profil..."
+                             onChanging="@command('filterProfils', query=event.value)"
+                             sclass="search-input"/>
+                    <button iconSclass="z-icon-search" sclass="search-button"/>
+                </div>
+                <button label="@load(vm.filtersVisible ? 'Masquer les profils' : 'Afficher les profils')"
+                        sclass="btn ghost"
+                        onClick="@command('toggleFilters')"/>
+            </div>
 
-                <!-- COLONNE GAUCHE : PROFILS -->
-                <div width="300px" vflex="1" sclass="panel">
-                    <div class="panel-header">
-                        <label class="panel-title" value="Profils"/>
-                    </div>
-
+            <hlayout hflex="1" vflex="1" sclass="access-content" style="gap:16px;">
+                <div class="profiles-panel panel" visible="@load(vm.filtersVisible)">
+                    <label value="Profils" class="panel-title"/>
                     <listbox model="@load(vm.profils)"
                              selectedItem="@bind(vm.selectedProfil)"
-                             onSelect="@command('loadPermissionsForProfil', profil=vm.selectedProfil)"
+                             onSelect="@command('loadPermissionsForProfil', profil=self.selectedItem.value)"
                              emptyMessage="Aucun profil trouvé."
                              vflex="1"
                              sclass="sidebar-listbox">
                         <template name="model">
-                            <listitem>
+                            <listitem value="@load(each)">
                                 <listcell label="@load(each.libelle)"/>
                             </listitem>
                         </template>
                     </listbox>
                 </div>
 
-                <!-- COLONNE DROITE : PERMISSIONS -->
-                <div hflex="1" vflex="1" sclass="panel">
-                    <div class="panel-header">
-                        <label class="panel-title" value="Permissions du profil : "/>
-                        <label class="panel-title-highlight"
-                               value="@load(vm.selectedProfil ne null ? vm.selectedProfil.libelle : '...')"/>
+                <div class="permissions-panel panel" hflex="1" vflex="1">
+                    <div class="panel-header permissions-header">
+                        <div>
+                            <label class="panel-title" value="Permissions du profil : "/>
+                            <label class="panel-title-highlight"
+                                   value="@load(vm.selectedProfil ne null ? vm.selectedProfil.libelle : '...')"/>
+                        </div>
+                        <div class="search-group permission-search">
+                            <textbox value="@bind(vm.permissionFilter)" instant="true"
+                                     placeholder="Filtrer une fonctionnalité..."
+                                     onChanging="@command('filterPermissions', query=event.value)"
+                                     sclass="search-input"/>
+                            <button iconSclass="z-icon-search" sclass="search-button"/>
+                        </div>
                     </div>
 
-                    <div vflex="1" style="overflow:auto;">
-
-                        <!-- Message quand aucun profil sélectionné -->
-                        <div if="@load(vm.selectedProfil eq null)" sclass="placeholder-message">
+                    <div class="panel-body" vflex="1">
+                        <div visible="@load(vm.selectedProfil eq null)" sclass="placeholder-message">
                             <n:i class="z-icon-hand-o-left placeholder-message-icon"/>
                             <label sclass="placeholder-message-text"
                                    value="Veuillez sélectionner un profil pour voir les permissions."/>
                         </div>
 
-                        <!-- Grille des permissions -->
-                        <grid model="@bind(vm.permissionItems)"
-                              if="@load(vm.selectedProfil ne null)"
+                        <grid model="@load(vm.permissionItems)"
+                              visible="@load(vm.selectedProfil ne null)"
                               vflex="1"
                               sclass="permission-grid"
                               emptyMessage="Aucune fonctionnalité à configurer.">
@@ -77,26 +90,23 @@
                                 <column label="Créer" align="center" width="80px"/>
                                 <column label="Modifier" align="center" width="80px"/>
                                 <column label="Supprimer" align="center" width="80px"/>
-                                <column label="Exporter" align="center" width="80px"/>
+                                <column label="Importer" align="center" width="80px"/>
                                 <column label="Dupliquer" align="center" width="80px"/>
                             </columns>
-                            <rows>
-                                <template name="model" var="item">
-                                    <row>
-                                        <label value="@load(item.f.libelle)"/>
-                                        <checkbox checked="@bind(item.canRead)"/>
-                                        <checkbox checked="@bind(item.canCreate)"/>
-                                        <checkbox checked="@bind(item.canUpdate)"/>
-                                        <checkbox checked="@bind(item.canDelete)"/>
-                                        <checkbox checked="@bind(item.canExport)"/>
-                                        <checkbox checked="@bind(item.canDuplicate)"/>
-                                    </row>
-                                </template>
-                            </rows>
+                            <template name="model" var="item">
+                                <row>
+                                    <label value="@load(item.f.libelle)"/>
+                                    <checkbox checked="@bind(item.canRead)"/>
+                                    <checkbox checked="@bind(item.canCreate)"/>
+                                    <checkbox checked="@bind(item.canUpdate)"/>
+                                    <checkbox checked="@bind(item.canDelete)"/>
+                                    <checkbox checked="@bind(item.canImport)"/>
+                                    <checkbox checked="@bind(item.canDuplicate)"/>
+                                </row>
+                            </template>
                         </grid>
                     </div>
                 </div>
-
             </hlayout>
         </vlayout>
     </div>

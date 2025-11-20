@@ -21,6 +21,7 @@
 		<packname>-${project.version}-FL-${maven.build.timestamp}</packname>
 		<log4j2.version>2.17.2</log4j2.version>
 		<commons-lang3.version>3.14.0</commons-lang3.version>
+        <zk.charts.version>11.2.0.0-Eval</zk.charts.version>
 	</properties>
 	<packaging>war</packaging>
 	<name>The gedi Project</name>
@@ -84,6 +85,11 @@
 			<artifactId>zhtml</artifactId>
 			<version>${zk.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.zkoss.chart</groupId>
+            <artifactId>zkcharts</artifactId>
+            <version>${zk.charts.version}</version>
+        </dependency>
 		
 		<!-- ZK Spring integration -->
 <dependency>

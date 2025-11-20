@@ -1,7 +1,6 @@
 <!-- candidat/list.zul -->
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native"> <!-- Ajout de xmlns:n="native" -->
-    <div hflex="1" vflex="1" sclass="page-container" 
-         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.CandidatViewModel')">
+    <div hflex="1" vflex="1" sclass="page-container">
 
         <!-- Utilisation de vlayout pour une disposition verticale correcte -->
         <vlayout hflex="1" vflex="1" sclass="z-flex z-flex-col" style="gap: 16px;">
@@ -13,7 +12,7 @@
                     <label value="Gérez les candidats aux concours" sclass="page-subtitle"/>
                 </div>
                 <div sclass="header-actions">
-                    <button label="Nouveau Candidat" sclass="btn-primary" iconSclass="z-icon-plus" 
+                    <button label="Nouveau Candidat" sclass="enmg-btn enmg-btn-primary" iconSclass="z-icon-plus" 
                             onClick="@command('newCandidat')"/>
                 </div>
             </div>
@@ -23,19 +22,17 @@
                 <div sclass="search-box" hflex="1">
                     <n:i class="z-icon-search search-icon" />
                     <textbox placeholder="Rechercher par nom, prénom..." 
-                             value="@bind(vm.searchQuery)" 
-                             onOK="@command('search')"
+                             value="@bind(vm.candidatViewModel.searchQuery)" 
+                             onOK="@command('searchCandidats')"
                              instant="true"/>
                 </div>
-                <button label="Rafraîchir" sclass="btn" iconSclass="z-icon-refresh" 
-                        onClick="@command('refresh')"/>
+                <button label="Rafraîchir" sclass="enmg-btn enmg-btn-secondary" iconSclass="z-icon-refresh" 
+                        onClick="@command('refreshCandidats')"/>
             </div>
 
-            <!-- Panneau du tableau (vflex="1" pour prendre tout l'espace) -->
-            <div sclass="panel" vflex="1">
-                <!-- Listbox (vflex="1" pour remplir le panneau) -->
-                <listbox model="@load(vm.candidats)" vflex="1" hflex="1" 
-                         emptyMessage="Aucun candidat trouvé." mold="paging" pageSize="10">
+            <div sclass="panel enmg-card" vflex="1">
+                <listbox model="@load(vm.candidatViewModel.candidats)" vflex="1" hflex="1"
+                         emptyMessage="Aucun candidat trouvé." mold="paging" pageSize="10" sclass="data-table">
                     <listhead>
                         <listheader label="NOM"/>
                         <listheader label="PRÉNOM"/>
@@ -45,11 +42,10 @@
                         <listheader label="ACTIONS" width="120px" align="center"/>
                     </listhead>
                     <template name="model" var="candidat">
-                        <listitem>
+                        <listitem sclass="data-table-row">
                             <listcell label="@load(candidat.nom)"/>
                             <listcell label="@load(candidat.prenom)"/>
                             <listcell>
-                                <!-- Affichage sur deux lignes pour plus de clarté -->
                                 <vlayout>
                                     <label value="@load(candidat.concours.avisConcours)" style="font-weight: 500;"/>
                                     <label value="@load(candidat.concours.numeroArrete)" sclass="text-muted" style="font-size: 12px;"/>
@@ -62,11 +58,11 @@
                             <listcell sclass="actions-cell">
                                 <div hflex="1" align="center" style="display: flex; gap: 16px; justify-content: center;">
                                     <a iconSclass="z-icon-eye" tooltiptext="Voir"
-                                            onClick="@command('viewCandidat', candidat=candidat)"/>
+                                       onClick="@command('viewCandidat', candidat=candidat)"/>
                                     <a iconSclass="z-icon-pencil" tooltiptext="Modifier"
-                                            onClick="@command('editCandidat', candidat=candidat)"/>
+                                       onClick="@command('editCandidat', candidat=candidat)"/>
                                     <a sclass="text-danger" iconSclass="z-icon-trash-o" tooltiptext="Supprimer"
-                                            onClick="@command('delete', id=candidat.candidatId)"/>
+                                       onClick="@command('deleteCandidat', id=candidat.candidatId)"/>
                                 </div>
                             </listcell>
                         </listitem>
@@ -76,4 +72,103 @@
 
         </vlayout>
     </div>
+
+    <window title="Profil du candidat" mode="modal" visible="@bind(vm.candidatViewModel.detailVisible)"
+            width="80%" height="85%" closable="true" sizable="true" border="normal"
+            onClose="@command('closeDetail')" sclass="candidate-modal">
+        <attribute name="onClose"><![CDATA[self.setVisible(false); event.stopPropagation();]]></attribute>
+        <vlayout vflex="1" hflex="1" style="gap: 16px;">
+            <div class="detail-header">
+                <div>
+                    <label value="@load(vm.candidatViewModel.detailDisplayName)" sclass="detail-title"/>
+                    <label value="@load(vm.candidatViewModel.detailConcoursLabel)" sclass="detail-subtitle"/>
+                </div>
+            </div>
+            <div class="detail-grid">
+                <div>
+                    <label value="Numéro d'inscription" sclass="detail-label"/>
+                    <label value="@load(vm.candidatViewModel.detailRegistrationLabel)" sclass="detail-value"/>
+                </div>
+                <div>
+                    <label value="Centre d'examen" sclass="detail-label"/>
+                    <label value="@load(vm.candidatViewModel.detailCentreLabel)" sclass="detail-value"/>
+                </div>
+                <div>
+                    <label value="Contact" sclass="detail-label"/>
+                    <label value="@load(vm.candidatViewModel.detailContactLabel)" sclass="detail-value"/>
+                </div>
+                <div>
+                    <label value="Email" sclass="detail-label"/>
+                    <label value="@load(vm.candidatViewModel.detailEmailLabel)" sclass="detail-value"/>
+                </div>
+            </div>
+            <div class="summary-inline detail-metrics">
+                <div class="mini-card">
+                    <label value="Documents" class="mini-card-title"/>
+                    <label value="@load(vm.candidatViewModel.detailSummary.total)" class="mini-card-value"/>
+                    <div class="progress-shell mini">
+                        <div class="progress-bar" style="@load(vm.candidatViewModel.detailSummary.progressStyle)"></div>
+                    </div>
+                    <label value="@load(vm.candidatViewModel.detailSummary.progressLabel)" class="mini-card-sub"/>
+                </div>
+                <div class="mini-card">
+                    <label value="Validés" class="mini-card-title"/>
+                    <label value="@load(vm.candidatViewModel.detailSummary.valides)" class="status-label status-success"/>
+                </div>
+                <div class="mini-card">
+                    <label value="En cours" class="mini-card-title"/>
+                    <label value="@load(vm.candidatViewModel.detailSummary.enCours)" class="status-label status-warning"/>
+                </div>
+                <div class="mini-card">
+                    <label value="Rejetés" class="mini-card-title"/>
+                    <label value="@load(vm.candidatViewModel.detailSummary.rejetes)" class="status-label status-danger"/>
+                </div>
+            </div>
+            <div class="missing-docs" visible="@load(not empty vm.candidatViewModel.missingDocuments)">
+                <label value="Documents requis manquants" sclass="detail-label"/>
+                <hlayout sclass="pill-stack">
+                    <forEach items="@load(vm.candidatViewModel.missingDocuments)" var="doc">
+                        <label value="@load(doc)" sclass="tag tag-warning"/>
+                    </forEach>
+                </hlayout>
+            </div>
+            <div class="detail-documents" vflex="1">
+                <listbox model="@load(vm.candidatViewModel.detailDocuments)" vflex="1" sizedByContent="false"
+                         emptyMessage="Aucun document trouvé" sclass="listbox-thread detail-list"
+                         mold="paging" pageSize="6">
+                    <listhead sizable="true">
+                        <listheader label="Document" hflex="2"/>
+                        <listheader label="État" width="120px"/>
+                        <listheader label="Remarque" hflex="2"/>
+                        <listheader label="Version" width="90px"/>
+                        <listheader label="Fichier" hflex="1"/>
+                    </listhead>
+                    <template name="model" var="doc">
+                        <listitem>
+                            <listcell>
+                                <label value="@load(doc.documentLabel)" sclass="list-title text-ellipsis"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(doc.etatLabel)" sclass="@load(doc.etatSclass)"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(doc.remarque)" sclass="text-muted text-ellipsis"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(doc.version)" sclass="text-muted"/>
+                            </listcell>
+                            <listcell>
+                                <vlayout sclass="listbox-thread-stack">
+                                    <label value="@load(doc.fileName)" sclass="text-muted text-ellipsis"/>
+                                                    <a label="Télécharger" sclass="link-pill"
+                                                       visible="@load(doc.hasAttachment)"
+                                                       onClick="@command('downloadDocument', doc=doc)"/>
+                                </vlayout>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+        </vlayout>
+    </window>
 </zk>

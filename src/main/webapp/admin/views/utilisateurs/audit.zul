@@ -3,7 +3,7 @@
     
     <vlayout sclass="section" spacing="16px">
         <vlayout spacing="4px">
-            <label value="Audit et Journalisation" style="font-size:22px;font-weight:700;color:#111827"/>
+            <label value="Audit et Journalisation" style="font-size:22px;font-weight:700;color:var(--enmg-color-text)"/>
             <label value="Consulter les logs et activités du système." sclass="muted"/>
         </vlayout>
 

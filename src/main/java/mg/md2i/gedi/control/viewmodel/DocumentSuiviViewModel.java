@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class DocumentSuiviViewModel {
 
-    private List<SuiviRow> dossiers = new ArrayList<>();
+    private List<DossierRow> dossiers = new ArrayList<>();
     private SummaryStats summaryStats = new SummaryStats();
 
     private List<Concours> concoursList = new ArrayList<>();
@@ -35,6 +35,9 @@ public class DocumentSuiviViewModel {
     private DocumentConcours selectedDocumentType;
     private DocumentEtatFilterOption selectedEtatFilter;
     private String searchNomCandidat = "";
+    private boolean filtersVisible = false;
+    private DossierRow selectedDossier;
+    private boolean detailsModalVisible = false;
 
     @Init
     public void init() {
@@ -71,21 +74,28 @@ public class DocumentSuiviViewModel {
                     .collect(Collectors.toList());
         }
 
-        dossiers = raw.stream()
-                .map(SuiviRow::new)
-                .sorted(Comparator.comparing(SuiviRow::getCandidatLabel, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
+        Map<Integer, List<ListeDossierConcoursCandidat>> grouped = raw.stream()
+                .filter(item -> item.getCandidatId() != null)
+                .collect(Collectors.groupingBy(ListeDossierConcoursCandidat::getCandidatId));
+
+        dossiers = grouped.values().stream()
+                .map(entries -> new DossierRow(entries, documentTypes))
+                .sorted(Comparator.comparing(DossierRow::getCandidatLabel, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
                 .collect(Collectors.toList());
-        summaryStats = SummaryStats.from(raw);
+
+        summaryStats = SummaryStats.fromDossiers(dossiers);
+        selectedDossier = null;
+        detailsModalVisible = false;
     }
 
     @Command
-    @NotifyChange({"dossiers", "summaryStats"})
+    @NotifyChange({"dossiers", "summaryStats", "selectedDossier", "detailsModalVisible"})
     public void applyFilters() {
         loadDossiers();
     }
 
     @Command
-    @NotifyChange({"dossiers", "summaryStats", "selectedConcours", "selectedCentre", "selectedDocumentType", "searchNomCandidat", "selectedEtatFilter"})
+    @NotifyChange({"dossiers", "summaryStats", "selectedConcours", "selectedCentre", "selectedDocumentType", "searchNomCandidat", "selectedEtatFilter", "selectedDossier", "detailsModalVisible"})
     public void clearFilters() {
         selectedConcours = null;
         selectedCentre = null;
@@ -96,7 +106,27 @@ public class DocumentSuiviViewModel {
     }
 
     @Command
-    public void download(@BindingParam("item") SuiviRow item) {
+    @NotifyChange({"dossiers", "summaryStats", "searchNomCandidat", "selectedDossier", "detailsModalVisible"})
+    public void updateSearchNom(@BindingParam("keyword") String keyword) {
+        searchNomCandidat = keyword != null ? keyword.trim() : "";
+        loadDossiers();
+    }
+
+    @Command
+    @NotifyChange({"selectedDossier", "detailsModalVisible"})
+    public void openDossierDetails(@BindingParam("row") DossierRow row) {
+        selectedDossier = row;
+        detailsModalVisible = row != null;
+    }
+
+    @Command
+    @NotifyChange("detailsModalVisible")
+    public void closeDossierDetails() {
+        detailsModalVisible = false;
+    }
+
+    @Command
+    public void downloadDocument(@BindingParam("item") DocumentItem item) {
         if (item == null || item.getPath() == null) return;
         try {
             File file = new File(item.getPath());
@@ -112,7 +142,7 @@ public class DocumentSuiviViewModel {
         }
     }
 
-    public List<SuiviRow> getDossiers() {
+    public List<DossierRow> getDossiers() {
         return dossiers;
     }
 
@@ -176,46 +206,202 @@ public class DocumentSuiviViewModel {
         this.searchNomCandidat = searchNomCandidat;
     }
 
-    public static class SuiviRow {
-        private final ListeDossierConcoursCandidat dossier;
-        private final DocumentValidationEtat etat;
+    public boolean isFiltersVisible() {
+        return filtersVisible;
+    }
 
-        public SuiviRow(ListeDossierConcoursCandidat dossier) {
-            this.dossier = dossier;
-            this.etat = DocumentValidationEtat.fromCode(dossier.getEtatDocument());
+    @Command
+    @NotifyChange("filtersVisible")
+    public void toggleFilters() {
+        filtersVisible = !filtersVisible;
+    }
+
+    public DossierRow getSelectedDossier() {
+        return selectedDossier;
+    }
+
+    public boolean isDetailsModalVisible() {
+        return detailsModalVisible;
+    }
+
+    public static class DossierRow {
+        private final Integer candidatId;
+        private final Candidat candidat;
+        private final Concours concours;
+        private final CentreExamen centre;
+        private final List<DocumentItem> documents;
+        private final long totalDocuments;
+        private final long valides;
+        private final long enCours;
+        private final long rejetes;
+        private final long sansPiece;
+        private final long missingRequired;
+        private final List<String> missingRequiredLabels;
+        private final long expectedTotal;
+        private final DocumentValidationEtat globalEtat;
+
+        public DossierRow(List<ListeDossierConcoursCandidat> entries, List<DocumentConcours> requiredDocuments) {
+            ListeDossierConcoursCandidat first = entries.get(0);
+            this.candidatId = first.getCandidatId();
+            this.candidat = first.getCandidat();
+            this.concours = candidat != null ? candidat.getConcours() : null;
+            this.centre = candidat != null ? candidat.getCentreExamen() : null;
+            this.documents = entries.stream()
+                    .map(DocumentItem::new)
+                    .collect(Collectors.toList());
+            this.totalDocuments = documents.size();
+            this.valides = documents.stream().filter(DocumentItem::isValide).count();
+            this.enCours = documents.stream().filter(DocumentItem::isEnCours).count();
+            this.rejetes = documents.stream().filter(DocumentItem::isRejete).count();
+            this.sansPiece = documents.stream().filter(doc -> !doc.hasAttachment()).count();
+
+            Set<Integer> providedDocIds = entries.stream()
+                    .map(ListeDossierConcoursCandidat::getDocumentConcoursId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            List<DocumentConcours> requiredList = Optional.ofNullable(requiredDocuments).orElse(Collections.emptyList());
+            this.missingRequiredLabels = requiredList.stream()
+                    .filter(doc -> doc.getDocumentConcoursId() != null && !providedDocIds.contains(doc.getDocumentConcoursId()))
+                    .map(DocumentConcours::getLibelle)
+                    .collect(Collectors.toList());
+            this.missingRequired = missingRequiredLabels.size();
+            this.expectedTotal = totalDocuments + missingRequired;
+            this.globalEtat = resolveGlobalEtat();
+        }
+
+        private DocumentValidationEtat resolveGlobalEtat() {
+            if (rejetes > 0) {
+                return DocumentValidationEtat.REJETE;
+            }
+            if (valideEtComplets()) {
+                return DocumentValidationEtat.VALIDE;
+            }
+            if (missingRequired > 0 || sansPiece > 0 || enCours > 0) {
+                return DocumentValidationEtat.EN_COURS;
+            }
+            return DocumentValidationEtat.EN_COURS;
+        }
+
+        private boolean valideEtComplets() {
+            return missingRequired == 0 && sansPiece == 0 && enCours == 0 && rejetes == 0 && valides == totalDocuments;
+        }
+
+        public Integer getCandidatId() {
+            return candidatId;
+        }
+
+        public String getReference() {
+            String num = Optional.ofNullable(candidat)
+                    .map(Candidat::getNumInscription)
+                    .map(val -> String.format("%05d", val))
+                    .orElse(Optional.ofNullable(candidat).map(Candidat::getNumeroEnregistrement).orElse("N/A"));
+            String concoursInfo = Optional.ofNullable(concours).map(Concours::getDisplayInfo).orElse("-");
+            return "DOS-" + num + " | " + concoursInfo;
         }
 
         public String getCandidatLabel() {
-            Candidat candidat = dossier.getCandidat();
             if (candidat == null) return "-";
             String nom = Optional.ofNullable(candidat.getNom()).orElse("");
             String prenom = Optional.ofNullable(candidat.getPrenom()).orElse("");
             return (nom + " " + prenom).trim();
         }
 
-        public String getDocumentLabel() {
-            DocumentConcours doc = dossier.getDocumentConcours();
-            return doc != null ? doc.getLibelle() : "-";
-        }
-
         public String getConcoursLabel() {
-            Candidat candidat = dossier.getCandidat();
-            if (candidat != null && candidat.getConcours() != null) {
-                return candidat.getConcours().getDisplayInfo();
-            }
-            return "-";
+            return Optional.ofNullable(concours).map(Concours::getDisplayInfo).orElse("-");
         }
 
         public String getCentreLabel() {
-            Candidat candidat = dossier.getCandidat();
-            if (candidat != null && candidat.getCentreExamen() != null) {
-                return candidat.getCentreExamen().getLibelle();
-            }
-            return "-";
+            return Optional.ofNullable(centre).map(CentreExamen::getLibelle).orElse("-");
         }
 
-        public DocumentValidationEtat getEtat() {
-            return etat;
+        public String getGlobalEtatLabel() {
+            return globalEtat.getLabel();
+        }
+
+        public String getGlobalEtatSclass() {
+            return "status-label " + globalEtat.getChipSclass();
+        }
+
+        public String getDocumentsResume() {
+            return String.format(Locale.FRENCH, "%d/%d pièces reçues • %d validés • %d en cours • %d rejetés",
+                    totalDocuments, expectedTotal, valides, enCours, rejetes);
+        }
+
+        public boolean isComplet() {
+            return sansPiece == 0 && missingRequired == 0;
+        }
+
+        public long getSansPiece() {
+            return sansPiece;
+        }
+
+        public long getMissingRequired() {
+            return missingRequired;
+        }
+
+        public long getTotalDocuments() { return totalDocuments; }
+        public long getValides() { return valides; }
+        public long getRejetes() { return rejetes; }
+        public long getEnCours() { return enCours; }
+
+        public boolean isFullyValidated() {
+            return valideEtComplets();
+        }
+
+        public List<DocumentItem> getDocuments() {
+            return documents;
+        }
+
+        public String getMissingRequiredLabel() {
+            if (missingRequired <= 0) {
+                return "";
+            }
+            return missingRequired + (missingRequired > 1 ? " documents requis manquants" : " document requis manquant");
+        }
+
+        public String getMissingRequiredDetails() {
+            if (missingRequiredLabels.isEmpty()) {
+                return "";
+            }
+            return String.join(", ", missingRequiredLabels);
+        }
+
+        public String getPiecesStateLabel() {
+            if (missingRequired > 0 && sansPiece > 0) {
+                return String.format(Locale.FRENCH, "%d doc. requis manquants • %d pièces sans fichier", missingRequired, sansPiece);
+            }
+            if (missingRequired > 0) {
+                return getMissingRequiredLabel();
+            }
+            if (sansPiece > 0) {
+                return sansPiece + (sansPiece > 1 ? " pièces sans fichier" : " pièce sans fichier");
+            }
+            return "Complet";
+        }
+
+        public String getPiecesStateSclass() {
+            if (missingRequired > 0) {
+                return "status-label status-danger";
+            }
+            if (sansPiece > 0) {
+                return "status-label status-warning";
+            }
+            return "status-label status-success";
+        }
+    }
+
+    public static class DocumentItem {
+        private final ListeDossierConcoursCandidat dossier;
+        private final DocumentValidationEtat etat;
+
+        public DocumentItem(ListeDossierConcoursCandidat dossier) {
+            this.dossier = dossier;
+            this.etat = DocumentValidationEtat.fromCode(dossier.getEtatDocument());
+        }
+
+        public String getLabel() {
+            DocumentConcours doc = dossier.getDocumentConcours();
+            return doc != null ? doc.getLibelle() : "-";
         }
 
         public String getEtatLabel() {
@@ -234,6 +420,19 @@ public class DocumentSuiviViewModel {
             return dossier.getVersion();
         }
 
+        public Integer getDocumentTypeId() {
+            return dossier.getDocumentConcoursId();
+        }
+
+        public boolean hasAttachment() {
+            String path = dossier.getRemarqueFacultatif();
+            return path != null && !path.trim().isEmpty();
+        }
+
+        public boolean getHasAttachment() {
+            return hasAttachment();
+        }
+
         public String getPath() {
             return dossier.getRemarqueFacultatif();
         }
@@ -244,6 +443,10 @@ public class DocumentSuiviViewModel {
             int idx = path.lastIndexOf(File.separator);
             return idx >= 0 ? path.substring(idx + 1) : path;
         }
+
+        public boolean isValide() { return etat == DocumentValidationEtat.VALIDE; }
+        public boolean isRejete() { return etat == DocumentValidationEtat.REJETE; }
+        public boolean isEnCours() { return etat == DocumentValidationEtat.EN_COURS; }
     }
 
     public static class SummaryStats {
@@ -252,13 +455,15 @@ public class DocumentSuiviViewModel {
         private long enCours;
         private long rejetes;
 
-        public static SummaryStats from(List<ListeDossierConcoursCandidat> docs) {
+        public static SummaryStats fromDossiers(List<DossierRow> dossiers) {
             SummaryStats stats = new SummaryStats();
-            if (docs == null) return stats;
-            stats.total = docs.size();
-            stats.valides = docs.stream().filter(d -> Objects.equals(d.getEtatDocument(), DocumentValidationEtat.VALIDE.getCode())).count();
-            stats.enCours = docs.stream().filter(d -> Objects.equals(d.getEtatDocument(), DocumentValidationEtat.EN_COURS.getCode())).count();
-            stats.rejetes = docs.stream().filter(d -> Objects.equals(d.getEtatDocument(), DocumentValidationEtat.REJETE.getCode())).count();
+            if (dossiers == null) {
+                return stats;
+            }
+            stats.total = dossiers.size();
+            stats.valides = dossiers.stream().filter(DossierRow::isFullyValidated).count();
+            stats.rejetes = dossiers.stream().filter(d -> d.globalEtat == DocumentValidationEtat.REJETE).count();
+            stats.enCours = Math.max(0, stats.total - stats.valides - stats.rejetes);
             return stats;
         }
 
@@ -266,5 +471,20 @@ public class DocumentSuiviViewModel {
         public long getValides() { return valides; }
         public long getEnCours() { return enCours; }
         public long getRejetes() { return rejetes; }
+
+        public String getProgressLabel() {
+            if (total == 0) return "0%";
+            int percent = (int)Math.round((double)valides / total * 100);
+            return percent + "% validés";
+        }
+
+        public int getProgressPercent() {
+            if (total == 0) return 0;
+            return (int)Math.round((double)valides / total * 100);
+        }
+
+        public String getProgressStyle() {
+            return "width:" + getProgressPercent() + "%";
+        }
     }
 }
