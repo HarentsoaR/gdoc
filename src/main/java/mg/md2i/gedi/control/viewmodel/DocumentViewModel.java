@@ -6,6 +6,7 @@ import mg.md2i.gedi.entity.Document;
 import mg.md2i.gedi.gestionmetier.DocumentGestion;
 import mg.md2i.gedi.services.LuceneService;
 import mg.md2i.gedi.services.impl.LuceneServiceImpl;
+import mg.md2i.gedi.util.RoleUtils;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zk.ui.Executions;
@@ -27,6 +28,10 @@ public class DocumentViewModel {
     private boolean concoursExpanded = false;
     private boolean navigationExpanded = true;
     private boolean fluxExpanded = true;
+    private boolean canValidateDossiers = false;
+    private boolean canSeeSuiviGlobal = false;
+    private boolean canManageReferentiels = false;
+    private boolean canImportDocuments = false;
     
     private List<SearchResult> searchResults = new ArrayList<>();
     private String searchQuery = "";
@@ -43,7 +48,10 @@ public class DocumentViewModel {
         map.put("/documents/views/concours/documents-concours/new.zul", "/documents/concours/documents/new");
         map.put("/documents/views/concours/documents-concours/edit.zul", "/documents/concours/documents/edit");
         map.put("/documents/views/concours/suivi-dossiers.zul", "/documents/concours/suivi");
+        map.put("/documents/views/concours/suivi-dossier-detail.zul", "/documents/concours/suivi/dossier");
         map.put("/documents/views/concours/validation-dossiers.zul", "/documents/concours/validation");
+        map.put("/documents/views/concours/validation-documents.zul", "/documents/concours/validation/documents");
+        map.put("/documents/views/concours/upload-candidat.zul", "/documents/concours/upload");
         map.put("/documents/views/filiere/list.zul", "/documents/filieres/list");
         map.put("/documents/views/filiere/new.zul", "/documents/filieres/new");
         map.put("/documents/views/filiere/edit.zul", "/documents/filieres/edit");
@@ -86,6 +94,10 @@ public class DocumentViewModel {
     public void setNavigationExpanded(boolean navigationExpanded) { this.navigationExpanded = navigationExpanded; }
     public boolean isFluxExpanded() { return fluxExpanded; }
     public void setFluxExpanded(boolean fluxExpanded) { this.fluxExpanded = fluxExpanded; }
+    public boolean isCanValidateDossiers() { return canValidateDossiers; }
+    public boolean isCanSeeSuiviGlobal() { return canSeeSuiviGlobal; }
+    public boolean isCanManageReferentiels() { return canManageReferentiels; }
+    public boolean isCanImportDocuments() { return canImportDocuments; }
     
     @DependsOn("currentView")
     public String getActiveView() {
@@ -121,6 +133,7 @@ public class DocumentViewModel {
 
     @Init
     public void init() {
+        applyRolePermissions();
         loadDocuments();
         if (candidatViewModel != null) {
             candidatViewModel.init();
@@ -325,4 +338,20 @@ public class DocumentViewModel {
     @Command @NotifyChange("candidatViewModel") public void searchCandidats() { candidatViewModel.search(); }
     @Command @NotifyChange("candidatViewModel") public void onConcoursChange(@BindingParam("self") org.zkoss.zul.Combobox c) { candidatViewModel.onConcoursChange(c); }
     @Command @NotifyChange("candidatViewModel") public void onCentreExamenChange(@BindingParam("self") org.zkoss.zul.Combobox c) { candidatViewModel.onCentreExamenChange(c); }
+    @Command public void downloadCandidatDocumentsAsZip() { candidatViewModel.downloadCandidatDocumentsAsZip(); }
+    
+    @GlobalCommand("refreshCandidatsList")
+    @NotifyChange("candidatViewModel")
+    public void refreshCandidatsList() {
+        if (candidatViewModel != null) {
+            candidatViewModel.refreshCandidatsList();
+        }
+    }
+
+    private void applyRolePermissions() {
+        canValidateDossiers = RoleUtils.canValidateDossiers();
+        canSeeSuiviGlobal = RoleUtils.canSeeSuiviGlobal();
+        canManageReferentiels = RoleUtils.canManageReferentiels();
+        canImportDocuments = RoleUtils.canImportDocuments();
+    }
 }

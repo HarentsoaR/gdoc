@@ -97,6 +97,14 @@ public class PromotionViewModel {
             currentPromotion.setFiliereId(currentPromotion.getFiliere().getFiliereId());
         }
 
+        normalizePromotionLibelle();
+
+        if (PromotionGestion.existsActiveDuplicate(currentPromotion)) {
+            Messagebox.show("Une promotion avec ce numéro, cette filière et cette année existe déjà.", "Duplication",
+                    Messagebox.OK, Messagebox.EXCLAMATION);
+            return;
+        }
+
         PromotionGestion.save(this.currentPromotion);
         Messagebox.show("Promotion sauvegardée avec succès!", "Succès", Messagebox.OK, Messagebox.INFORMATION);
 
@@ -105,6 +113,14 @@ public class PromotionViewModel {
             view.detach();
         } else { // We are on the NEW page
             navigateToList();
+        }
+    }
+
+    private void normalizePromotionLibelle() {
+        String numero = currentPromotion.getNumeroPromotion() != null ? currentPromotion.getNumeroPromotion().trim() : "";
+        if (!numero.isEmpty()) {
+            currentPromotion.setNumeroPromotion(numero.toUpperCase());
+            currentPromotion.setLibelle(numero.toUpperCase() + " EME PROMOTION");
         }
     }
     

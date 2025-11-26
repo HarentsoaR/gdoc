@@ -6,11 +6,13 @@ import mg.md2i.gedi.entity.Concours;
 import mg.md2i.gedi.entity.DocumentConcours;
 import mg.md2i.gedi.entity.ListeDossierConcoursCandidat;
 import mg.md2i.gedi.enums.DocumentValidationEtat;
+import mg.md2i.gedi.util.ArchiveUtils;
 import mg.md2i.gedi.gestionmetier.CentreExamenGestion;
 import mg.md2i.gedi.gestionmetier.ConcoursGestion;
 import mg.md2i.gedi.gestionmetier.DocumentConcoursGestion;
 import mg.md2i.gedi.gestionmetier.ListeDossierConcoursCandidatGestion;
 import mg.md2i.gedi.viewmodel.dto.DocumentEtatFilterOption;
+import mg.md2i.gedi.util.RoleUtils;
 import org.zkoss.bind.annotation.*;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.zk.ui.Executions;
@@ -19,6 +21,7 @@ import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Messagebox;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,9 +47,11 @@ public class DocumentValidationViewModel {
     private String focusedCandidatName;
     private boolean detailMode = false;
     private boolean filtersVisible = false;
+    private boolean canValidate = false;
 
     @Init
     public void init() {
+        canValidate = RoleUtils.canValidateDossiers();
         concoursList = ConcoursGestion.findAll();
         centreList = CentreExamenGestion.findAll();
         documentTypes = DocumentConcoursGestion.findAll();
@@ -125,13 +130,13 @@ public class DocumentValidationViewModel {
     }
 
     @Command
-    @NotifyChange({"dossiers", "selectedRows", "dossierSummaries", "selectedSummaryRows"})
+    @NotifyChange({"dossiers", "selectedRows", "dossierSummaries", "selectedSummaryRows", "documentSelectionLabel", "documentToggleLabel", "summarySelectionLabel", "summaryToggleLabel"})
     public void applyFilters() {
         loadDossiers();
     }
 
     @Command
-    @NotifyChange({"dossiers", "selectedRows", "dossierSummaries", "selectedSummaryRows", "selectedConcours", "selectedCentre", "selectedDocumentType", "searchNomCandidat", "selectedEtatFilter"})
+    @NotifyChange({"dossiers", "selectedRows", "dossierSummaries", "selectedSummaryRows", "selectedConcours", "selectedCentre", "selectedDocumentType", "searchNomCandidat", "selectedEtatFilter", "documentSelectionLabel", "documentToggleLabel", "summarySelectionLabel", "summaryToggleLabel"})
     public void clearFilters() {
         selectedConcours = null;
         selectedCentre = null;
@@ -149,10 +154,14 @@ public class DocumentValidationViewModel {
     // FIX: Removed the updateSearchNom command as it's no longer necessary and caused performance issues.
 
     @Command
-    @NotifyChange({"dossiers", "selectedRows", "dossierSummaries", "selectedSummaryRows"})
+    @NotifyChange({"dossiers", "selectedRows", "dossierSummaries", "selectedSummaryRows", "documentSelectionLabel", "documentToggleLabel", "summarySelectionLabel", "summaryToggleLabel"})
     public void changeEtat(@BindingParam("item") ValidationRow item,
                            @BindingParam("etat") int etatCode) {
         if (item == null) return;
+        if (!canValidate) {
+            Clients.showNotification("Vous n'êtes pas autorisé à valider/rejeter des dossiers.", "warning", null, "top_center", 2500);
+            return;
+        }
 
         DocumentValidationEtat etat = DocumentValidationEtat.fromCode(etatCode);
         if (etat == DocumentValidationEtat.REJETE && (item.getCommentaire() == null || item.getCommentaire().trim().isEmpty())) {
@@ -188,7 +197,7 @@ public class DocumentValidationViewModel {
     }
 
     @Command
-    @NotifyChange("selectedSummaryRows")
+    @NotifyChange({"selectedSummaryRows", "summarySelectionLabel", "summaryToggleLabel"})
     public void toggleSummarySelection() {
         if (selectedSummaryRows.size() == dossierSummaries.size() && !dossierSummaries.isEmpty()) {
             selectedSummaryRows.clear();
@@ -198,9 +207,27 @@ public class DocumentValidationViewModel {
     }
 
     @Command
+    @NotifyChange({"selectedRows", "documentSelectionLabel", "documentToggleLabel"})
+    public void updateSelection() {
+        // This method is called when listbox selection changes
+        // The binding will update selectedRows, we just need to notify the labels
+    }
+
+    @Command
+    @NotifyChange({"selectedSummaryRows", "summarySelectionLabel", "summaryToggleLabel"})
+    public void updateSummarySelection() {
+        // This method is called when listbox selection changes
+        // The binding will update selectedSummaryRows, we just need to notify the labels
+    }
+
+    @Command
     public void bulkChangeEtat(@BindingParam("etat") int etatCode) {
         if (selectedRows == null || selectedRows.isEmpty()) {
             Clients.showNotification("Sélectionnez au moins un dossier.", "warning", null, "top_center", 2000);
+            return;
+        }
+        if (!canValidate) {
+            Clients.showNotification("Vous n'êtes pas autorisé à valider/rejeter des dossiers.", "warning", null, "top_center", 2500);
             return;
         }
 
@@ -239,7 +266,10 @@ public class DocumentValidationViewModel {
         BindUtils.postNotifyChange(null, null, this, "selectedRows");
         BindUtils.postNotifyChange(null, null, this, "selectedSummaryRows");
         BindUtils.postNotifyChange(null, null, this, "dossierSummaries");
-        BindUtils.postNotifyChange(null, null, this, "dossierSummaries");
+        BindUtils.postNotifyChange(null, null, this, "documentSelectionLabel");
+        BindUtils.postNotifyChange(null, null, this, "documentToggleLabel");
+        BindUtils.postNotifyChange(null, null, this, "summarySelectionLabel");
+        BindUtils.postNotifyChange(null, null, this, "summaryToggleLabel");
 
         if (processed > 0) {
             Clients.showNotification(processed + " dossier(s) mis à jour", "info", null, "top_center", 2000);
@@ -283,6 +313,126 @@ public class DocumentValidationViewModel {
         } catch (Exception e) {
             Clients.showNotification("Impossible de télécharger le fichier.", "error", null, "top_center", 2500);
         }
+    }
+
+    @Command
+    public void downloadDocumentSelection() {
+        if (selectedRows == null || selectedRows.isEmpty()) {
+            Clients.showNotification("Sélectionnez au moins un document.", "warning", null, "top_center", 2000);
+            return;
+        }
+        Map<Integer, String> folderByCandidate = new HashMap<>();
+        List<ArchiveUtils.ArchiveEntry> entries = new ArrayList<>();
+        for (ValidationRow row : selectedRows) {
+            if (!row.hasAttachment()) {
+                continue;
+            }
+            String folder = folderByCandidate.computeIfAbsent(row.getCandidateKey(),
+                    key -> buildCandidateFolder(row.getRegistrationLabel(), row.getCandidatLabel()));
+            entries.add(new ArchiveUtils.ArchiveEntry(row.getDocumentLabel(),
+                    new File(row.getDossier().getRemarqueFacultatif()),
+                    folder));
+        }
+        triggerArchiveDownload(resolveArchiveNameForDocuments(), entries, "Aucun document disponible pour la sélection");
+    }
+
+    @Command
+    public void downloadSummarySelection() {
+        if (selectedSummaryRows == null || selectedSummaryRows.isEmpty()) {
+            Clients.showNotification("Sélectionnez au moins un dossier.", "warning", null, "top_center", 2000);
+            return;
+        }
+        List<ArchiveUtils.ArchiveEntry> entries = new ArrayList<>();
+        for (DossierSummary summary : selectedSummaryRows) {
+            String folder = buildCandidateFolder(summary.getRegistrationLabel(), summary.getCandidateLabel());
+            entries.addAll(collectEntriesForSummary(summary, folder));
+        }
+        triggerArchiveDownload(resolveArchiveNameForSummaries(), entries, "Aucun fichier à exporter pour les dossiers sélectionnés");
+    }
+
+    @Command
+    public void downloadFocusedDossier() {
+        if (focusedCandidatId == null) {
+            Clients.showNotification("Aucun dossier ciblé pour le téléchargement.", "warning", null, "top_center", 2000);
+            return;
+        }
+        String folder = buildCandidateFolder(getFocusedRegistrationLabel(), focusedCandidatName);
+        List<ArchiveUtils.ArchiveEntry> entries = collectEntriesForCandidate(focusedCandidatId, folder);
+        triggerArchiveDownload("DOSSIER_" + folder, entries, "Aucun fichier trouvé pour ce dossier");
+    }
+
+    private List<ArchiveUtils.ArchiveEntry> collectEntriesForSummary(DossierSummary summary, String folder) {
+        List<ArchiveUtils.ArchiveEntry> entries = new ArrayList<>();
+        for (ValidationRow row : dossiers) {
+            if (summary.matches(row) && row.hasAttachment()) {
+                entries.add(new ArchiveUtils.ArchiveEntry(row.getDocumentLabel(),
+                        new File(row.getDossier().getRemarqueFacultatif()),
+                        folder));
+            }
+        }
+        return entries;
+    }
+
+    private List<ArchiveUtils.ArchiveEntry> collectEntriesForCandidate(Integer candidateKey, String folder) {
+        List<ArchiveUtils.ArchiveEntry> entries = new ArrayList<>();
+        for (ValidationRow row : dossiers) {
+            if (Objects.equals(row.getCandidateKey(), candidateKey) && row.hasAttachment()) {
+                entries.add(new ArchiveUtils.ArchiveEntry(row.getDocumentLabel(),
+                        new File(row.getDossier().getRemarqueFacultatif()),
+                        folder));
+            }
+        }
+        return entries;
+    }
+
+    private void triggerArchiveDownload(String baseName, List<ArchiveUtils.ArchiveEntry> entries, String emptyMessage) {
+        try {
+            File archive = ArchiveUtils.buildArchive(baseName, entries);
+            if (archive == null) {
+                Clients.showNotification(emptyMessage != null ? emptyMessage : "Aucun fichier à exporter", "warning", null, "top_center", 2500);
+                return;
+            }
+            Filedownload.save(archive, "application/zip");
+        } catch (IOException e) {
+            Clients.showNotification("Erreur lors de la création de l'archive : " + e.getMessage(), "error", null, "top_center", 3000);
+        }
+    }
+
+    private String buildCandidateFolder(String registrationLabel, String candidateLabel) {
+        String reg = registrationLabel != null ? registrationLabel : "";
+        String name = candidateLabel != null ? candidateLabel : "candidat";
+        return ArchiveUtils.sanitizeFileName((reg + "_" + name).trim());
+    }
+
+    private String resolveArchiveNameForDocuments() {
+        if (selectedRows != null && selectedRows.size() == 1) {
+            ValidationRow row = selectedRows.iterator().next();
+            return "DOCUMENT_" + ArchiveUtils.sanitizeFileName(row.getDocumentLabel());
+        }
+        return "DOCUMENTS_SELECTION";
+    }
+
+    private String resolveArchiveNameForSummaries() {
+        if (selectedSummaryRows != null && selectedSummaryRows.size() == 1) {
+            DossierSummary summary = selectedSummaryRows.iterator().next();
+            return "DOSSIER_" + buildCandidateFolder(summary.getRegistrationLabel(), summary.getCandidateLabel());
+        }
+        return "DOSSIERS_SELECTION";
+    }
+
+    private String getFocusedRegistrationLabel() {
+        return findFirstRowForCandidate(focusedCandidatId)
+                .map(ValidationRow::getRegistrationLabel)
+                .orElse("dossier");
+    }
+
+    private Optional<ValidationRow> findFirstRowForCandidate(Integer candidateKey) {
+        if (candidateKey == null) {
+            return Optional.empty();
+        }
+        return dossiers.stream()
+                .filter(row -> Objects.equals(row.getCandidateKey(), candidateKey))
+                .findFirst();
     }
 
     // getters and setters...
@@ -360,6 +510,8 @@ public class DocumentValidationViewModel {
         this.selectedRows = (selectedRows != null)
                 ? new LinkedHashSet<>(selectedRows)
                 : new LinkedHashSet<>();
+        BindUtils.postNotifyChange(null, null, this, "documentSelectionLabel");
+        BindUtils.postNotifyChange(null, null, this, "documentToggleLabel");
     }
 
     public boolean isFiltersVisible() {
@@ -381,7 +533,7 @@ public class DocumentValidationViewModel {
     }
 
     @Command
-    @NotifyChange("selectedRows")
+    @NotifyChange({"selectedRows", "documentSelectionLabel", "documentToggleLabel"})
     public void toggleDocumentSelection() {
         if (isAllDocumentsSelected()) {
             selectedRows.clear();
@@ -397,6 +549,10 @@ public class DocumentValidationViewModel {
 
     public String getFocusedCandidatName() {
         return focusedCandidatName;
+    }
+
+    public boolean isCanValidate() {
+        return canValidate;
     }
 
     public String getDetailTitle() {
@@ -420,6 +576,8 @@ public class DocumentValidationViewModel {
         this.selectedSummaryRows = (selectedSummaryRows != null)
                 ? new LinkedHashSet<>(selectedSummaryRows)
                 : new LinkedHashSet<>();
+        BindUtils.postNotifyChange(null, null, this, "summarySelectionLabel");
+        BindUtils.postNotifyChange(null, null, this, "summaryToggleLabel");
     }
 
     public String getDossierCountLabel() {
@@ -500,6 +658,10 @@ public class DocumentValidationViewModel {
     public void updateSummaryEtat(@BindingParam("summary") DossierSummary summary,
                                   @BindingParam("etat") int etatCode) {
         if (summary == null) return;
+        if (!canValidate) {
+            Clients.showNotification("Vous n'êtes pas autorisé à valider/rejeter des dossiers.", "warning", null, "top_center", 2500);
+            return;
+        }
         DocumentValidationEtat etat = DocumentValidationEtat.fromCode(etatCode);
         if (etat == DocumentValidationEtat.VALIDE && summary.hasBlockingDocuments()) {
             Clients.showNotification("Impossible de valider ce dossier : certains documents sont en attente ou manquants.",
@@ -525,6 +687,10 @@ public class DocumentValidationViewModel {
     public void bulkUpdateSummaries(@BindingParam("etat") int etatCode) {
         if (selectedSummaryRows == null || selectedSummaryRows.isEmpty()) {
             Clients.showNotification("Sélectionnez au moins un dossier.", "warning", null, "top_center", 2000);
+            return;
+        }
+        if (!canValidate) {
+            Clients.showNotification("Vous n'êtes pas autorisé à valider/rejeter des dossiers.", "warning", null, "top_center", 2500);
             return;
         }
         DocumentValidationEtat etat = DocumentValidationEtat.fromCode(etatCode);

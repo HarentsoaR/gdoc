@@ -37,6 +37,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Utilisateur getUserByLogin(String login) {
+        if (login == null || login.trim().isEmpty()) return null;
+        return utilisateurRepository.findByLogin(login.trim()).orElse(null);
+    }
+
+    @Override
     public Utilisateur saveUser(Utilisateur user) {
         // Encrypt password if it's a new user or password has been changed
         if (user.getUtilisateurId() == null || (user.getPassword() != null && !user.getPassword().isEmpty())) {

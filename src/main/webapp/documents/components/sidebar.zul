@@ -31,10 +31,12 @@
                     <button label="Validation dossiers"
                             sclass="@load(vm.activeView eq '/documents/views/concours/validation-dossiers.zul' ? 'sidebar-button active' : 'sidebar-button')"
                             iconSclass="z-icon-check-circle"
+                            visible="@load(vm.canValidateDossiers)"
                             onClick="@command('navigateTo', view='/documents/views/concours/validation-dossiers.zul', section='Concours', page='Validation dossiers')"/>
                     <button label="Suivi dossiers"
                             sclass="@load(vm.activeView eq '/documents/views/concours/suivi-dossiers.zul' ? 'sidebar-button active' : 'sidebar-button')"
                             iconSclass="z-icon-line-chart"
+                            visible="@load(vm.canSeeSuiviGlobal)"
                             onClick="@command('navigateTo', view='/documents/views/concours/suivi-dossiers.zul', section='Concours', page='Suivi dossiers')"/>
                     <button label="Dossiers candidats"
                             sclass="@load(vm.activeView eq '/documents/views/candidats/dossiers.zul' ? 'sidebar-button active' : 'sidebar-button')"
@@ -51,22 +53,27 @@
                     <button label="Liste Concours"
                             sclass="@load(vm.activeView eq '/documents/views/concours/list.zul' ? 'sidebar-button active' : 'sidebar-button')"
                             iconSclass="z-icon-list"
+                            visible="@load(vm.canManageReferentiels)"
                             onClick="@command('navigateTo', view='/documents/views/concours/list.zul', section='Concours', page='Liste Concours')"/>
                     <button label="Doc. Concours"
                             sclass="@load(vm.activeView eq '/documents/views/concours/documents-concours/list.zul' ? 'sidebar-button active' : 'sidebar-button')"
                             iconSclass="z-icon-file-text"
+                            visible="@load(vm.canManageReferentiels)"
                             onClick="@command('navigateTo', view='/documents/views/concours/documents-concours/list.zul', section='Concours', page='Documents')"/>
                     <button label="Candidats"
                             sclass="@load(vm.activeView eq '/documents/views/candidats/list.zul' ? 'sidebar-button active' : 'sidebar-button')"
                             iconSclass="z-icon-users"
+                            visible="@load(vm.canManageReferentiels)"
                             onClick="@command('navigateTo', view='/documents/views/candidats/list.zul', section='Concours', page='Candidats')"/>
                     <button label="Filières"
                             sclass="@load(vm.activeView eq '/documents/views/filiere/list.zul' ? 'sidebar-button active' : 'sidebar-button')"
                             iconSclass="z-icon-sitemap"
+                            visible="@load(vm.canManageReferentiels)"
                             onClick="@command('navigateTo', view='/documents/views/filiere/list.zul', section='Concours', page='Filières')"/>
                     <button label="Promotions"
                             sclass="@load(vm.activeView eq '/documents/views/promotion/list.zul' ? 'sidebar-button active' : 'sidebar-button')"
                             iconSclass="z-icon-graduation-cap"
+                            visible="@load(vm.canManageReferentiels)"
                             onClick="@command('navigateTo', view='/documents/views/promotion/list.zul', section='Concours', page='Promotions')"/>
                 </div>
 
@@ -111,15 +118,15 @@
     </div>
 
     <menupopup id="concoursPopup">
-        <menuitem label="Liste Concours" iconSclass="z-icon-list" onClick="@command('navigateTo', view='/documents/views/concours/list.zul')" />
-        <menuitem label="Doc. Concours" iconSclass="z-icon-file-text" onClick="@command('navigateTo', view='/documents/views/concours/documents-concours/list.zul')" />
-        <menuitem label="Candidats" iconSclass="z-icon-user-plus" onClick="@command('navigateTo', view='/documents/views/candidats/list.zul')" />
+        <menuitem label="Liste Concours" iconSclass="z-icon-list" visible="@load(vm.canManageReferentiels)" onClick="@command('navigateTo', view='/documents/views/concours/list.zul')" />
+        <menuitem label="Doc. Concours" iconSclass="z-icon-file-text" visible="@load(vm.canManageReferentiels)" onClick="@command('navigateTo', view='/documents/views/concours/documents-concours/list.zul')" />
+        <menuitem label="Candidats" iconSclass="z-icon-user-plus" visible="@load(vm.canManageReferentiels)" onClick="@command('navigateTo', view='/documents/views/candidats/list.zul')" />
         <menuitem label="Dossiers Candidats" iconSclass="z-icon-folder-open" onClick="@command('navigateTo', view='/documents/views/candidats/dossiers.zul')" />
-        <menuitem label="Validation dossiers" iconSclass="z-icon-check-circle" onClick="@command('navigateTo', view='/documents/views/concours/validation-dossiers.zul')" />
-        <menuitem label="Suivi dossiers" iconSclass="z-icon-line-chart" onClick="@command('navigateTo', view='/documents/views/concours/suivi-dossiers.zul')" />
+        <menuitem label="Validation dossiers" iconSclass="z-icon-check-circle" visible="@load(vm.canValidateDossiers)" onClick="@command('navigateTo', view='/documents/views/concours/validation-dossiers.zul')" />
+        <menuitem label="Suivi dossiers" iconSclass="z-icon-line-chart" visible="@load(vm.canSeeSuiviGlobal)" onClick="@command('navigateTo', view='/documents/views/concours/suivi-dossiers.zul')" />
         <menuseparator/>
         <menuitem label="Corbeille" iconSclass="z-icon-trash-o" onClick="@command('navigateTo', view='/documents/views/candidats/corbeille.zul')" />
-        <menuitem label="Filières" iconSclass="z-icon-sitemap" onClick="@command('navigateTo', view='/documents/views/filiere/list.zul')" />
-        <menuitem label="Promotions" iconSclass="z-icon-bookmark" onClick="@command('navigateTo', view='/documents/views/promotion/list.zul')" />
+        <menuitem label="Filières" iconSclass="z-icon-sitemap" visible="@load(vm.canManageReferentiels)" onClick="@command('navigateTo', view='/documents/views/filiere/list.zul')" />
+        <menuitem label="Promotions" iconSclass="z-icon-bookmark" visible="@load(vm.canManageReferentiels)" onClick="@command('navigateTo', view='/documents/views/promotion/list.zul')" />
     </menupopup>
 </zk>

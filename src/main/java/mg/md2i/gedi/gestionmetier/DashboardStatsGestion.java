@@ -6,6 +6,7 @@ import mg.md2i.gedi.dto.dashboard.ConcoursVolumeStat;
 import mg.md2i.gedi.dto.dashboard.MonthlyDocumentStat;
 import mg.md2i.gedi.dto.dashboard.StorageStat;
 import mg.md2i.gedi.dto.dashboard.UploadHeatmapPoint;
+import mg.md2i.gedi.entity.Connexion1;
 import mg.md2i.gedi.entity.Document;
 import mg.md2i.gedi.enums.DocumentValidationEtat;
 import mg.md2i.gedi.services.DashboardStatsService;
@@ -69,5 +70,13 @@ public class DashboardStatsGestion {
 
     public static long countActiveUsers() {
         return getService().getActiveUsers();
+    }
+
+    public static List<Connexion1> getRecentConnections(int limit) {
+        return getService().getRecentConnections(limit);
+    }
+
+    public static Map<DocumentValidationEtat, Long> getDossierStatusCountsByConcours(Integer concoursId) {
+        return getService().getDossierStatusCountsByConcours(concoursId);
     }
 }

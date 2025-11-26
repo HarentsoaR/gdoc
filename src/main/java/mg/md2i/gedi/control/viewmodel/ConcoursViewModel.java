@@ -153,6 +153,11 @@ public class ConcoursViewModel {
         if (selectedFiliere != null && allPromotions != null) {
             availablePromotions = allPromotions.stream()
                     .filter(p -> selectedFiliere.getFiliereId().equals(p.getFiliereId()))
+                    .sorted((a, b) -> {
+                        String la = a.getDisplayLibelle();
+                        String lb = b.getDisplayLibelle();
+                        return la.compareToIgnoreCase(lb);
+                    })
                     .collect(Collectors.toList());
         } else {
             availablePromotions = Collections.emptyList();

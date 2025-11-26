@@ -31,6 +31,39 @@
 
                 <div class="form-row">
                     <div class="form-field">
+                        <label class="form-label">Filière *</label>
+                        <combobox model="@load(vm.filieres)"
+                                  selectedItem="@bind(vm.selectedFiliere)"
+                                  constraint="no empty"
+                                  placeholder="Choisir une filière"
+                                  autodrop="true"
+                                  readonly="true"
+                                  hflex="1">
+                            <template name="model" var="f">
+                                <comboitem label="@load(f.libelle)" description="@load(f.code)"/>
+                            </template>
+                        </combobox>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="form-label">Service</label>
+                        <combobox model="@load(vm.services)"
+                                  selectedItem="@bind(vm.selectedService)"
+                                  placeholder="Choisir un service"
+                                  autodrop="true"
+                                  readonly="true"
+                                  hflex="1">
+                            <template name="model" var="s">
+                                <comboitem label="@load(s.libelle)" description="@load(s.code)"/>
+                            </template>
+                        </combobox>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
                         <label class="form-label">Libellé *</label>
                         <textbox value="@bind(vm.currentProfil.libelle)"
                                  constraint="no empty"

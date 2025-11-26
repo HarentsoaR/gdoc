@@ -5,6 +5,7 @@ import java.util.List;
 
 public interface ConcoursService {
     List<Concours> getAllActive();
+    List<Concours> getAll();
     Concours getById(Integer id);
     void save(Concours concours);
     void softDelete(Integer id);
@@ -13,5 +14,4 @@ public interface ConcoursService {
     List<String> getDistinctAvis();
     List<String> getDistinctNumeros();
 }
-
 

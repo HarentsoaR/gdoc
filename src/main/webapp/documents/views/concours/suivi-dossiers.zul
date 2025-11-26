@@ -96,7 +96,7 @@
                             <listheader label="Pièces / Manque" hflex="2"/>
                         </listhead>
                         <template name="model" var="row">
-                            <listitem onDoubleClick="@command('openDossierDetails', row=row)">
+                            <listitem onDoubleClick="@command('openDossier', row=row)">
                                 <listcell>
                                     <vlayout sclass="listbox-thread-stack">
                                         <label value="@load(row.reference)" sclass="list-title text-ellipsis"/>
@@ -120,54 +120,6 @@
                     </listbox>
                 </div>
             </div>
-
-            <window title="Détails du dossier" mode="modal" closable="true" width="720px"
-                    border="normal" position="center" visible="@bind(vm.detailsModalVisible)"
-                    onClose="@command('closeDossierDetails')">
-                <attribute name="onClose"><![CDATA[self.setVisible(false); event.stopPropagation();]]></attribute>
-                <vlayout sclass="detail-modal" visible="@load(vm.selectedDossier ne null)" style="gap: 16px;">
-                    <div class="modal-summary">
-                        <label value="@load(vm.selectedDossier.reference)" sclass="modal-title"/>
-                        <label value="@load(vm.selectedDossier.candidatLabel)" sclass="modal-subtitle"/>
-                        <hlayout style="gap: 12px;" sclass="pill-stack">
-                            <label value="@load(vm.selectedDossier.concoursLabel)" sclass="tag"/>
-                            <label value="@load(vm.selectedDossier.centreLabel)" sclass="tag"/>
-                            <label value="@load(vm.selectedDossier.documentsResume)" sclass="tag"/>
-                        </hlayout>
-                    </div>
-                    <listbox model="@load(vm.selectedDossier.documents)" mold="paging" pageSize="6"
-                             sizedByContent="false" vflex="min" sclass="listbox-thread detail-list">
-                        <listhead sizable="true">
-                            <listheader label="Document" hflex="2"/>
-                            <listheader label="État" width="120px"/>
-                            <listheader label="Remarques" hflex="2"/>
-                            <listheader label="Pièce" hflex="1"/>
-                        </listhead>
-                        <template name="model" var="doc">
-                            <listitem>
-                                <listcell>
-                                    <label value="@load(doc.label)" sclass="text-ellipsis"/>
-                                </listcell>
-                                <listcell>
-                                    <label value="@load(doc.etatLabel)" sclass="@load('status-label '.concat(doc.etatSclass))"/>
-                                </listcell>
-                                <listcell>
-                                    <label value="@load(doc.remarque)" sclass="text-muted text-ellipsis"/>
-                                </listcell>
-                                <listcell>
-                                    <vlayout sclass="listbox-thread-stack">
-                                        <label value="@load(doc.hasAttachment ? doc.fileName : 'Pièce non fournie')"
-                                               sclass="text-muted text-ellipsis"/>
-                                        <a label="Télécharger" sclass="link-pill"
-                                           visible="@load(doc.hasAttachment)"
-                                           onClick="@command('downloadDocument', item=doc)"/>
-                                    </vlayout>
-                                </listcell>
-                            </listitem>
-                        </template>
-                    </listbox>
-                </vlayout>
-            </window>
         </vlayout>
     </div>
 </zk>

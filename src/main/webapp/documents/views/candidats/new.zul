@@ -248,7 +248,7 @@
                                               selectedItem="@bind(vm.currentCandidat.concours)"
                                               autodrop="true" width="100%"
                                               constraint="no empty: Le concours est obligatoire"
-                                              onSelect="@command('updateCandidatConcours', combobox=self)">
+                                              onSelect="@command('onConcoursChange', self=self)">
                                         <template name="model" var="concours">
                                             <comboitem label="@load(concours.toString())" value="@load(concours)"/>
                                         </template>
@@ -260,7 +260,7 @@
                                               selectedItem="@bind(vm.currentCandidat.centreExamen)"
                                               autodrop="true" width="100%"
                                               constraint="no empty: Le centre d'examen est obligatoire"
-                                              onSelect="@command('updateCandidatCentre', combobox=self)">
+                                              onSelect="@command('onCentreExamenChange', self=self)">
                                         <template name="model" var="centre">
                                             <comboitem label="@load(centre.libelle)" value="@load(centre)"/>
                                         </template>
@@ -268,16 +268,13 @@
                                 </cell>
                             </row>
                             <row>
-                                <cell><label value="Rang attribué" sclass="fw-bold"/></cell>
-                                <cell>
-                                    <label value="@load(vm.nextRangLabel)"/>
-                                    <label value="Calcul automatique selon le concours sélectionné" sclass="step-hint"/>
-                                </cell>
                                 <cell><label value="Date de dépôt" sclass="fw-bold"/></cell>
                                 <cell>
                                     <datebox value="@bind(vm.currentCandidat.dateDepotCandidature)"
                                              width="100%" format="dd/MM/yyyy"/>
                                 </cell>
+                                <cell/>
+                                <cell/>
                             </row>
                         </rows>
                     </grid>

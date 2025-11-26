@@ -33,6 +33,10 @@ public class UtilisateurGestion {
         return getService().getUserById(utilisateurId);
     }
 
+    public static Utilisateur findByLogin(String login) {
+        return getService().getUserByLogin(login);
+    }
+
     public static void save(Utilisateur utilisateur) { // Renamed from updateUtilisateur and saveUtilisateur
         getService().saveUser(utilisateur);
     }

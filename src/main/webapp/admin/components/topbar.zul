@@ -1,10 +1,6 @@
 <zk xmlns="http://www.zkoss.org/2005/zul">
     <div sclass="topbar admin-topbar">
         <div sclass="topbar-left">
-            <button sclass="btn-icon ghost mobile-only"
-                    iconSclass="z-icon-bars"
-                    onClick="@command('toggleSidebar')"
-                    tooltiptext="Afficher/masquer le menu" />
             <label value="@load(vm.currentPath)" sclass="breadcrumb" />
         </div>
 

@@ -145,6 +145,18 @@ public final class TrashManager {
     }
 
     /**
+    * Remove a document from cache and optionally trigger a permanent deletion callback.
+    */
+    public static synchronized void remove(Integer id, Consumer<Integer> permanentDelete) {
+        if (id == null) return;
+        if (permanentDelete != null) {
+            permanentDelete.accept(id);
+        }
+        CACHE.remove(id);
+        persist();
+    }
+
+    /**
      * Purges entries older than the retention duration.
      * @param permanentDelete action to execute for each purged document id.
      */

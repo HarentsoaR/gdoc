@@ -7,6 +7,7 @@ import mg.md2i.gedi.dto.dashboard.StorageStat;
 import mg.md2i.gedi.dto.dashboard.UploadHeatmapPoint;
 import mg.md2i.gedi.entity.Document;
 import mg.md2i.gedi.enums.DocumentValidationEtat;
+import mg.md2i.gedi.entity.Connexion1;
 
 import java.util.List;
 import java.util.Map;
@@ -27,4 +28,8 @@ public interface DashboardStatsService {
 
     long getTotalUsers();
     long getActiveUsers();
+
+    List<Connexion1> getRecentConnections(int limit);
+
+    Map<DocumentValidationEtat, Long> getDossierStatusCountsByConcours(Integer concoursId);
 }

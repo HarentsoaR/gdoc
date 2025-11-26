@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 /**
@@ -51,7 +53,7 @@ public class Profil implements Serializable {
 	private Integer serviceId;
 	
 	@Column(name="pl_filiere")
-	private String filiere;
+	private String filiere = "TOUS";
 
 	@Column(name="pl_sysid")
 	private String sysid;
@@ -175,7 +177,32 @@ public class Profil implements Serializable {
 	public void setSysid(String sysid) {
 		this.sysid = sysid;
 	}
+
+	@PrePersist
+	@PreUpdate
+	private void ensureDefaults() {
+		// pl_filiere is an ENUM in DB (MAGISTRAT, GREFFIER, TOUS); keep a safe default
+		if (filiere == null || filiere.trim().isEmpty()) {
+			filiere = "TOUS";
+		} else {
+			String value = filiere.trim().toUpperCase();
+			if ("MAGISTRAT".equals(value) || "GREFFIER".equals(value) || "TOUS".equals(value)) {
+				filiere = value;
+			} else {
+				filiere = "TOUS";
+			}
+		}
+
+		// pl_sysid is VARCHAR(5) in DB; trim and clamp length to avoid truncation errors
+		if (sysid != null) {
+			String cleaned = sysid.trim().toUpperCase();
+			if (cleaned.isEmpty()) {
+				sysid = null;
+			} else {
+				sysid = cleaned.length() > 5 ? cleaned.substring(0, 5) : cleaned;
+			}
+		}
+	}
 	
 	
 }
-

@@ -24,6 +24,10 @@
         .z-button:hover  { filter: brightness(0.95); }
         .z-button:active { transform: translateY(1px); }
         .z-button-content { font-size: 16px; font-weight: 600; }
+        login-branding-logo{
+            width:140px;
+            align-self:center;
+        }
     </style>
 
     <!--
@@ -53,9 +57,8 @@
             style="background:var(--enmg-color-surface);border-radius:14px;box-shadow:var(--enmg-shadow-md)">
             
             <vbox hflex="1" spacing="22px" align="center" style="padding:28px 56px">
-                <image src="/img/logo-gedi.png" width="72px" height="72px"/>
-                <label value="GEDI" style="font-size:30px;font-weight:700;color:var(--enmg-color-primary)"/>
-                <label value="Bienvenue dans votre espace GEDI" style="color:var(--enmg-color-text-soft)"/>
+                <image src="/img/login.png" width="80px" height="120px"/>
+                <label value="Bienvenue dans votre espace documentaire" style="color:var(--enmg-color-text-soft)"/>
 
              
                 <vbox spacing="14px" hflex="1" style="width:100%">
@@ -87,11 +90,36 @@
                 </vbox>
 
                 <hlayout spacing="12px">
-                    <a label="Aide" href="#"/>
+                    <a label="Aide" onClick="@command('showHelp')"/>
                     <label value="·"/>
-                    <a label="Paramètres" href="#"/>
-                    <label value="·"/>
-                    <a label="À propos" href="#"/>
+                    <a label="À propos" onClick="@command('showAbout')"/>
+                </hlayout>
+            </vbox>
+        </window>
+
+        <!-- AIDE -->
+        <window title="Aide" width="520px" mode="modal" closable="true" visible="@load(vm.helpVisible)"
+                onClose="@command('closeHelp')" border="normal" sclass="enmg-modal">
+            <vbox spacing="10px" style="padding:18px;">
+                <label value="Besoin d'aide ?" sclass="fw-bold"/>
+                <label value="• Accédez à vos documents via le bouton Documents."/>
+                <label value="• L'administration est réservée aux comptes autorisés."/>
+                <label value="• Pour toute assistance, contactez le support ou un responsable concours."/>
+                <hlayout hflex="1" style="justify-content:flex-end; gap:8px;">
+                    <button label="Fermer" sclass="btn" onClick="@command('closeHelp')"/>
+                </hlayout>
+            </vbox>
+        </window>
+
+        <!-- A PROPOS -->
+        <window title="À propos" width="520px" mode="modal" closable="true" visible="@load(vm.aboutVisible)"
+                onClose="@command('closeAbout')" border="normal" sclass="enmg-modal">
+            <vbox spacing="10px" style="padding:18px;">
+                <label value="GEDI - Gestion documentaire ENMG" sclass="fw-bold"/>
+                <label value="Version interne - Plateforme de gestion des candidatures et documents concours."/>
+                <label value="Développé pour les équipes ENMG : cellule concours, responsables dossier et validation."/>
+                <hlayout hflex="1" style="justify-content:flex-end; gap:8px;">
+                    <button label="Fermer" sclass="btn" onClick="@command('closeAbout')"/>
                 </hlayout>
             </vbox>
         </window>

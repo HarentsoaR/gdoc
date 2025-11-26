@@ -5,8 +5,10 @@ import mg.md2i.gedi.dto.dashboard.ConcoursVolumeStat;
 import mg.md2i.gedi.dto.dashboard.MonthlyDocumentStat;
 import mg.md2i.gedi.dto.dashboard.StorageStat;
 import mg.md2i.gedi.dto.dashboard.UploadHeatmapPoint;
+import mg.md2i.gedi.entity.Connexion1;
 import mg.md2i.gedi.entity.Document;
 import mg.md2i.gedi.enums.DocumentValidationEtat;
+import mg.md2i.gedi.repository.Connexion1Repository;
 import mg.md2i.gedi.repository.DocumentRepository;
 import mg.md2i.gedi.repository.ListeDossierConcoursCandidatRepository;
 import mg.md2i.gedi.repository.ConcoursRepository;
@@ -30,16 +32,19 @@ public class DashboardStatsServiceImpl implements DashboardStatsService {
     private final ListeDossierConcoursCandidatRepository dossierRepository;
     private final UtilisateurRepository utilisateurRepository;
     private final ConcoursRepository concoursRepository;
+    private final Connexion1Repository connexion1Repository;
 
     @Autowired
     public DashboardStatsServiceImpl(DocumentRepository documentRepository,
                                      ListeDossierConcoursCandidatRepository dossierRepository,
                                      UtilisateurRepository utilisateurRepository,
-                                     ConcoursRepository concoursRepository) {
+                                     ConcoursRepository concoursRepository,
+                                     Connexion1Repository connexion1Repository) {
         this.documentRepository = documentRepository;
         this.dossierRepository = dossierRepository;
         this.utilisateurRepository = utilisateurRepository;
         this.concoursRepository = concoursRepository;
+        this.connexion1Repository = connexion1Repository;
     }
 
     @Override
@@ -179,5 +184,25 @@ public class DashboardStatsServiceImpl implements DashboardStatsService {
     @Override
     public long getActiveUsers() {
         return utilisateurRepository.countByActif(1);
+    }
+
+    @Override
+    public List<Connexion1> getRecentConnections(int limit) {
+        if (limit <= 0) limit = 10;
+        return connexion1Repository.findTop10ByActifOrderByDateDebutDesc(1);
+    }
+
+    @Override
+    public Map<DocumentValidationEtat, Long> getDossierStatusCountsByConcours(Integer concoursId) {
+        if (concoursId == null) return Collections.emptyMap();
+        List<Object[]> rows = dossierRepository.countByEtatAndConcours(concoursId);
+        Map<DocumentValidationEtat, Long> map = new EnumMap<>(DocumentValidationEtat.class);
+        for (Object[] row : rows) {
+            Integer code = row[0] != null ? ((Number) row[0]).intValue() : null;
+            DocumentValidationEtat etat = DocumentValidationEtat.fromCode(code);
+            long count = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            map.put(etat, count);
+        }
+        return map;
     }
 }

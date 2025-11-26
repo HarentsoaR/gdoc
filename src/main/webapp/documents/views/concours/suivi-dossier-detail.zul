@@ -1,0 +1,82 @@
+<?page title="Dossier candidat" contentType="text/html;charset=UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
+    <div hflex="1" vflex="1" sclass="page-container"
+         viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.DocumentSuiviViewModel')">
+
+        <vlayout hflex="1" vflex="1" style="gap: 12px;">
+            <div class="page-header">
+                <div>
+                    <label value="@load(vm.detailTitle)" sclass="page-title"/>
+                    <label value="@load(vm.detailSubtitle)" sclass="page-subtitle"/>
+                </div>
+                <div class="header-actions">
+                    <button label="Retour au suivi" sclass="btn"
+                            iconSclass="z-icon-arrow-left"
+                            onClick="@command('backToSuivi')"/>
+                    <button label="Télécharger le dossier" sclass="btn btn-primary"
+                            iconSclass="z-icon-download"
+                            disabled="@load(vm.selectedDossier eq null)"
+                            onClick="@command('downloadCurrentDossier')"/>
+                </div>
+            </div>
+
+            <div class="panel" visible="@load(vm.selectedDossier ne null)">
+                <hlayout style="gap: 12px; align-items: center;">
+                    <vlayout style="flex: 1;">
+                        <label value="@load(vm.selectedDossier.reference)" sclass="modal-title"/>
+                        <label value="@load(vm.selectedDossier.candidatLabel)" sclass="modal-subtitle"/>
+                        <hlayout style="gap: 12px; margin-top: 8px;" sclass="pill-stack">
+                            <label value="@load(vm.selectedDossier.concoursLabel)" sclass="tag"/>
+                            <label value="@load(vm.selectedDossier.centreLabel)" sclass="tag"/>
+                            <label value="@load(vm.selectedDossier.documentsResume)" sclass="tag"/>
+                        </hlayout>
+                    </vlayout>
+                    <vlayout sclass="detail-metrics">
+                        <label value="État du dossier" sclass="text-muted"/>
+                        <label value="@load(vm.selectedDossier.globalEtatLabel)" sclass="@load(vm.selectedDossier.globalEtatSclass)"/>
+                        <hlayout style="gap: 6px; margin-top: 6px;">
+                            <label value="@load(vm.selectedDossier.validesLabel)" sclass="text-muted"/>
+                            <label value="@load(vm.selectedDossier.enCoursLabel)" sclass="text-muted"/>
+                            <label value="@load(vm.selectedDossier.rejetesLabel)" sclass="text-muted"/>
+                        </hlayout>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <div class="panel scroll-panel" vflex="1" visible="@load(vm.selectedDossier ne null)">
+                <listbox model="@load(vm.selectedDocuments)" mold="paging" pageSize="8"
+                         sizedByContent="false" vflex="1" sclass="listbox-thread data-table"
+                         emptyMessage="Aucun document pour ce dossier.">
+                    <listhead sizable="true">
+                        <listheader label="Document" hflex="2"/>
+                        <listheader label="État" width="140px"/>
+                        <listheader label="Remarques" hflex="2"/>
+                        <listheader label="Pièce" hflex="1"/>
+                    </listhead>
+                    <template name="model" var="doc">
+                        <listitem>
+                            <listcell>
+                                <label value="@load(doc.label)" sclass="text-ellipsis"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(doc.etatLabel)" sclass="@load('status-label '.concat(doc.etatSclass))"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(doc.remarque)" sclass="text-muted text-ellipsis"/>
+                            </listcell>
+                            <listcell>
+                                <vlayout sclass="listbox-thread-stack">
+                                    <label value="@load(doc.hasAttachment ? doc.fileName : 'Pièce non fournie')"
+                                           sclass="text-muted text-ellipsis"/>
+                                    <a label="Télécharger" sclass="link-pill"
+                                       visible="@load(doc.hasAttachment)"
+                                       onClick="@command('downloadDocument', item=doc)"/>
+                                </vlayout>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+        </vlayout>
+    </div>
+</zk>

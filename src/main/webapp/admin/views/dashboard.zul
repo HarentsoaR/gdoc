@@ -36,96 +36,94 @@
             </div>
 
             <hlayout sclass="dashboard-grid">
-                <div class="chart-card">
-                    <label class="chart-card-title" value="État des dossiers"/>
-                    <chart type="pie" threeD="true" height="240px" model="@load(vm.dossierPieModel)"
-                           visible="@load(not empty vm.dossierStatusEntries)"/>
-                    <label value="Aucune donnée"
-                           visible="@load(empty vm.dossierStatusEntries)"
-                           sclass="empty-message"/>
+                <div class="panel enmg-card" vflex="1" hflex="1">
+                    <label class="panel-title" value="État global des dossiers"/>
+                    <listbox model="@load(vm.dossierStatusEntries)" mold="paging" pageSize="5"
+                             emptyMessage="Aucune donnée."
+                             sclass="data-table" vflex="1">
+                        <listhead>
+                            <listheader label="Statut"/>
+                            <listheader label="Nombre" width="120px"/>
+                        </listhead>
+                        <template name="model" var="entry">
+                            <listitem>
+                                <listcell label="@load(entry.key.label)"/>
+                                <listcell label="@load(entry.value)"/>
+                            </listitem>
+                        </template>
+                    </listbox>
                 </div>
-                <div class="chart-card">
-                    <label class="chart-card-title" value="Répartition du stockage par type"/>
-                    <chart type="pie" threeD="true" height="240px" model="@load(vm.storagePieModel)"
-                           visible="@load(not empty vm.storageStats)"/>
-                    <label value="Aucune donnée de stockage"
-                           visible="@load(empty vm.storageStats)"
-                           sclass="empty-message"/>
-                    <div class="storage-meter">
-                        <progressmeter value="@load(vm.storageUsagePercent)" width="100%"/>
-                        <label value="@load(vm.storageUsageText)"/>
-                    </div>
-                </div>
-            </hlayout>
-
-            <hlayout sclass="dashboard-grid">
-                <div class="chart-card chart-card--wide">
-                    <label class="chart-card-title" value="Documents par concours (Top 8)"/>
-                    <chart type="bar" height="300px" model="@load(vm.concoursBarModel)"
-                           visible="@load(not empty vm.concoursStats)"/>
-                    <label value="Aucun concours référencé"
-                           visible="@load(empty vm.concoursStats)"
-                           sclass="empty-message"/>
-                </div>
-                <div class="chart-card">
-                    <label class="chart-card-title" value="Tendance des imports (6 derniers mois)"/>
-                    <chart type="line" height="300px" model="@load(vm.trendLineModel)"
-                           visible="@load(not empty vm.trendStats)"/>
-                    <label value="Aucun import durant cette période"
-                           visible="@load(empty vm.trendStats)"
-                           sclass="empty-message"/>
+                <div class="panel enmg-card" vflex="1" hflex="1">
+                    <label class="panel-title" value="Concours en cours (ID 101)"/>
+                    <listbox model="@load(vm.concours101Entries)" mold="paging" pageSize="5"
+                             emptyMessage="Aucun dossier pour ce concours."
+                             sclass="data-table" vflex="1">
+                        <listhead>
+                            <listheader label="Statut"/>
+                            <listheader label="Nombre" width="120px"/>
+                        </listhead>
+                        <template name="model" var="entry">
+                            <listitem>
+                                <listcell label="@load(entry.key.label)"/>
+                                <listcell label="@load(entry.value)"/>
+                            </listitem>
+                        </template>
+                    </listbox>
                 </div>
             </hlayout>
 
             <hlayout sclass="dashboard-grid">
-                <div class="chart-card">
-                    <label class="chart-card-title" value="Durée des concours (jours)"/>
-                    <chart type="bar" height="280px" model="@load(vm.timelineModel)"
-                           visible="@load(not empty vm.timelineStats)"/>
-                    <label value="Aucun concours planifié"
-                           visible="@load(empty vm.timelineStats)"
-                           sclass="empty-message"/>
+                <div class="panel enmg-card" vflex="1" hflex="1">
+                    <label class="panel-title" value="Connexions récentes"/>
+                    <listbox model="@load(vm.recentConnections)" mold="paging" pageSize="6"
+                             emptyMessage="Aucune connexion récente."
+                             sclass="data-table" vflex="1">
+                        <listhead>
+                            <listheader label="Utilisateur"/>
+                            <listheader label="Date" width="200px"/>
+                            <listheader label="IP" width="140px"/>
+                            <listheader label="Navigateur"/>
+                        </listhead>
+                        <template name="model" var="cx">
+                            <listitem>
+                                <listcell label="@load(vm.formatUser(cx))"/>
+                                <listcell label="@load(vm.formatDate(cx.dateDebut))"/>
+                                <listcell label="@load(cx.adresseIp)"/>
+                                <listcell label="@load(cx.navigateur)"/>
+                            </listitem>
+                        </template>
+                    </listbox>
                 </div>
-                <div class="chart-card">
-                    <label class="chart-card-title" value="Activité d'import (35 derniers jours)"/>
-                    <chart type="bar" height="280px" model="@load(vm.heatmapModel)"
-                           visible="@load(not empty vm.heatmapStats)"/>
-                    <label value="Aucun import récent"
-                           visible="@load(empty vm.heatmapStats)"
-                           sclass="empty-message"/>
+                <div class="panel enmg-card" vflex="1" hflex="1">
+                    <label class="panel-title" value="Derniers documents importés"/>
+                    <listbox model="@load(vm.recentDocuments)"
+                             vflex="1"
+                             emptyMessage="Aucun document disponible."
+                             mold="paging"
+                             pageSize="6"
+                             sclass="data-table">
+                        <listhead>
+                            <listheader label="Titre" width="280px"/>
+                            <listheader label="Type" width="130px"/>
+                            <listheader label="Taille"/>
+                            <listheader label="Date d'import"/>
+                        </listhead>
+                        <template name="model" var="doc">
+                            <listitem>
+                                <listcell>
+                                    <vlayout>
+                                        <label value="@load(doc.titre)" sclass="list-title"/>
+                                        <label value="@load(doc.resume)" sclass="text-muted" visible="@load(not empty doc.resume)"/>
+                                    </vlayout>
+                                </listcell>
+                                <listcell label="@load(doc.type)"/>
+                                <listcell label="@load(vm.formatSize(doc.taille))"/>
+                                <listcell label="@load(vm.formatDate(doc.dateUpload))"/>
+                            </listitem>
+                        </template>
+                    </listbox>
                 </div>
             </hlayout>
-
-            <div class="panel enmg-card" hflex="1" vflex="1">
-                <label class="panel-title" value="Derniers documents importés"/>
-                <listbox model="@load(vm.recentDocuments)"
-                         vflex="1"
-                         emptyMessage="Aucun document disponible."
-                         mold="paging"
-                         pageSize="6"
-                         sclass="data-table">
-                    <listhead>
-                        <listheader label="Titre" width="280px"/>
-                        <listheader label="Type" width="130px"/>
-                        <listheader label="Taille"/>
-                        <listheader label="Date d'import"/>
-                    </listhead>
-                    <template name="model" var="doc">
-                        <listitem>
-                            <listcell>
-                                <vlayout>
-                                    <label value="@load(doc.titre)" sclass="list-title"/>
-                                    <label value="@load(doc.resume)" sclass="text-muted" visible="@load(not empty doc.resume)"/>
-                                </vlayout>
-                            </listcell>
-                            <listcell label="@load(doc.type)"/>
-                            <listcell label="@load(vm.formatSize(doc.taille))"/>
-                            <listcell label="@load(vm.formatDate(doc.dateUpload))"/>
-                        </listitem>
-                    </template>
-                </listbox>
-            </div>
-
         </vlayout>
     </div>
 </zk>

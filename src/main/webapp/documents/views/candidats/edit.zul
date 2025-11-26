@@ -265,18 +265,13 @@
                                 </cell>
                             </row>
                             <row>
-                                <cell><label value="Rang concours" sclass="fw-bold"/></cell>
-                                <cell>
-                                    <hlayout spacing="8px">
-                                        <textbox value="@bind(vm.currentCandidat.rangConcours)" width="120px"/>
-                                        <label value="@load(vm.nextRangLabel)" sclass="step-hint"/>
-                                    </hlayout>
-                                </cell>
                                 <cell><label value="Date de dépôt" sclass="fw-bold"/></cell>
                                 <cell>
                                     <datebox value="@bind(vm.currentCandidat.dateDepotCandidature)"
                                              width="100%" format="dd/MM/yyyy"/>
                                 </cell>
+                                <cell/>
+                                <cell/>
                             </row>
                         </rows>
                     </grid>

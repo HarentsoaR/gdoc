@@ -5,6 +5,10 @@ import mg.md2i.gedi.entity.ListeDossierConcoursCandidat;
 import mg.md2i.gedi.gestionmetier.ListeDossierConcoursCandidatGestion;
 import mg.md2i.gedi.trash.TrashEntry;
 import mg.md2i.gedi.trash.TrashManager;
+import mg.md2i.gedi.util.RoleUtils;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Messagebox;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.Init;
@@ -19,9 +23,20 @@ import java.util.stream.Collectors;
 public class CorbeilleViewModel {
 
     private List<TrashRow> documents;
+    private boolean accessAllowed = false;
 
     @Init
     public void init() {
+        accessAllowed = RoleUtils.isRSPConcours();
+        if (!accessAllowed) {
+            // Deny access silently and redirect
+            Messagebox.show("Accès réservé au RSP-Concours.", "Accès refusé", Messagebox.OK, Messagebox.EXCLAMATION);
+            org.zkoss.bind.BindUtils.postGlobalCommand(null, null, "navigateToGlobal", new java.util.HashMap<String, Object>() {{
+                put("view", "/documents/views/dashboard.zul");
+                put("label", "Mes Documents");
+            }});
+            return;
+        }
         TrashManager.purgeExpired(ListeDossierConcoursCandidatGestion::hardDelete);
         loadDocuments();
     }
@@ -54,9 +69,17 @@ public class CorbeilleViewModel {
     @NotifyChange("documents")
     public void deleteForever(@BindingParam("id") Integer id) {
         if (id == null) return;
-        ListeDossierConcoursCandidatGestion.hardDelete(id);
-        TrashManager.remove(id);
-        loadDocuments();
+        Messagebox.show("Supprimer définitivement ce document ? Cette action est irréversible.",
+                "Confirmation", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
+                (Event evt) -> {
+                    if (!Messagebox.ON_YES.equals(evt.getName())) {
+                        return;
+                    }
+                    ListeDossierConcoursCandidatGestion.hardDelete(id);
+                    TrashManager.remove(id);
+                    loadDocuments();
+                    BindUtils.postNotifyChange(null, null, CorbeilleViewModel.this, "documents");
+                });
     }
 
     @Command

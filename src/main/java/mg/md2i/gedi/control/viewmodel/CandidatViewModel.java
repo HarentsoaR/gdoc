@@ -26,15 +26,23 @@ import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Messagebox;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class CandidatViewModel {
 
@@ -64,7 +72,8 @@ public class CandidatViewModel {
     @Init
     public void init() {
         candidats = CandidatGestion.findAll();
-        concoursList = ConcoursGestion.findAll();
+        // Include inactive concours so edition keeps the previously assigned concours visible/selectable
+        concoursList = ConcoursGestion.findAllIncludingInactive();
         centreExamenList = CentreExamenGestion.findAll();
         requiredDocuments = DocumentConcoursGestion.findAll();
         prepareNewForm();
@@ -92,6 +101,7 @@ public class CandidatViewModel {
         currentCandidat.setDateDepotCandidature(new Date());
         currentCandidat.setActif(1);
         currentCandidat.setVersion(1);
+        currentCandidat.setRangConcours(null);
         creationStep = 1;
         fonctionnaire = false;
         nextRangLabel = "-";
@@ -130,7 +140,11 @@ public class CandidatViewModel {
         }
         creationStep = 1;
         fonctionnaire = currentCandidat.getStatutFonctionnaire() != null && !currentCandidat.getStatutFonctionnaire().trim().isEmpty();
-        nextRangLabel = currentCandidat.getRangConcours() != null ? currentCandidat.getRangConcours() : "-";
+        if (currentCandidat.getRangConcours() == null) {
+            updateNextRangLabel();
+        } else {
+            nextRangLabel = currentCandidat.getRangConcours();
+        }
         isEditMode = true;
     }
 
@@ -278,6 +292,13 @@ public class CandidatViewModel {
         resetDetailContext();
     }
 
+    @GlobalCommand("refreshCandidatsList")
+    @NotifyChange({"candidats", "detailVisible", "detailCandidat", "detailSummary", "detailDocuments", "missingDocuments"})
+    public void refreshCandidatsList() {
+        candidats = CandidatGestion.findAll();
+        resetDetailContext();
+    }
+
     @Command @NotifyChange({"candidats", "detailVisible", "detailCandidat", "detailSummary", "detailDocuments", "missingDocuments"})
     public void search() {
         if (searchQuery == null || searchQuery.trim().isEmpty()) {
@@ -354,18 +375,18 @@ public class CandidatViewModel {
                 currentCandidat.setCentreExamenId(currentCandidat.getCentreExamen().getCentreExamenId());
             }
 
-            // ================== THE FIX ==================
-            // I have commented out the line that causes the error.
-             CandidatGestion.save(currentCandidat); // <-- CHANGED
+            ensureRangConcours();
+
+            // Save the candidat
+            CandidatGestion.save(currentCandidat);
             
-            // I added this log so you can see the data in your console and verify it's correct.
-            System.out.println("--- DATABASE CALL DISABLED. Data to save: " + currentCandidat.toString()); // <-- ADDED FOR DEBUGGING
+            // Show success message
+            Messagebox.show("✅ Candidat sauvegardé avec succès", "Succès", Messagebox.OK, Messagebox.INFORMATION);
 
-            // I changed the message to make it clear this is a test.
-//            Messagebox.show("✅ TEST: Sauvegarde simulée avec succès", "Succès", Messagebox.OK, Messagebox.INFORMATION); // <-- CHANGED
-            // =============================================
+            // Post global command to refresh the candidats list
+            BindUtils.postGlobalCommand(null, null, "refreshCandidatsList", null);
 
-            // Your navigation logic (unchanged)
+            // Navigate back to list
             BindUtils.postGlobalCommand(null, null, "navigateToGlobal",
                 new HashMap<String, Object>() {{
                     put("view", "/documents/views/candidats/list.zul");
@@ -467,6 +488,119 @@ public class CandidatViewModel {
         }
     }
 
+    @Command
+    public void downloadCandidatDocumentsAsZip() {
+        if (detailCandidat == null || detailCandidat.getCandidatId() == null) {
+            Clients.showNotification("Aucun candidat sélectionné", "warning", null, "top_center", 2000);
+            return;
+        }
+
+        if (detailDocuments == null || detailDocuments.isEmpty()) {
+            Clients.showNotification("Aucun document à télécharger pour ce candidat", "warning", null, "top_center", 2000);
+            return;
+        }
+
+        try {
+            File zipFile = createCandidatDocumentsArchive(detailCandidat, detailDocuments);
+            if (zipFile != null && zipFile.exists()) {
+                Filedownload.save(zipFile, "application/zip");
+                Clients.showNotification("Archive téléchargée avec succès", "info", null, "top_center", 2000);
+            } else {
+                Clients.showNotification("Impossible de créer l'archive", "error", null, "top_center", 2500);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Clients.showNotification("Erreur lors de la création de l'archive: " + e.getMessage(), "error", null, "top_center", 3000);
+        }
+    }
+
+    private File createCandidatDocumentsArchive(Candidat candidat, List<DocumentEntry> documents) throws IOException {
+        // Create a safe filename from candidate info
+        String candidateName = sanitizeFileName(candidat.getNom() + "_" + (candidat.getPrenom() != null ? candidat.getPrenom() : ""));
+        String numInscription = candidat.getNumInscription() != null
+                ? String.format("%05d", candidat.getNumInscription())
+                : (candidat.getNumeroEnregistrement() != null ? candidat.getNumeroEnregistrement() : "N/A");
+        
+        String concoursInfo = "";
+        if (candidat.getConcours() != null) {
+            concoursInfo = sanitizeFileName(candidat.getConcours().getAvisConcours());
+        }
+        
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String archiveName = String.format("CANDIDAT_%s_%s_%s_%s.zip", 
+                numInscription, candidateName, concoursInfo, timestamp);
+        
+        // Create temp file for the archive
+        File zipFile = File.createTempFile("gedi_candidat_", ".zip");
+        zipFile.delete(); // Delete the temp file, we'll create it with our name
+        zipFile = new File(zipFile.getParentFile(), archiveName);
+
+        Set<String> usedNames = new HashSet<>();
+        
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile))) {
+            int fileCount = 0;
+            
+            for (DocumentEntry doc : documents) {
+                if (doc.hasAttachment() && doc.getPath() != null) {
+                    File sourceFile = new File(doc.getPath());
+                    if (sourceFile.exists() && sourceFile.isFile()) {
+                        // Use document label as filename in archive
+                        String entryName = sanitizeFileName(doc.getDocumentLabel());
+                        String extension = getFileExtension(sourceFile.getName());
+                        String zipEntryName = entryName + extension;
+                        
+                        // Avoid duplicate names
+                        int counter = 1;
+                        String finalEntryName = zipEntryName;
+                        while (usedNames.contains(finalEntryName)) {
+                            String baseName = entryName;
+                            finalEntryName = baseName + "_" + counter + extension;
+                            counter++;
+                        }
+                        usedNames.add(finalEntryName);
+                        
+                        ZipEntry entry = new ZipEntry(finalEntryName);
+                        zos.putNextEntry(entry);
+                        
+                        try (FileInputStream fis = new FileInputStream(sourceFile)) {
+                            byte[] buffer = new byte[8192];
+                            int length;
+                            while ((length = fis.read(buffer)) > 0) {
+                                zos.write(buffer, 0, length);
+                            }
+                        }
+                        zos.closeEntry();
+                        fileCount++;
+                    }
+                }
+            }
+            
+            if (fileCount == 0) {
+                zipFile.delete();
+                return null;
+            }
+        }
+
+        return zipFile;
+    }
+
+    private String sanitizeFileName(String name) {
+        if (name == null || name.trim().isEmpty()) return "Unknown";
+        // Remove or replace invalid filename characters
+        return name.replaceAll("[^a-zA-Z0-9._-]", "_")
+                   .replaceAll("_{2,}", "_")
+                   .trim();
+    }
+
+    private String getFileExtension(String filename) {
+        if (filename == null || filename.isEmpty()) return "";
+        int lastDot = filename.lastIndexOf('.');
+        if (lastDot > 0 && lastDot < filename.length() - 1) {
+            return filename.substring(lastDot);
+        }
+        return "";
+    }
+
     // ===================================================
     // Compatibilité : méthodes appelées depuis DocumentViewModel
     // (ou autres) — elles acceptent une Combobox et mettent
@@ -542,20 +676,37 @@ public class CandidatViewModel {
             if (currentCandidat != null) currentCandidat.setRangConcours(null);
             return;
         }
+        String generated = generateRangConcours();
+        currentCandidat.setRangConcours(generated);
+        nextRangLabel = generated != null ? generated : "-";
+    }
+
+    private void ensureRangConcours() {
+        if (currentCandidat == null || currentCandidat.getConcoursId() == null) {
+            currentCandidat.setRangConcours(null);
+            nextRangLabel = "-";
+            return;
+        }
+        if (currentCandidat.getRangConcours() == null || currentCandidat.getRangConcours().trim().isEmpty()) {
+            updateNextRangLabel();
+        } else {
+            nextRangLabel = currentCandidat.getRangConcours();
+        }
+    }
+
+    private String generateRangConcours() {
+        Integer concoursId = currentCandidat != null ? currentCandidat.getConcoursId() : null;
+        if (concoursId == null) return null;
+        List<Candidat> existing = CandidatGestion.findByConcours(concoursId);
         int base = 0;
-        List<Candidat> existing = CandidatGestion.findByConcours(currentCandidat.getConcoursId());
         if (existing != null) {
-            base = existing.size();
+            base = (int) existing.stream()
+                    .filter(c -> currentCandidat.getCandidatId() == null || !Objects.equals(c.getCandidatId(), currentCandidat.getCandidatId()))
+                    .count();
         }
         int next = base + 1;
-        Integer max = null;
-        if (currentCandidat.getConcours() != null) {
-            max = currentCandidat.getConcours().getNombrePoste();
-        }
-        if (currentCandidat.getRangConcours() == null || !currentCandidat.getRangConcours().equals(String.valueOf(next))) {
-            currentCandidat.setRangConcours(String.valueOf(next));
-        }
-        nextRangLabel = max != null ? next + " / " + max : String.valueOf(next);
+        int year = new Date().toInstant().atZone(java.time.ZoneId.systemDefault()).getYear() % 100;
+        return String.format("J-%02d-%05d", year, next);
     }
 
     public static class DocumentEntry {

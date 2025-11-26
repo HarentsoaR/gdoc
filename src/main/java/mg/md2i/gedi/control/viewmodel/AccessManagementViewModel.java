@@ -103,6 +103,11 @@ public class AccessManagementViewModel {
             if (result == null) {
                 result = new ArrayList<Profil>();
             }
+            // Only keep ADMIN + service_id = 40 (cellule concours)
+            result = result.stream()
+                    .filter(this::isProfilAllowed)
+                    .collect(Collectors.toList());
+
             if (profilFilter != null && !profilFilter.trim().isEmpty()) {
                 String lower = profilFilter.toLowerCase();
                 result = result.stream()
@@ -359,5 +364,16 @@ public class AccessManagementViewModel {
 
     private int toInt(Integer value) {
         return value != null ? value.intValue() : 0;
+    }
+
+    private boolean isProfilAllowed(Profil p) {
+        if (p == null) return false;
+        // Admin profiles are always allowed
+        String lib = p.getLibelle() != null ? p.getLibelle().trim().toUpperCase() : "";
+        if ("ADMINISTRATEUR".equals(lib) || "ADMIN".equals(lib)) {
+            return true;
+        }
+        // Only keep service_id = 40 (Cellule concours)
+        return p.getServiceId() != null && p.getServiceId() == 40;
     }
 }

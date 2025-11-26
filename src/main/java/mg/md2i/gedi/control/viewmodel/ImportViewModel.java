@@ -3,6 +3,7 @@ package mg.md2i.gedi.control.viewmodel;
 import mg.md2i.gedi.entity.*;
 import mg.md2i.gedi.enums.DocumentValidationEtat;
 import mg.md2i.gedi.gestionmetier.*;
+import mg.md2i.gedi.util.RoleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.bind.BindUtils;
@@ -51,6 +52,14 @@ public class ImportViewModel {
 
     @Init
     public void init() {
+        if (!RoleUtils.canImportDocuments()) {
+            Clients.showNotification("Accès réservé au Responsable dossier ou à l'administrateur.", "warning", null, "top_center", 2500);
+            allConcours = Collections.emptyList();
+            allCandidats = Collections.emptyList();
+            allDocumentTypes = Collections.emptyList();
+            filteredConcours = Collections.emptyList();
+            return;
+        }
         allConcours = ConcoursGestion.findAll();
         allCandidats = CandidatGestion.findAll();
         allDocumentTypes = DocumentConcoursGestion.findAll();

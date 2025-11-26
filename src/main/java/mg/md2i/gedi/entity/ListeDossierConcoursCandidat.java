@@ -13,7 +13,6 @@ import java.io.Serializable;
 //import java.util.Date;
 import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
-import javax.persistence.CascadeType;
 
 /**
  * Entite(listeDossierConcoursCandidat) avec mapping pour les tables de la BDD pour l'ENMG
@@ -35,14 +34,14 @@ public class ListeDossierConcoursCandidat implements Serializable {
 	@Column(name="candidat_id", nullable =false)
 	private Integer candidatId;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "candidat_id", nullable = false, insertable=false , updatable=false)
 	private Candidat candidat;
 
 	@Column(name="document_concours_id", nullable =false)
 	private Integer documentConcoursId;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "document_concours_id", nullable = false, insertable=false , updatable=false)
 	private DocumentConcours documentConcours;
 

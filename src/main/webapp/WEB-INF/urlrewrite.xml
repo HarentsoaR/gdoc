@@ -107,6 +107,11 @@
         <from>^/documents/candidats/dossiers$</from>
         <to last="true">/documents/documents.zul?view=/documents/views/candidats/dossiers.zul&amp;section=Candidats&amp;page=Dossiers</to>
     </rule>
+    <rule>
+        <name>documents-candidats-corbeille</name>
+        <from>^/documents/candidats/corbeille$</from>
+        <to last="true">/documents/documents.zul?view=/documents/views/candidats/corbeille.zul&amp;section=Candidats&amp;page=Corbeille</to>
+    </rule>
 
     <!-- Biblio module: /biblio -> /biblio/biblio.zul (landing) -->
     <rule>

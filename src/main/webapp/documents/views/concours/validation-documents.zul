@@ -14,6 +14,10 @@
                             sclass="btn"
                             iconSclass="@load(vm.filtersVisible ? 'z-icon-chevron-up' : 'z-icon-chevron-down')"
                             onClick="@command('toggleFilters')"/>
+                    <button label="Télécharger le dossier" sclass="btn btn-primary"
+                            iconSclass="z-icon-download"
+                            visible="@load(vm.detailMode)"
+                            onClick="@command('downloadFocusedDossier')"/>
                     <button label="Retour aux dossiers" sclass="btn"
                             iconSclass="z-icon-arrow-left"
                             onClick="@command('backToDossiers')"/>
@@ -46,14 +50,21 @@
                     <button label="@load(vm.documentToggleLabel)" sclass="pill-btn pill-btn--ghost btn-sm"
                             disabled="@load(empty vm.dossiers)"
                             onClick="@command('toggleDocumentSelection')"/>
-                    <button label="Valider" sclass="pill-btn pill-btn--primary btn-sm"
+                    <button label="Télécharger" sclass="pill-btn pill-btn--ghost btn-sm"
+                            iconSclass="z-icon-download"
                             disabled="@load(empty vm.selectedRows)"
+                            onClick="@command('downloadDocumentSelection')"/>
+                    <button label="Valider" sclass="pill-btn pill-btn--primary btn-sm"
+                            visible="@load(vm.canValidate)"
+                            disabled="@load(empty vm.selectedRows or not vm.canValidate)"
                             onClick="@command('bulkChangeEtat', etat=1)"/>
                     <button label="Rejeter" sclass="pill-btn pill-btn--danger btn-sm"
-                            disabled="@load(empty vm.selectedRows)"
+                            visible="@load(vm.canValidate)"
+                            disabled="@load(empty vm.selectedRows or not vm.canValidate)"
                             onClick="@command('bulkChangeEtat', etat=0)"/>
                     <button label="Revoir" sclass="pill-btn pill-btn--ghost btn-sm"
-                            disabled="@load(empty vm.selectedRows)"
+                            visible="@load(vm.canValidate)"
+                            disabled="@load(empty vm.selectedRows or not vm.canValidate)"
                             onClick="@command('bulkChangeEtat', etat=2)"/>
                 </div>
             </div>
@@ -61,6 +72,7 @@
             <div class="panel scroll-panel" vflex="1">
                 <listbox model="@load(vm.dossiers)" vflex="1" hflex="1" sizedByContent="true"
                          checkmark="true" multiple="true" selectedItems="@bind(vm.selectedRows)"
+                         onCheckSelect="@command('updateSelection')"
                          sclass="listbox-thread data-table"
                          emptyMessage="Aucun document à valider.">
                     <listhead>

@@ -21,6 +21,11 @@ public class DocumentConcoursGestion {
         return getService().getAllActive();
     }
 
+    public static List<DocumentConcours> findAllIncludingInactive() {
+        log.info("[Gestion] DocumentConcours: findAll (including inactive)");
+        return getService().getAll();
+    }
+
     public static DocumentConcours findById(Integer id) {
         return getService().getById(id);
     }
@@ -37,5 +42,4 @@ public class DocumentConcoursGestion {
         return getService().search(q);
     }
 }
-
 

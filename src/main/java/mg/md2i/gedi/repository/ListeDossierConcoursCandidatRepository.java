@@ -62,4 +62,9 @@ public interface ListeDossierConcoursCandidatRepository extends JpaRepository<Li
             "GROUP BY concours.concoursId, f.code, concours.avisConcours, concours.numeroArrete " +
             "ORDER BY COUNT(e) DESC")
     List<Object[]> countByConcours();
+
+    @Query("SELECT e.etatDocument, COUNT(e) FROM ListeDossierConcoursCandidat e " +
+           "JOIN e.candidat c " +
+           "WHERE e.actif = 1 AND c.concoursId = :concoursId GROUP BY e.etatDocument")
+    List<Object[]> countByEtatAndConcours(@Param("concoursId") Integer concoursId);
 }

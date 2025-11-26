@@ -44,6 +44,11 @@ html, body {
   padding: 24px 40px;
 }
 
+.page-container {
+  min-height: 0;
+  overflow: auto;
+}
+
 /* ---- ADMIN SHELL ---- */
 .admin-shell {
   background: var(--bg);
@@ -62,6 +67,28 @@ html, body {
   background: var(--bg);
   min-height: 0;
   padding: 24px 32px;
+}
+
+/* ---- AUDIT PAGE HELPERS ---- */
+.audit-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  grid-gap: 12px;
+  width: 100%;
+}
+
+.audit-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+}
+
+.table-scroll {
+  overflow: auto;
+}
+
+.listbox-thread.data-table .z-listcell {
+  white-space: nowrap;
 }
 
 /* ---- SIDEBAR ---- */
@@ -1263,4 +1290,8 @@ html, body {
 
 .permission-grid {
     min-height: 0;
+}
+.table-scroll {
+    overflow: auto; /* Or overflow-y: scroll; */
+    position: relative; /* Often needed for correct layout calculation */
 }

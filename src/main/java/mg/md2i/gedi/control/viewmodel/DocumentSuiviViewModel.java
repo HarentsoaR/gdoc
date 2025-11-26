@@ -10,12 +10,17 @@ import mg.md2i.gedi.gestionmetier.CentreExamenGestion;
 import mg.md2i.gedi.gestionmetier.ConcoursGestion;
 import mg.md2i.gedi.gestionmetier.DocumentConcoursGestion;
 import mg.md2i.gedi.gestionmetier.ListeDossierConcoursCandidatGestion;
+import mg.md2i.gedi.util.ArchiveUtils;
+import mg.md2i.gedi.util.RoleUtils;
 import mg.md2i.gedi.viewmodel.dto.DocumentEtatFilterOption;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.*;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Filedownload;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,15 +43,43 @@ public class DocumentSuiviViewModel {
     private boolean filtersVisible = false;
     private DossierRow selectedDossier;
     private boolean detailsModalVisible = false;
+    private Integer focusedCandidatId;
+    private String focusedCandidatName;
+    private boolean detailMode = false;
+    private boolean accessAllowed = false;
 
     @Init
     public void init() {
+        accessAllowed = RoleUtils.canSeeSuiviGlobal();
+        if (!accessAllowed) {
+            Clients.showNotification("Accès réservé au RSP-Concours ou à l'administrateur.", "warning", null, "top_center", 2500);
+            BindUtils.postGlobalCommand(null, null, "navigateToGlobal", new HashMap<String, Object>() {{
+                put("view", "/documents/views/dashboard.zul");
+                put("label", "Mes Documents");
+            }});
+            return;
+        }
         concoursList = ConcoursGestion.findAll();
         centreList = CentreExamenGestion.findAll();
         documentTypes = DocumentConcoursGestion.findAll();
+        restoreDetailContext();
         buildEtatOptions();
         selectedEtatFilter = etatFilterOptions.get(0); // Tous par défaut
         loadDossiers();
+    }
+
+    private void restoreDetailContext() {
+        Object candidateAttr = Executions.getCurrent().getAttribute("suiviCandidateId");
+        if (candidateAttr instanceof Number) {
+            focusedCandidatId = ((Number) candidateAttr).intValue();
+            detailMode = true;
+        }
+        Object candidateNameAttr = Executions.getCurrent().getAttribute("suiviCandidateName");
+        if (candidateNameAttr instanceof String) {
+            focusedCandidatName = (String) candidateNameAttr;
+        }
+        Executions.getCurrent().removeAttribute("suiviCandidateId");
+        Executions.getCurrent().removeAttribute("suiviCandidateName");
     }
 
     private void buildEtatOptions() {
@@ -63,6 +96,13 @@ public class DocumentSuiviViewModel {
                 selectedConcours != null ? selectedConcours.getConcoursId() : null,
                 selectedCentre != null ? selectedCentre.getCentreExamenId() : null,
                 searchNomCandidat);
+
+        if (focusedCandidatId != null) {
+            raw = raw.stream()
+                    .filter(doc -> doc.getCandidat() != null
+                            && Objects.equals(doc.getCandidat().getCandidatId(), focusedCandidatId))
+                    .collect(Collectors.toList());
+        }
 
         Integer code = (selectedEtatFilter != null && selectedEtatFilter.getEtat() != null)
                 ? selectedEtatFilter.getEtat().getCode()
@@ -84,7 +124,7 @@ public class DocumentSuiviViewModel {
                 .collect(Collectors.toList());
 
         summaryStats = SummaryStats.fromDossiers(dossiers);
-        selectedDossier = null;
+        selectedDossier = detailMode && !dossiers.isEmpty() ? dossiers.get(0) : null;
         detailsModalVisible = false;
     }
 
@@ -113,10 +153,19 @@ public class DocumentSuiviViewModel {
     }
 
     @Command
-    @NotifyChange({"selectedDossier", "detailsModalVisible"})
-    public void openDossierDetails(@BindingParam("row") DossierRow row) {
-        selectedDossier = row;
-        detailsModalVisible = row != null;
+    public void openDossier(@BindingParam("row") DossierRow row) {
+        if (row == null || row.getCandidatId() == null) {
+            Clients.showNotification("Dossier introuvable", "warning", null, "top_center", 2000);
+            return;
+        }
+        Executions.getCurrent().setAttribute("suiviCandidateId", row.getCandidatId());
+        Executions.getCurrent().setAttribute("suiviCandidateName", row.getCandidatLabel());
+        BindUtils.postGlobalCommand(null, null, "navigateToGlobal", new HashMap<String, Object>() {{
+            put("view", "/documents/views/concours/suivi-dossier-detail.zul");
+            put("section", "Concours");
+            put("page", "Suivi dossiers \u203A Dossier");
+            put("label", "Dossier candidat");
+        }});
     }
 
     @Command
@@ -140,6 +189,51 @@ public class DocumentSuiviViewModel {
         } catch (Exception e) {
             Clients.showNotification("Impossible de télécharger le fichier.", "error", null, "top_center", 2500);
         }
+    }
+
+    @Command
+    public void downloadDossierAsZip(@BindingParam("format") String format) {
+        downloadCurrentDossier();
+    }
+
+    @Command
+    public void downloadCurrentDossier() {
+        if (selectedDossier == null) {
+            Clients.showNotification("Aucun dossier sélectionné", "warning", null, "top_center", 2000);
+            return;
+        }
+        try {
+            File zipFile = createDossierArchive(selectedDossier);
+            if (zipFile != null && zipFile.exists()) {
+                Filedownload.save(zipFile, "application/zip");
+            } else {
+                Clients.showNotification("Impossible de créer l'archive", "error", null, "top_center", 2500);
+            }
+        } catch (Exception e) {
+            Clients.showNotification("Erreur lors de la création de l'archive: " + e.getMessage(), "error", null, "top_center", 3000);
+        }
+    }
+
+    private File createDossierArchive(DossierRow dossier) throws IOException {
+        List<ArchiveUtils.ArchiveEntry> entries = dossier.getDocuments().stream()
+                .filter(DocumentItem::hasAttachment)
+                .map(doc -> new ArchiveUtils.ArchiveEntry(doc.getLabel(), new File(doc.getPath())))
+                .collect(Collectors.toList());
+
+        if (entries.isEmpty()) {
+            Clients.showNotification("Aucun fichier à archiver dans ce dossier", "warning", null, "top_center", 2500);
+            return null;
+        }
+
+        Candidat candidat = dossier.getCandidat();
+        String numInscription = candidat != null && candidat.getNumInscription() != null
+                ? String.format("%05d", candidat.getNumInscription())
+                : "N/A";
+        String candidateName = ArchiveUtils.sanitizeFileName(dossier.getCandidatLabel());
+        String concoursInfo = ArchiveUtils.sanitizeFileName(dossier.getConcoursLabel());
+        String archiveName = String.format("DOSSIER_%s_%s_%s", numInscription, candidateName, concoursInfo);
+
+        return ArchiveUtils.buildArchive(archiveName, entries);
     }
 
     public List<DossierRow> getDossiers() {
@@ -220,8 +314,47 @@ public class DocumentSuiviViewModel {
         return selectedDossier;
     }
 
+    public List<DocumentItem> getSelectedDocuments() {
+        if (selectedDossier == null) {
+            return Collections.emptyList();
+        }
+        return selectedDossier.getDocuments();
+    }
+
     public boolean isDetailsModalVisible() {
         return detailsModalVisible;
+    }
+
+    public boolean isDetailMode() {
+        return detailMode;
+    }
+
+    public String getFocusedCandidatName() {
+        return focusedCandidatName;
+    }
+
+    public String getDetailTitle() {
+        if (detailMode && selectedDossier != null) {
+            return "Dossier " + selectedDossier.getReference();
+        }
+        return "Dossier candidat";
+    }
+
+    public String getDetailSubtitle() {
+        if (detailMode && selectedDossier != null) {
+            return "Détails et pièces de " + Optional.ofNullable(selectedDossier.getCandidatLabel()).orElse("candidat");
+        }
+        return "Consultez les pièces et téléchargez le dossier";
+    }
+
+    @Command
+    public void backToSuivi() {
+        BindUtils.postGlobalCommand(null, null, "navigateToGlobal", new HashMap<String, Object>() {{
+            put("view", "/documents/views/concours/suivi-dossiers.zul");
+            put("section", "Concours");
+            put("page", "Suivi dossiers");
+            put("label", "Suivi dossiers");
+        }});
     }
 
     public static class DossierRow {
@@ -290,6 +423,10 @@ public class DocumentSuiviViewModel {
             return candidatId;
         }
 
+        public Candidat getCandidat() {
+            return candidat;
+        }
+
         public String getReference() {
             String num = Optional.ofNullable(candidat)
                     .map(Candidat::getNumInscription)
@@ -343,6 +480,18 @@ public class DocumentSuiviViewModel {
         public long getValides() { return valides; }
         public long getRejetes() { return rejetes; }
         public long getEnCours() { return enCours; }
+
+        public String getValidesLabel() {
+            return valides + " validés";
+        }
+
+        public String getEnCoursLabel() {
+            return enCours + " en cours";
+        }
+
+        public String getRejetesLabel() {
+            return rejetes + " rejetés";
+        }
 
         public boolean isFullyValidated() {
             return valideEtComplets();

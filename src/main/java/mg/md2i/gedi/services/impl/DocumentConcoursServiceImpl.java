@@ -20,6 +20,11 @@ public class DocumentConcoursServiceImpl implements DocumentConcoursService {
     }
 
     @Override
+    public List<DocumentConcours> getAll() {
+        return repository.findAll();
+    }
+
+    @Override
     public DocumentConcours getById(Integer id) {
         return repository.findById(id).orElse(null);
     }
@@ -43,5 +48,4 @@ public class DocumentConcoursServiceImpl implements DocumentConcoursService {
         return repository.findByLibelleContainingIgnoreCase(query);
     }
 }
-
 

@@ -6,6 +6,7 @@ import java.util.List;
 public interface UserService {
     List<Utilisateur> getAllUsers();
     Utilisateur getUserById(Integer id);
+    Utilisateur getUserByLogin(String login);
     Utilisateur saveUser(Utilisateur user);
     void deleteUser(Integer id);
     Utilisateur toggleUserStatus(Integer userId);

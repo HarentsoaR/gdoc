@@ -17,6 +17,7 @@
 </hlayout>
 
             <button label="Importer" sclass="btn-import" iconSclass="z-icon-upload"
+                    visible="@load(vm.canImportDocuments)"
                     onClick="@global-command('navigateToGlobal', view='/documents/views/import/import-view.zul', label='Centre d\'Importation')" />
         </div>
     </div>

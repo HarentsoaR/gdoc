@@ -20,6 +20,11 @@ public class ConcoursServiceImpl implements ConcoursService {
     }
 
     @Override
+    public List<Concours> getAll() {
+        return repository.findAll();
+    }
+
+    @Override
     public Concours getById(Integer id) {
         return repository.findById(id).orElse(null);
     }
@@ -53,5 +58,4 @@ public class ConcoursServiceImpl implements ConcoursService {
         return repository.findDistinctNumeroArrete();
     }
 }
-
 

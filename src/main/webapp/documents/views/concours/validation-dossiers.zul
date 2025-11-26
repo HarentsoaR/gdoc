@@ -68,15 +68,22 @@
                             sclass="pill-btn pill-btn--ghost btn-sm"
                             onClick="@command('toggleSummarySelection')"
                             disabled="@load(empty vm.dossierSummaries)"/>
+                    <button label="Télécharger" sclass="pill-btn pill-btn--ghost btn-sm"
+                            iconSclass="z-icon-download"
+                            disabled="@load(empty vm.selectedSummaryRows)"
+                            onClick="@command('downloadSummarySelection')"/>
                     <button label="Valider" sclass="pill-btn pill-btn--primary btn-sm"
+                            visible="@load(vm.canValidate)"
                             onClick="@command('bulkUpdateSummaries', etat=1)"
-                            disabled="@load(empty vm.selectedSummaryRows)"/>
+                            disabled="@load(empty vm.selectedSummaryRows or not vm.canValidate)"/>
                     <button label="Rejeter" sclass="pill-btn pill-btn--danger btn-sm"
+                            visible="@load(vm.canValidate)"
                             onClick="@command('bulkUpdateSummaries', etat=0)"
-                            disabled="@load(empty vm.selectedSummaryRows)"/>
+                            disabled="@load(empty vm.selectedSummaryRows or not vm.canValidate)"/>
                     <button label="Revoir" sclass="pill-btn pill-btn--ghost btn-sm"
+                            visible="@load(vm.canValidate)"
                             onClick="@command('bulkUpdateSummaries', etat=2)"
-                            disabled="@load(empty vm.selectedSummaryRows)"/>
+                            disabled="@load(empty vm.selectedSummaryRows or not vm.canValidate)"/>
                 </div>
             </div>
 
@@ -84,6 +91,7 @@
                 <listbox model="@load(vm.dossierSummaries)" sizedByContent="true"
                          checkmark="true" multiple="true"
                          selectedItems="@bind(vm.selectedSummaryRows)"
+                         onCheckSelect="@command('updateSummarySelection')"
                          vflex="1" hflex="1" sclass="listbox-thread data-table"
                          emptyMessage="Aucun dossier à afficher avec ces filtres.">
                     <listhead>

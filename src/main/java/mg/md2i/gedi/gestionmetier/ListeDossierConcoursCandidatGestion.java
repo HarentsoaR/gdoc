@@ -53,7 +53,24 @@ public class ListeDossierConcoursCandidatGestion {
     }
 
     public static void hardDelete(Integer id) {
+        if (id == null) return;
+        // deindex first
         luceneService.deleteDocument(id.longValue());
+        // delete associated file from storage if present
+        try {
+            ListeDossierConcoursCandidat entity = getService().getById(id);
+            if (entity != null && entity.getRemarqueFacultatif() != null) {
+                java.io.File f = new java.io.File(entity.getRemarqueFacultatif());
+                if (f.exists()) {
+                    f.delete();
+                    // clean up empty parent directory
+                    java.io.File parent = f.getParentFile();
+                    if (parent != null && parent.isDirectory() && parent.list() != null && parent.list().length == 0) {
+                        parent.delete();
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
         getService().hardDelete(id);
     }
     

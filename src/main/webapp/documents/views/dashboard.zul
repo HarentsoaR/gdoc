@@ -1,84 +1,108 @@
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:n="native">
-    <!-- 
-      NOUVEAU DASHBOARD - Inspiré de Google Drive
-      - Structure en sections claires (Dossiers, Fichiers).
-      - Utilise un listbox stylé pour la liste des fichiers.
-    -->
-    <div hflex="1" vflex="1" sclass="content-area dashboard"
+    <div hflex="1" vflex="1" sclass="page-container"
          viewModel="@id('vm') @init('mg.md2i.gedi.control.viewmodel.DashboardViewModel')">
 
-        <!-- 1. En-tête de page -->
-        <div sclass="page-header">
-            <label value="Bienvenue dans GEDI Drive" sclass="page-title"/>
-            <button sclass="btn-icon" iconSclass="z-icon-info-circle" />
-        </div>
-
-        <!-- 2. Section: Dossiers Suggérés (Cartes Horizontales) -->
-        <div sclass="dashboard-section">
-            <div sclass="section-header">
-                <button sclass="btn-icon section-toggle"
-                        iconSclass="@load(vm.showRecentFolders ? 'z-icon-angle-down' : 'z-icon-angle-right')"
-                        onClick="@command('toggle', key='folders')" />
-                <label value="Dossiers Récents" sclass="section-title" />
-            </div>
-            <!-- NOTE: On suppose que vm.recentFolders est une liste de vos dossiers -->
-            <div sclass="suggested-folders-grid" visible="@load(vm.showRecentFolders)">
-                 <forEach items="@load(vm.recentFolders)" var="doc">
-                    <include src="/documents/components/documentCard.zul" doc="${doc}" />
-                </forEach>
-            </div>
-        </div>
-
-        <!-- 3. Section: Fichiers Suggérés (Liste Verticale) -->
-        <div sclass="dashboard-section" vflex="1">
-            <div sclass="section-header">
-                 <button sclass="btn-icon section-toggle"
-                         iconSclass="@load(vm.showRecentFiles ? 'z-icon-angle-down' : 'z-icon-angle-right')"
-                         onClick="@command('toggle', key='files')" />
-                <label value="Fichiers Récents" sclass="section-title" />
-                <space hflex="1" />
-                <!-- TODO: Ajouter le toggle List/Grid view plus tard -->
+        <vlayout hflex="1" vflex="1" style="gap: 12px;">
+            <div sclass="page-header">
+                <div>
+                    <label value="Accueil Concours" sclass="page-title"/>
+                    <label value="@load('Actualisé : '.concat(vm.lastRefreshLabel))" sclass="page-subtitle"/>
+                </div>
+                <hlayout style="gap: 8px;">
+                    <button label="Suivi dossiers" sclass="btn btn-secondary"
+                            iconSclass="z-icon-line-chart"
+                            onClick="@command('goToSuivi')"/>
+                    <button label="Actualiser" sclass="btn"
+                            iconSclass="z-icon-refresh"
+                            onClick="@command('refreshDashboard')"/>
+                </hlayout>
             </div>
 
-            <!-- Conteneur de la liste pour qu'elle prenne la hauteur restante -->
-            <div sclass="data-table-container file-list-table" vflex="1" visible="@load(vm.showRecentFiles)">
-                 <!-- NOTE: On suppose que vm.recentFiles est une liste de vos fichiers -->
-                <listbox model="@load(vm.recentFiles)" sclass="data-table" vflex="1" hflex="1" emptyMessage="Aucun document récent.">
-                    <listhead sclass="data-table-header">
-                        <listheader label="Nom" />
-                        <listheader label="Dernière modification" width="250px" />
-                        <listheader label="Emplacement" width="250px" />
-                        <listheader label="" width="80px" align="center" />
-                    </listhead>
-                    <template name="model" var="file">
-                        <listitem sclass="data-table-row">
-                            <listcell sclass="data-table-cell">
-                                <hlayout valign="center" spacing="12px">
-                                    <!-- Icône dynamique basée sur le type de fichier -->
-                                    <n:i sclass="@load(file.type eq 'pdf' ? 'z-icon-file-pdf-o file-icon-pdf' : 'z-icon-file-o file-icon-default')" />
-                                    <label value="@load(file.titre)" />
-                                </hlayout>
-                            </listcell>
-                            <listcell sclass="data-table-cell text-muted" label="@load('Modifié par vous • '.concat(file.dateUpload))" />
-                            <listcell sclass="data-table-cell text-muted">
-                                <hlayout valign="center" spacing="8px">
-                                    <n:i sclass="z-icon-folder" />
-                                    <label value="@load(file.emplacement)" />
-                                </hlayout>
-                            </listcell>
-                            <listcell sclass="data-table-cell actions-cell">
-                                <hlayout spacing="6px">
-                                    <button sclass="btn-icon" iconSclass="z-icon-eye" tooltiptext="Voir"
-                                            onClick="@command('viewFile', doc=file)" />
-                                    <button sclass="btn-icon" iconSclass="z-icon-download" tooltiptext="Télécharger"
-                                            onClick="@command('downloadFile', doc=file)" />
-                                    <button sclass="btn-icon" iconSclass="z-icon-ellipsis-v" tooltiptext="Plus" />
-                                </hlayout>
-                            </listcell>
-                        </listitem>
-                    </template>
-                </listbox>
+           <!-- <div sclass="panel action-bar">
+                <hlayout style="gap: 10px; align-items: center;">
+                    <label value="Actions rapides" sclass="section-title"/>
+                    <space hflex="1"/>
+                    <button label="Valider dossiers" sclass="btn btn-primary"
+                            iconSclass="z-icon-check"
+                            onClick="@command('goToValidationDossiers')"/>
+                    <button label="Valider documents" sclass="btn"
+                            iconSclass="z-icon-file-text"
+                            onClick="@command('goToValidationDocuments')"/>
+                    <button label="Suivi des dossiers" sclass="btn"
+                            iconSclass="z-icon-eye"
+                            onClick="@command('goToSuivi')"/>
+                    <button label="Gérer les concours" sclass="btn"
+                            iconSclass="z-icon-cubes"
+                            onClick="@command('goToConcoursList')"/>
+                    <button label="Dépôt candidat" sclass="btn btn-secondary"
+                            iconSclass="z-icon-upload"
+                            onClick="@command('goToUpload')"/>
+                </hlayout>
             </div>
-        </div>
+            -->
+
+            <hlayout hflex="1" style="gap: 12px;">
+                <div sclass="panel" hflex="1" vflex="1">
+                    <label value="État des dossiers" sclass="section-title"/>
+                    <vlayout style="gap: 10px; margin-top: 8px;">
+                        <forEach items="@load(vm.dossierStatusStats)" var="stat">
+                            <vlayout>
+                                <hlayout style="gap: 8px; align-items: center;">
+                                    <label value="@load(stat.label)" sclass="list-title"/>
+                                    <space hflex="1"/>
+                                <label value="@load(stat.count)" sclass="text-muted"/>
+                                <label value="@load(stat.percentLabel)" sclass="text-muted"/>
+                            </hlayout>
+                            <div sclass="progress-shell">
+                                <div sclass="@load('progress-bar '.concat(stat.sclass))" style="@load(stat.widthStyle)"></div>
+                            </div>
+                        </vlayout>
+                    </forEach>
+                </vlayout>
+            </div>
+            </hlayout>
+
+            <hlayout hflex="1" vflex="1" style="gap: 12px;">
+                <div sclass="panel" hflex="1" vflex="1">
+                    <hlayout style="align-items: center; gap: 8px;">
+                        <label value="Documents récents" sclass="section-title"/>
+                        <space hflex="1"/>
+                        <button label="Actualiser" sclass="btn btn-ghost btn-sm"
+                                iconSclass="z-icon-refresh"
+                                onClick="@command('refreshDashboard')"/>
+                    </hlayout>
+                    <listbox model="@load(vm.recentDocuments)" vflex="1" hflex="1"
+                             sizedByContent="false"
+                             emptyMessage="Aucun document récent."
+                             sclass="listbox-thread data-table"
+                             mold="paging" pageSize="6">
+                        <listhead>
+                            <listheader label="Type" hflex="2"/>
+                            <listheader label="Taille" width="120px"/>
+                            <listheader label="Importé le" width="180px"/>
+                            <listheader label="" width="80px"/>
+                        </listhead>
+                        <template name="model" var="doc">
+                            <listitem>
+                                <listcell>
+                                    <label value="@load(doc.title)" sclass="list-title text-ellipsis"/>
+                                </listcell>
+                                <listcell>
+                                    <label value="@load(doc.sizeLabel)" sclass="text-muted"/>
+                                </listcell>
+                                <listcell>
+                                    <label value="@load(doc.importDateLabel)" sclass="text-muted"/>
+                                </listcell>
+                                <listcell>
+                                    <button sclass="btn-icon" iconSclass="z-icon-download"
+                                            tooltiptext="Télécharger"
+                                            onClick="@command('downloadFile', doc=doc)"/>
+                                </listcell>
+                            </listitem>
+                        </template>
+                    </listbox>
+                </div>
+            </hlayout>
+        </vlayout>
     </div>
 </zk>

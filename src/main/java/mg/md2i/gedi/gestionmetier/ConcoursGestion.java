@@ -21,6 +21,11 @@ public class ConcoursGestion {
         return getService().getAllActive();
     }
 
+    public static List<Concours> findAllIncludingInactive() {
+        log.info("[Gestion] Concours: findAll (including inactive)");
+        return getService().getAll();
+    }
+
     public static Concours findById(Integer id) {
         return getService().getById(id);
     }
@@ -45,5 +50,4 @@ public class ConcoursGestion {
         return getService().getDistinctNumeros();
     }
 }
-
 

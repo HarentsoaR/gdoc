@@ -67,7 +67,7 @@
                                       width="100%"
                                       constraint="no empty: La promotion est obligatoire">
                                 <template name="model">
-                                    <comboitem label="@load(each.libelle)"/>
+                                    <comboitem label="@load(each.displayLibelle)"/>
                                 </template>
                             </combobox>
                         </cell>

@@ -135,7 +135,18 @@ public class Promotion implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Override
 	public String toString(){
-		return numeroPromotion +" EME promotion ";
+		return getDisplayLibelle();
+	}
+	
+	public String getDisplayLibelle() {
+		String numero = numeroPromotion != null ? numeroPromotion.trim() : "";
+		if (!numero.isEmpty()) {
+			return numero + " EME PROMOTION";
+		}
+		if (libelle != null && !libelle.trim().isEmpty()) {
+			return libelle.trim();
+		}
+		return "Promotion";
 	}
 	
 	public Integer getAnneeConcours() {

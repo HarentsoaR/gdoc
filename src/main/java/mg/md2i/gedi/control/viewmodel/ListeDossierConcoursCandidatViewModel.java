@@ -37,7 +37,8 @@ public class ListeDossierConcoursCandidatViewModel {
     public void init() {
         allConcours = ConcoursGestion.findAll();
         allCentresExamen = CentreExamenGestion.findAll();
-        allDocumentTypes = DocumentConcoursGestion.findAll();
+        // Include inactive document types to display folders like CV still linked to dossiers
+        allDocumentTypes = DocumentConcoursGestion.findAllIncludingInactive();
         navigateToRoot();
     }
 

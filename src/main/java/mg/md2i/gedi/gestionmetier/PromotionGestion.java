@@ -28,6 +28,10 @@ public class PromotionGestion {
         getService().save(promotion);
     }
 
+    public static boolean existsActiveDuplicate(Promotion promotion) {
+        return getService().existsActiveDuplicate(promotion);
+    }
+
     public static void delete(Integer id) {
         getService().softDelete(id);
     }

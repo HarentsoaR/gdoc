@@ -83,6 +83,14 @@
                     <label value="@load(vm.candidatViewModel.detailDisplayName)" sclass="detail-title"/>
                     <label value="@load(vm.candidatViewModel.detailConcoursLabel)" sclass="detail-subtitle"/>
                 </div>
+                <div sclass="header-actions">
+                    <button label="Télécharger tous les documents (ZIP)" 
+                            sclass="enmg-btn enmg-btn-primary" 
+                            iconSclass="z-icon-download"
+                            onClick="@command('downloadCandidatDocumentsAsZip')"
+                            tooltiptext="Télécharger tous les documents du candidat en format ZIP"
+                            visible="@load(not empty vm.candidatViewModel.detailDocuments)"/>
+                </div>
             </div>
             <div class="detail-grid">
                 <div>
